@@ -1,10 +1,11 @@
-import React from 'react';
-import { View, Text } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { View, Text, Animated, Pressable, Alert } from 'react-native';
 import styled from 'styled-components';
-import { AppleButton } from '@invertase/react-native-apple-authentication';
+import { request, PERMISSIONS } from 'react-native-permissions';
 import { getIconFromLabel } from '../utils/icon';
 import { useDispatch } from 'react-redux';
 import { continueWithApple } from '../stores/user/userSlice';
+import { speak } from '../utils/speak';
 
 const Container = styled.View`
   flex: 1;
@@ -22,25 +23,61 @@ const Login = () => {
     dispatch(continueWithApple());
   };
 
+  const startConversation = async () => {
+    const response = await request(PERMISSIONS.IOS.MICROPHONE);
+    if (response === 'granted') {
+      speak('Hello, how can I help you?');
+    } else {
+      Alert.alert('Permission Denied', 'Please allow microphone access to continue');
+    }
+  };
+
+  const translateY = useRef(new Animated.Value(0)).current; // Start off-screen
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial opacity is 0
+
+  useEffect(() => {
+    // Start the logo animation when the component mounts
+    Animated.timing(translateY, {
+      toValue: -100, // Adjust this value to the final position
+      duration: 1000,
+      useNativeDriver: true,
+    }).start(() => {
+      // After the logo animation is finished, start the text fade-in
+      Animated.timing(fadeAnim, {
+        toValue: 1, // Final opacity is 1
+        duration: 1200,
+        useNativeDriver: true,
+      }).start();
+    });
+  }, [translateY, fadeAnim]);
+
   return (
     <Container>
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Animated.View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          transform: [{ translateY }],
+        }}>
         <Icon />
-        <Text style={{ color: '#fff', fontWeight: 500, marginTop: 10, fontSize: 20 }}>
-          Welcome to <Text style={{ color: '#E66642', fontWeight: 700 }}>Sabio</Text>
+        <Text style={{ color: '#fff', fontWeight: '500', marginTop: 10, fontSize: 25, marginBottom: 50 }}>
+          Welcome to <Text style={{ color: '#E66642', fontWeight: '700' }}>Sabio</Text>
         </Text>
-      </View>
-      <View style={{ flex: 0.2, justifyContent: 'center', alignItems: 'center' }}>
-        <AppleButton
-          buttonStyle={AppleButton.Style.BLACK}
-          buttonType={AppleButton.Type.SIGN_IN}
+        <Animated.Text
           style={{
-            width: 300,
-            height: 50,
-          }}
-          onPress={() => onAppleButtonPress()}
+            color: '#fff',
+            fontWeight: '500',
+            fontSize: 18,
+            opacity: fadeAnim,
+          }}>
+          Tap to start a conversation with Sabio
+        </Animated.Text>
+        <Pressable
+          onPress={startConversation}
+          style={{ width: 200, height: 50, backgroundColor: 'grey', borderRadius: 8, marginTop: '40%' }}
         />
-      </View>
+      </Animated.View>
     </Container>
   );
 };

@@ -4,6 +4,7 @@ import Garmin from '../components/icons/brands/Garmin';
 import Fitbit from '../components/icons/brands/Fitbit';
 import Strava from '../components/icons/brands/Strava';
 import Stop from '../components/icons/general/Stop';
+import Mind from '../components/icons/general/Mind';
 
 export const ICONS = [
   { label: 'LogoLarge', icon: LogoLarge },
@@ -12,6 +13,7 @@ export const ICONS = [
   { label: 'fitbit', icon: Fitbit },
   { label: 'strava', icon: Strava },
   { label: 'stop', icon: Stop },
+  { label: 'mind', icon: Mind },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;
