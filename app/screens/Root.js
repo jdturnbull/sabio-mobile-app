@@ -5,8 +5,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LottieView from 'lottie-react-native';
 import { useNetInfo } from '@react-native-community/netinfo';
 import { useSelector } from 'react-redux';
-import { useDatabase } from '../data/database';
 import Login from './Login';
+import Onboarding from './Onboarding';
 
 const fadeTransition = {
   animation: 'timing',
@@ -63,15 +63,14 @@ const AppStack = createNativeStackNavigator();
 const AuthedStack = createNativeStackNavigator();
 
 const AuthedApp = () => {
-  const database = useDatabase();
   const { isConnected } = useNetInfo();
 
-  const user = useObservable(database.collections.get('user').findAndObserve('USER'));
+  const { user } = useSelector((state) => state.user.session);
 
   return (
     <React.Fragment>
       <AuthedStack.Navigator screenOptions={{ headerShown: false, ...CustomTransition }}>
-        {user.onboardingComplete ? (
+        {user.onboarded ? (
           <AuthedStack.Screen name="Main" component={Main} />
         ) : (
           <AuthedStack.Screen name="Onboarding" component={Onboarding} />

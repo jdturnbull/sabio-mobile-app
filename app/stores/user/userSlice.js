@@ -7,63 +7,51 @@ import call from '../../utils/call';
 
 export const setup = createAsyncThunk('user/setup', async () => {
   try {
-    const database = useDatabase();
-    const session = JSON.parse(await AsyncStorage.getItem('session'));
+    const session = await AsyncStorage.getItem('session');
 
     if (session) {
-      const uRes = await database.collections.get('user').query().fetch();
-      const user = await call('GET', `users/${session.userId}`);
+      const { id } = JSON.parse(session);
+      const valid = await call('GET', `users/session/${id}`);
 
-      if (uRes.length === 0) {
-        // Add user
-        await database.collections.get('user').create((record) => {});
-
-        // Sync
-        // await sync();
+      if (valid) {
+        return { session: JSON.parse(session) };
       }
+
+      await AsyncStorage.removeItem('session');
     }
 
-    return { session };
-  } catch (error) {
-    console.log(error.message);
-  }
+    return { session: null };
+  } catch (error) {}
 });
 
 export const continueWithApple = createAsyncThunk('user/continueWithApple', async () => {
-  const database = useDatabase();
+  const name = 'James Turnbull';
+  const email = 'jdturnbull98@gmail.com';
+  const timezone = RNLocalize.getTimeZone();
 
-  try {
-    const appleAuthResponse = await appleAuth.performRequest({
-      requestedOperation: appleAuth.Operation.LOGIN,
-      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-    });
+  const session = await call('POST', 'users/auth', { identityToken: '123', timezone, email, name });
+  await AsyncStorage.setItem('session', JSON.stringify(session));
 
-    const { email, fullName, identityToken } = appleAuthResponse;
+  return session;
 
-    if (identityToken) {
-      const name = `${fullName.givenName || ''} ${fullName.familyName || ''}`;
-
-      const timezone = RNLocalize.getTimeZone();
-      const session = await call('POST', 'users/auth', { identityToken, timezone, email, name });
-      const user = await call('GET', `users/${session.userId}`);
-
-      await AsyncStorage.setItem('session', JSON.stringify(session));
-
-      await database.action(async () => {
-        await database.collections.get('user').create((record) => {
-          record._raw.id = 'USER';
-          // Add fields from user
-          record._raw._status = 'synced';
-        });
-      });
-
-      // return data
-    } else {
-      // Sign in error
-    }
-  } catch (err) {
-    console.log(err);
-  }
+  // try {
+  //   const appleAuthResponse = await appleAuth.performRequest({
+  //     requestedOperation: appleAuth.Operation.LOGIN,
+  //     requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+  //   });
+  //   const { email, fullName, identityToken } = appleAuthResponse;
+  //   if (identityToken) {
+  //     const name = `${fullName.givenName || ''} ${fullName.familyName || ''}`;
+  //     const timezone = RNLocalize.getTimeZone();
+  //     const session = await call('POST', 'users/auth', { identityToken, timezone, email, name });
+  //     const user = await call('GET', `users/${session.userId}`);
+  //     await AsyncStorage.setItem('session', JSON.stringify(session));
+  //   } else {
+  //     // Error with apple signin
+  //   }
+  // } catch (err) {
+  //   console.log(err);
+  // }
 });
 
 export const counterSlice = createSlice({
@@ -77,16 +65,16 @@ export const counterSlice = createSlice({
   },
   reducers: {},
   extraReducers: (builder) => {
-    builder
-      .addCase(setup.pending, (state, action) => {})
-      .addCase(setup.fulfilled, (state, action) => {
-        state.loaded = true;
-        state.session = action.payload.session;
-      })
-      .addCase(setup.rejected, (state, action) => {});
-    builder
-      .addCase(continueWithApple.pending, (state, action) => {})
-      .addCase(continueWithApple.fulfilled, (state, action) => {});
+    builder.addCase(setup.fulfilled, (state, action) => {
+      state.loaded = true;
+      state.session = action.payload.session;
+      state.signedIn = !!action.payload.session;
+    });
+    builder.addCase(continueWithApple.fulfilled, (state, action) => {
+      state.session = action.payload;
+      state.signedIn = true;
+      state.loaded = true;
+    });
   },
 });
 
