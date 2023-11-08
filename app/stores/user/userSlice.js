@@ -62,8 +62,22 @@ export const counterSlice = createSlice({
     loading: false,
     signedIn: false,
     session: null,
+    onboardingState: {
+      motivations: [],
+      goal: '',
+      ai: {
+        assistant: null,
+        thread: null,
+        messages: [],
+        runId: null,
+      },
+    },
   },
-  reducers: {},
+  reducers: {
+    setOnboardingState: (state, action) => {
+      state.onboardingState = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(setup.fulfilled, (state, action) => {
       state.loaded = true;
@@ -79,6 +93,6 @@ export const counterSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-// export const { increment, decrement, incrementByAmount } = counterSlice.actions;
+export const { setOnboardingState } = counterSlice.actions;
 
 export default counterSlice.reducer;

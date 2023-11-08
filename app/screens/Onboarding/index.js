@@ -1,17 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
-import { getIconFromLabel } from '../../utils/icon';
+import { View, StyleSheet, Animated, useWindowDimensions } from 'react-native';
+import { useSelector } from 'react-redux';
 import FirstScreen from './screens/FirstScreen';
 import SecondScreen from './screens/SecondScreen';
+import ThirdScreen from './screens/ThirdScreen';
+import GoalChat from './screens/GoalChat';
 
 const Onboarding = () => {
   const [step, setStep] = useState(0);
-  const [label, setLabel] = useState('Connect your fitness tracker');
   const slideAnim = useRef(new Animated.Value(0)).current;
+
+  const onboardingState = useSelector((state) => state.user.onboardingState);
+
+  const width = useWindowDimensions().width;
 
   useEffect(() => {
     Animated.timing(slideAnim, {
-      toValue: step * -100,
+      toValue: step * -width,
       duration: 300,
       useNativeDriver: true,
     }).start();
@@ -21,33 +26,20 @@ const Onboarding = () => {
     setStep((currentStep) => currentStep + 1);
   };
 
-  // Render your screens based on the step
-  const renderScreen = () => {
-    switch (step) {
-      case 0:
-        return <FirstScreen handleNext={nextStep} />;
-      case 1:
-        return <SecondScreen />;
-      // Add more cases for additional screens
-    }
-  };
-
-  const Icon = getIconFromLabel('LogoLarge');
-
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Icon />
-        <Text style={styles.label}>{label}</Text>
-      </View>
       <Animated.View
         style={[
           styles.screenContainer,
           {
+            width: width * 4,
             transform: [{ translateX: slideAnim }],
           },
         ]}>
-        {renderScreen()}
+        <FirstScreen handleNext={nextStep} />
+        <SecondScreen handleNext={nextStep} />
+        {onboardingState.goal === 'Custom - Chat with Sabio' && <GoalChat handleNext={nextStep} />}
+        <ThirdScreen handleNext={nextStep} />
       </Animated.View>
     </View>
   );
@@ -60,22 +52,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0f1013',
   },
-  header: {
-    display: 'flex',
-    height: '30%',
-    marginBottom: 50,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  label: {
-    color: '#fff',
-    marginTop: 50,
-    fontSize: 20,
-    fontWeight: '700',
-  },
+
   screenContainer: {
     flex: 1,
     flexDirection: 'row',
-    width: '300%',
+    paddingTop: 80,
   },
 });

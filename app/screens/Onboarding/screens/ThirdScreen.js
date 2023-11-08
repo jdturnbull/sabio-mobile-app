@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const SecondScreen = ({ handleNext }) => {
+const ThirdScreen = ({ handleNext }) => {
   const width = useWindowDimensions().width;
   const dispatch = useDispatch();
 
@@ -56,7 +56,6 @@ const SecondScreen = ({ handleNext }) => {
   const [selected, setSelected] = useState(onboardingState.goal);
 
   const options = [
-    'Custom - Chat with Sabio',
     '5K Run',
     '10K Run',
     'Half Marathon',
@@ -65,6 +64,7 @@ const SecondScreen = ({ handleNext }) => {
     'Olympic Triathlon',
     'Half Ironman',
     'Ironman',
+    'Custom - Chat with Sabio',
   ];
 
   const handlePress = (option) => {
@@ -106,4 +106,4 @@ const SecondScreen = ({ handleNext }) => {
   );
 };
 
-export default SecondScreen;
+export default ThirdScreen;

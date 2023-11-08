@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
-import { StyleSheet, Pressable, Text, useWindowDimensions, Animated } from 'react-native';
+import { StyleSheet, Pressable, Text, Animated } from 'react-native';
 import { getIconFromLabel } from '../../../utils/icon';
 
-const AnimatedPressable = ({ onPress, icon, label }) => {
+const AnimatedPressable = ({ onPress, icon, label, selected }) => {
   const Icon = icon ? getIconFromLabel(icon) : null;
 
   const scaleValue = useRef(new Animated.Value(1)).current;
@@ -23,7 +23,7 @@ const AnimatedPressable = ({ onPress, icon, label }) => {
     }).start();
   };
 
-  const handlePress = () => onPress();
+  const handlePress = () => onPress(label);
 
   return (
     <Animated.View style={{ ...styles.container, transform: [{ scale: scaleValue }] }}>
@@ -35,6 +35,7 @@ const AnimatedPressable = ({ onPress, icon, label }) => {
           styles.pressable,
           {
             opacity: pressed ? 0.8 : 1,
+            borderColor: selected ? '#fff' : '#1F2025',
           },
         ]}>
         {Icon && <Icon />}
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#1F2025',
     borderRadius: 8,
-    width: '80%',
+    width: '100%',
     padding: 15,
     justifyContent: 'flex-start',
     alignItems: 'center',
@@ -71,11 +72,13 @@ const styles = StyleSheet.create({
     elevation: 10,
     marginTop: 10,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#1F2025',
   },
   text: {
     color: '#fff',
     fontWeight: '500',
-    fontSize: 16,
+    fontSize: 17,
     marginLeft: 20,
   },
 });

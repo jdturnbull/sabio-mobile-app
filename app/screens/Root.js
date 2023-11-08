@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LottieView from 'lottie-react-native';
 import { useNetInfo } from '@react-native-community/netinfo';
 import { useSelector } from 'react-redux';
-import Login from './Login';
 import Onboarding from './Onboarding';
 
 const fadeTransition = {
@@ -70,11 +69,7 @@ const AuthedApp = () => {
   return (
     <React.Fragment>
       <AuthedStack.Navigator screenOptions={{ headerShown: false, ...CustomTransition }}>
-        {user.onboarded ? (
-          <AuthedStack.Screen name="Main" component={Main} />
-        ) : (
-          <AuthedStack.Screen name="Onboarding" component={Onboarding} />
-        )}
+        <AuthedStack.Screen name="Main" component={Main} />
       </AuthedStack.Navigator>
       {isConnected === false && <LostConnectionScreen />}
     </React.Fragment>
@@ -89,7 +84,7 @@ const RootApp = () => {
       {signedIn ? (
         <AppStack.Screen name="Authed" component={AuthedApp} />
       ) : (
-        <AppStack.Screen name="Login" component={Login} />
+        <AuthedStack.Screen name="Onboarding" component={Onboarding} />
       )}
     </AppStack.Navigator>
   );
