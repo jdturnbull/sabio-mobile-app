@@ -84,11 +84,11 @@ const ThirdScreen = ({ handleNext }) => {
     <View style={{ ...styles.container, width }}>
       <View style={{ ...styles.headerContainer, width: width * 0.9 }}>
         <Text style={styles.header}>
-          What are you <Text style={{ color: '#E66642', fontWeight: '700' }}>training</Text> for?
+          Let's head to the <Text style={{ color: '#E66642', fontWeight: '700' }}>app</Text>!
         </Text>
-        <Text style={styles.subHeader}>Share with Sabio your race or personal milestone</Text>
+        <Text style={styles.subHeader}>Whooo!</Text>
       </View>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      {/* <GestureHandlerRootView style={{ flex: 1 }}>
         <ScrollView showsVerticalScrollIndicator={false} style={{ ...styles.optionContainer, width: width * 0.9 }}>
           {options.map((option, index) => (
             <AnimatedPressable
@@ -100,7 +100,7 @@ const ThirdScreen = ({ handleNext }) => {
             />
           ))}
         </ScrollView>
-      </GestureHandlerRootView>
+      </GestureHandlerRootView> */}
       <ContinueButton disabled={selected.length === 0} onPress={HandleContinue} />
     </View>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import {
   View,
@@ -12,7 +12,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { ScrollView, GestureHandlerRootView } from 'react-native-gesture-handler';
-import { retrieveAssistant, createThread, retrieveMessages, run, config } from '../../../utils/openai';
+import { retrieveAssistant, createThread, retrieveMessages, run, config, addUserMessage } from '../../../utils/openai';
 import { useDispatch, useSelector } from 'react-redux';
 import { setOnboardingState } from '../../../stores/user/userSlice';
 import { getIconFromLabel } from '../../../utils/icon';
@@ -49,7 +49,7 @@ const UserMessage = ({ message }) => {
   );
 };
 
-const GoalChat = () => {
+const GoalChat = ({ handleNext }) => {
   const dispatch = useDispatch();
   const width = useWindowDimensions().width;
 
@@ -58,12 +58,16 @@ const GoalChat = () => {
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
+  const scrollRef = useRef();
+
+  // Handles setting up the keyboard listeners to animate the input container & scroll up the scrollview
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setKeyboardVisible(true); // or some other action
+      setKeyboardVisible(true);
+      scrollRef.current.scrollToEnd({ animated: true });
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardVisible(false); // or some other action
+      setKeyboardVisible(false);
     });
 
     return () => {
@@ -74,6 +78,7 @@ const GoalChat = () => {
 
   const SendIcon = getIconFromLabel('send');
 
+  // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
     const setup = async () => {
       let assistant = state.ai.assistant;
@@ -111,6 +116,7 @@ const GoalChat = () => {
     setup();
   }, []);
 
+  // Handles adding AI responses to the message thread
   useEffect(() => {
     // Whenever runId is not null there's a message to be added
     if (!state.ai.runId || !state.ai.thread) return;
@@ -123,14 +129,46 @@ const GoalChat = () => {
 
       console.log(runResponse.data.status);
 
-      if (runResponse.data.status === 'completed') {
-        const messages = await retrieveMessages(state.ai.thread.id);
-        dispatch(setOnboardingState({ ...state, ai: { ...state.ai, messages, runId: null } }));
+      // The set goal function is being called
+      if (runResponse.data.status === 'requires_action') {
+        const { tool_calls } = runResponse.data.required_action.submit_tool_outputs;
+        const { arguments: args } = tool_calls[0].function;
+
+        const { _goal } = JSON.parse(args);
+
+        handleNext();
+        dispatch(setOnboardingState({ ...state, goal: _goal }));
         clearInterval(intervalId);
+      }
+
+      if (runResponse.data.status === 'completed') {
+        try {
+          const messages = await retrieveMessages(state.ai.thread.id);
+          dispatch(setOnboardingState({ ...state, ai: { ...state.ai, messages, runId: null } }));
+          setCanSend(true);
+          clearInterval(intervalId);
+        } catch (error) {
+          console.log(`Error retrieving messages (GoalChat.js): ${error.message}`);
+        }
       }
     }, 500);
   }, [state.ai.runId]);
 
+  // Handles initialising the response from the AI to a new user message
+  useEffect(() => {
+    const _run = async () => {
+      const latestMessage = state.ai.messages[state.ai.messages.length - 1];
+
+      if (latestMessage && latestMessage.role === 'user') {
+        const runId = await run(state.ai.thread.id, state.ai.assistant.id);
+        dispatch(setOnboardingState({ ...state, ai: { ...state.ai, runId } }));
+      }
+    };
+
+    _run();
+  }, [state.ai.messages]);
+
+  // Handles animating the width of the input container when the keyboard is shown / hidden
   useEffect(() => {
     Animated.timing(animatedWidth, {
       toValue: isKeyboardVisible ? width * 0.98 : width * 0.9,
@@ -142,13 +180,28 @@ const GoalChat = () => {
   const [userMessage, setUserMessage] = useState('');
   const [opacity] = useState(new Animated.Value(userMessage.split('').length > 0 ? 1 : 0.2));
 
+  // Handles animating the opacity of the send button when text is entered / removed
   useEffect(() => {
+    if (!canSend) return;
     Animated.timing(opacity, {
       toValue: userMessage.split('').length > 0 ? 1 : 0.2,
       duration: 200,
       useNativeDriver: true,
     }).start();
   }, [userMessage]);
+
+  const [canSend, setCanSend] = useState(false);
+
+  const handleSendUserMessage = async () => {
+    setCanSend(false);
+    const success = await addUserMessage(state.ai.thread.id, userMessage);
+
+    if (success) {
+      const messages = await retrieveMessages(state.ai.thread.id);
+      setUserMessage('');
+      dispatch(setOnboardingState({ ...state, ai: { ...state.ai, messages } }));
+    }
+  };
 
   return (
     <View style={{ ...styles.container, width }}>
@@ -158,7 +211,10 @@ const GoalChat = () => {
       <Text style={styles.subHeader}>Chat with Sabio to set your goal</Text>
       <KeyboardAvoidingView behavior="padding">
         <GestureHandlerRootView style={{ flex: 1, alignItems: 'center' }}>
-          <ScrollView showsVerticalScrollIndicator={false} style={{ ...styles.scrollable, width: width * 0.9 }}>
+          <ScrollView
+            ref={scrollRef}
+            showsVerticalScrollIndicator={false}
+            style={{ ...styles.scrollable, width: width * 0.9 }}>
             {state.ai.messages.map((message, index) => {
               if (message?.role === 'assistant') {
                 return <AssistantMessage key={index} message={message.content[0].text.value} />;
@@ -171,7 +227,7 @@ const GoalChat = () => {
         <Animated.View style={{ ...styles.inputContainer, width: animatedWidth }}>
           <TextInput multiline style={styles.input} value={userMessage} onChangeText={(text) => setUserMessage(text)} />
           <View style={{ height: '100%', width: 34 }}>
-            <Pressable style={{ ...styles.inputPressable }}>
+            <Pressable disabled={!canSend} style={{ ...styles.inputPressable }} onPress={handleSendUserMessage}>
               <Animated.View style={{ opacity }}>
                 <SendIcon />
               </Animated.View>
