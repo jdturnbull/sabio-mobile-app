@@ -52,6 +52,7 @@ const UserMessage = ({ message }) => {
 const GoalChat = () => {
   const dispatch = useDispatch();
   const width = useWindowDimensions().width;
+
   const [animatedWidth] = useState(new Animated.Value(width * 0.9));
   const state = useSelector((state) => state.user.onboardingState);
 
@@ -138,6 +139,17 @@ const GoalChat = () => {
     }).start();
   }, [isKeyboardVisible, width]);
 
+  const [userMessage, setUserMessage] = useState('');
+  const [opacity] = useState(new Animated.Value(userMessage.split('').length > 0 ? 1 : 0.2));
+
+  useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: userMessage.split('').length > 0 ? 1 : 0.2,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [userMessage]);
+
   return (
     <View style={{ ...styles.container, width }}>
       <Text style={styles.header}>
@@ -157,10 +169,12 @@ const GoalChat = () => {
           </ScrollView>
         </GestureHandlerRootView>
         <Animated.View style={{ ...styles.inputContainer, width: animatedWidth }}>
-          <TextInput multiline style={styles.input} />
+          <TextInput multiline style={styles.input} value={userMessage} onChangeText={(text) => setUserMessage(text)} />
           <View style={{ height: '100%', width: 34 }}>
-            <Pressable style={styles.inputPressable}>
-              <SendIcon />
+            <Pressable style={{ ...styles.inputPressable }}>
+              <Animated.View style={{ opacity }}>
+                <SendIcon />
+              </Animated.View>
             </Pressable>
           </View>
         </Animated.View>
@@ -199,8 +213,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#1F2025',
-    borderRadius: 10,
+    borderRadius: 20,
     padding: 7,
+    paddingLeft: 15,
     paddingRight: 7,
     paddingBottom: 7,
     marginBottom: 90,
