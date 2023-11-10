@@ -37,6 +37,7 @@ const Container = styled.View`
   shadow-radius: 3px;
   shadow-opacity: 0.3;
   shadow-color: black;
+  height: 85px;
 `;
 
 const Inner = styled(Animated.View)`

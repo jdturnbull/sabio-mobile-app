@@ -2,35 +2,44 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 import * as RNLocalize from 'react-native-localize';
-import { useDatabase } from '../../data/database';
 import call from '../../utils/call';
-import moment from 'moment';
 
 export const setup = createAsyncThunk('user/setup', async () => {
   try {
     const session = await AsyncStorage.getItem('session');
 
     if (session) {
-      const { id } = JSON.parse(session);
-      const valid = await call('GET', `users/session/${id}`);
+      try {
+        const { id } = JSON.parse(session);
+        const valid = await call('GET', `users/session/${id}`);
 
-      if (valid) {
-        return { session: JSON.parse(session) };
+        if (valid) {
+          return { session: JSON.parse(session) };
+        }
+
+        await AsyncStorage.removeItem('session');
+      } catch (error) {
+        console.log(error);
       }
-
-      await AsyncStorage.removeItem('session');
     }
 
     return { session: null };
   } catch (error) {}
 });
 
-export const continueWithApple = createAsyncThunk('user/continueWithApple', async () => {
+export const continueWithApple = createAsyncThunk('user/continueWithApple', async (data) => {
   const name = 'James Turnbull';
   const email = 'jdturnbull98@gmail.com';
   const timezone = RNLocalize.getTimeZone();
 
-  const session = await call('POST', 'users/auth', { identityToken: '123', timezone, email, name });
+  const session = await call('POST', 'users/auth', {
+    identityToken: '123',
+    timezone,
+    email,
+    name,
+    onboardingData: data,
+  });
+
   await AsyncStorage.setItem('session', JSON.stringify(session));
 
   return session;
@@ -63,7 +72,10 @@ export const counterSlice = createSlice({
     loading: false,
     signedIn: false,
     session: null,
-    selectedDate: moment.utc().format('YYYY-MM-DD'),
+    assistant: null,
+    thread: null,
+    messages: [],
+    runId: null,
     onboardingState: {
       motivations: [],
       goal: '',
@@ -78,6 +90,9 @@ export const counterSlice = createSlice({
     },
   },
   reducers: {
+    updateState: (state, action) => {
+      state = { ...state, ...action.payload };
+    },
     setOnboardingState: (state, action) => {
       state.onboardingState = action.payload;
     },
@@ -100,6 +115,6 @@ export const counterSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setOnboardingState, setSelectedDate } = counterSlice.actions;
+export const { setOnboardingState, setSelectedDate, updateState } = counterSlice.actions;
 
 export default counterSlice.reducer;

@@ -23,15 +23,13 @@ const options = {
 };
 
 const TabBar = ({ state, descriptors, navigation }) => {
-  const navigate = useNavigation();
-
   return (
     <View style={styles.container}>
       {state.routes.map((route, index) => {
         const selected = state.index === index;
         const Icon = getIconFromLabel(route.name);
 
-        const handlePress = () => navigate.navigate(route.name);
+        const handlePress = () => navigation.navigate(route.name);
 
         return (
           <Pressable onPress={handlePress} style={{ ...styles.tab }} key={route.name}>

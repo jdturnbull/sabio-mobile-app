@@ -24,9 +24,9 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { setOnboardingState } from '../../../stores/user/userSlice';
 import { getIconFromLabel } from '../../../utils/icon';
-import AssistantMessage from './components/AssistantMessage';
-import UserMessage from './components/UserMessage';
-import LoadingIndicator from './components/LoadingIndicator';
+import AssistantMessage from '../../../components/chat/AssistantMessage';
+import UserMessage from '../../../components/chat/UserMessage';
+import LoadingIndicator from '../../../components/chat/LoadingIndicator';
 import { useNavigation } from '@react-navigation/native';
 
 const GoalChat = () => {

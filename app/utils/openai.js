@@ -42,10 +42,19 @@ export const retrieveAssistant = async (type) => {
   }
 };
 
-export const createThread = async (type) => {
+export const createThread = async (type, id) => {
   if (type === 'goal') {
     try {
       const thread = await axios.post('https://api.openai.com/v1/threads', initial_goal_chat_messages, config);
+      return thread.data;
+    } catch (error) {
+      console.log(`Error creating thread: ${error.message}`);
+    }
+  }
+
+  if (type === 'chat') {
+    try {
+      const thread = await axios.post('https://api.openai.com/v1/threads', initial_chat_messages, config);
       return thread.data;
     } catch (error) {
       console.log(`Error creating thread: ${error.message}`);

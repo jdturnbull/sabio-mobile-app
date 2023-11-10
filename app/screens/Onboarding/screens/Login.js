@@ -10,10 +10,10 @@ const Login = () => {
 
   const opacity = useRef(new Animated.Value(0)).current;
 
-  const state = useSelector((state) => state.user.onboardingState.ai);
+  const state = useSelector((state) => state.user.onboardingState);
 
   const handlePress = () => {
-    dispatch(continueWithApple());
+    dispatch(continueWithApple(state));
   };
 
   const Icon = getIconFromLabel('appleWhite');

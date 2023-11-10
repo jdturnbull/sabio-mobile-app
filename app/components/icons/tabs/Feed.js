@@ -9,12 +9,12 @@ const SvgComponent = (props) => (
     />
     <Path
       fill="#fff"
-      fillOpacity={props.selected ? 0.8 : 0.2}
+      fillOpacity={props.selected ? 0.7 : 0.2}
       d="M15.69 6.25a1.25 1.25 0 0 0 0 2.5h10a1.25 1.25 0 1 0 0-2.5h-10ZM15.69 17.5a1.25 1.25 0 0 0 0 2.5h10a1.25 1.25 0 1 0 0-2.5h-10Z"
     />
     <Path
       fill="#fff"
-      fillOpacity={props.selected ? 1 : 0.3}
+      fillOpacity={props.selected ? 0.8 : 0.3}
       d="M4.31 5.003c-.69 0-1.25.56-1.25 1.25v6.25c0 .69.56 1.25 1.25 1.25h6.25c.69 0 1.25-.56 1.25-1.25v-6.25c0-.69-.56-1.25-1.25-1.25H4.31ZM4.31 16.247c-.69 0-1.25.56-1.25 1.25v6.25c0 .69.56 1.25 1.25 1.25h6.25c.69 0 1.25-.56 1.25-1.25v-6.25c0-.69-.56-1.25-1.25-1.25H4.31Z"
     />
   </Svg>
