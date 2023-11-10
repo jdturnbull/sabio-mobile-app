@@ -1,9 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Text, Animated, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { getIconFromLabel } from '../../../utils/icon';
 import { useNavigation } from '@react-navigation/native';
-
-const Icon = getIconFromLabel('logoMedium');
 
 const Landing = () => {
   const navigation = useNavigation();
@@ -26,8 +23,8 @@ const Landing = () => {
   return (
     <View style={{ ...styles.container, width }}>
       <Animated.View style={{ ...styles.header, width: width * 0.8 }}>
-        <Animated.Text style={{ color: '#fff', fontWeight: '500', fontSize: 40, opacity }}>
-          Welcome to <Text style={{ color: '#E66642', fontWeight: '700' }}>Sabio</Text>
+        <Animated.Text style={{ ...styles.headerText, opacity }}>
+          Welcome to <Text style={{ color: '#E66642', fontWeight: '600' }}>Sabio</Text>
         </Animated.Text>
         <Animated.View style={{ marginTop: 60, fontWeight: 500 }}>
           <Animated.Text style={{ ...styles.subHeader, opacity }}>
@@ -59,6 +56,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
   },
+  headerText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 40,
+  },
   subHeader: {
     lineHeight: 30,
     color: '#fff',
@@ -79,7 +81,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#1F2025',
     borderRadius: 10,
-    padding: 22,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

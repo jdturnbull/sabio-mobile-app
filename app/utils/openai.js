@@ -14,10 +14,24 @@ const initial_goal_chat_messages = JSON.stringify({
   messages: [
     {
       role: 'user',
-      content: "Hi Sabio, I'd like to set a goal",
+      content: 'Hey Sabio!',
     },
   ],
 });
+
+// const { tool_calls } = runResponse.data.required_action.submit_tool_outputs;
+//         const { arguments: args } = tool_calls[0].function;
+
+//         const { _goal } = JSON.parse(args);
+
+export const extractFunctionData = (res) => {
+  const { tool_calls } = res.required_action.submit_tool_outputs;
+  const { arguments: args } = tool_calls[0].function;
+
+  console.log(tool_calls);
+
+  return { name: '', args };
+};
 
 const sortMessagesByDate = (messages) => {
   return _.orderBy(messages, ['created_at'], ['asc']);
@@ -54,15 +68,15 @@ export const retrieveMessages = async (thread_id) => {
   }
 };
 
-export const run = async (thread_id, assistant_id, instructions) => {
-  const body = instructions ? JSON.stringify({ assistant_id, instructions }) : JSON.stringify({ assistant_id });
+export const run = async (thread_id, assistant_id) => {
+  const body = JSON.stringify({ assistant_id });
 
   try {
     const runRequest = await axios.post(`https://api.openai.com/v1/threads/${thread_id}/runs`, body, config);
     return runRequest.data.id;
   } catch (error) {
     console.log(`Error running assistant: ${error.message}`);
-    console.log(`thread_id: ${thread_id}, assistant_id: ${assistant_id}, instructions: ${instructions}`);
+    console.log(`thread_id: ${thread_id}, assistant_id: ${assistant_id}`);
   }
 };
 
