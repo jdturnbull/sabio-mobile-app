@@ -4,6 +4,7 @@ import { appleAuth } from '@invertase/react-native-apple-authentication';
 import * as RNLocalize from 'react-native-localize';
 import { useDatabase } from '../../data/database';
 import call from '../../utils/call';
+import moment from 'moment';
 
 export const setup = createAsyncThunk('user/setup', async () => {
   try {
@@ -62,6 +63,7 @@ export const counterSlice = createSlice({
     loading: false,
     signedIn: false,
     session: null,
+    selectedDate: moment.utc().format('YYYY-MM-DD'),
     onboardingState: {
       motivations: [],
       goal: '',
@@ -79,6 +81,9 @@ export const counterSlice = createSlice({
     setOnboardingState: (state, action) => {
       state.onboardingState = action.payload;
     },
+    setSelectedDate: (state, action) => {
+      state.selectedDate = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(setup.fulfilled, (state, action) => {
@@ -95,6 +100,6 @@ export const counterSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setOnboardingState } = counterSlice.actions;
+export const { setOnboardingState, setSelectedDate } = counterSlice.actions;
 
 export default counterSlice.reducer;

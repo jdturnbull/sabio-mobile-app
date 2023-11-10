@@ -9,6 +9,10 @@ import Stop from '../components/icons/general/Stop';
 import Send from '../components/icons/general/Send';
 import Back from '../components/icons/general/Back';
 import AppleWhite from '../components/icons/brands/AppleWhite';
+import Home from '../components/icons/tabs/Home';
+import Feed from '../components/icons/tabs/Feed';
+import Chat from '../components/icons/tabs/Chat';
+import Settings from '../components/icons/tabs/Settings';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -22,6 +26,10 @@ export const ICONS = [
   { label: 'logoMedium', icon: LogoMedium },
   { label: 'back', icon: Back },
   { label: 'appleWhite', icon: AppleWhite },
+  { label: 'home', icon: Home },
+  { label: 'feed', icon: Feed },
+  { label: 'chat', icon: Chat },
+  { label: 'settings', icon: Settings },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

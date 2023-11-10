@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Text, Animated, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { getIconFromLabel } from '../../../utils/icon';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { continueWithApple } from '../../../stores/user/userSlice';
 
 const Login = () => {
@@ -9,6 +9,8 @@ const Login = () => {
   const width = useWindowDimensions().width;
 
   const opacity = useRef(new Animated.Value(0)).current;
+
+  const state = useSelector((state) => state.user.onboardingState.ai);
 
   const handlePress = () => {
     dispatch(continueWithApple());
