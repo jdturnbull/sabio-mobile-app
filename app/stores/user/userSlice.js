@@ -65,6 +65,7 @@ export const counterSlice = createSlice({
     onboardingState: {
       motivations: [],
       goal: '',
+      achieveBy: '',
       ai: {
         assistant: null,
         thread: null,
