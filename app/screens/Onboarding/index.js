@@ -1,67 +1,17 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Animated, useWindowDimensions } from 'react-native';
-import { useSelector } from 'react-redux';
-import FirstScreen from './screens/FirstScreen';
-import SecondScreen from './screens/SecondScreen';
-import ThirdScreen from './screens/ThirdScreen';
-import GoalChat from './screens/GoalChat';
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Landing from './screens/Landing';
+import Chat from './screens/Chat';
 
 const Onboarding = () => {
-  const [step, setStep] = useState(0);
-  const slideAnim = useRef(new Animated.Value(0)).current;
-
-  const onboardingState = useSelector((state) => state.user.onboardingState);
-
-  const width = useWindowDimensions().width;
-
-  useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: step * -width,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  }, [step, slideAnim]);
-
-  const nextStep = () => {
-    setStep((currentStep) => currentStep + 1);
-  };
-
-  const prevStep = () => {
-    setStep((currentStep) => currentStep - 1);
-  };
+  const OnboardingStack = createNativeStackNavigator();
 
   return (
-    <View style={styles.container}>
-      <Animated.View
-        style={[
-          styles.screenContainer,
-          {
-            width: width * 4,
-            transform: [{ translateX: slideAnim }],
-          },
-        ]}>
-        <FirstScreen handleNext={nextStep} />
-        <SecondScreen handleNext={nextStep} handleBack={prevStep} />
-        {onboardingState.goal === 'Custom - Chat with Sabio' && (
-          <GoalChat handleNext={nextStep} handleBack={prevStep} />
-        )}
-        <ThirdScreen handleNext={nextStep} />
-      </Animated.View>
-    </View>
+    <OnboardingStack.Navigator screenOptions={{ headerShown: false }}>
+      <OnboardingStack.Screen name="Landing" component={Landing} />
+      <OnboardingStack.Screen name="Chat" component={Chat} />
+    </OnboardingStack.Navigator>
   );
 };
 
 export default Onboarding;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0f1013',
-  },
-
-  screenContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingTop: 80,
-  },
-});

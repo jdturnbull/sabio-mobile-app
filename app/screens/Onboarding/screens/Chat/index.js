@@ -13,10 +13,17 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { ScrollView, GestureHandlerRootView } from 'react-native-gesture-handler';
-import { retrieveAssistant, createThread, retrieveMessages, run, config, addUserMessage } from '../../../utils/openai';
+import {
+  retrieveAssistant,
+  createThread,
+  retrieveMessages,
+  run,
+  config,
+  addUserMessage,
+} from '../../../../utils/openai';
 import { useDispatch, useSelector } from 'react-redux';
-import { setOnboardingState } from '../../../stores/user/userSlice';
-import { getIconFromLabel } from '../../../utils/icon';
+import { setOnboardingState } from '../../../../stores/user/userSlice';
+import { getIconFromLabel } from '../../../../utils/icon';
 
 const AssistantMessage = ({ message }) => {
   return (

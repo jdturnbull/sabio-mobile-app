@@ -1,0 +1,98 @@
+import React, { useEffect, useRef } from 'react';
+import { Text, Animated, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { getIconFromLabel } from '../../../utils/icon';
+import { useNavigation } from '@react-navigation/native';
+
+const Icon = getIconFromLabel('logoMedium');
+
+const Landing = () => {
+  const navigation = useNavigation();
+  const width = useWindowDimensions().width;
+
+  const opacity = useRef(new Animated.Value(0)).current;
+
+  const handlePress = () => {
+    navigation.navigate('Chat');
+  };
+
+  useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  return (
+    <View style={{ ...styles.container, width }}>
+      <Animated.View style={{ ...styles.header, width: width * 0.8 }}>
+        <Animated.Text style={{ color: '#fff', fontWeight: '500', fontSize: 40, opacity }}>
+          Welcome to <Text style={{ color: '#E66642', fontWeight: '700' }}>Sabio</Text>
+        </Animated.Text>
+        <Animated.View style={{ marginTop: 60, fontWeight: 500 }}>
+          <Animated.Text style={{ ...styles.subHeader, opacity }}>
+            To get started we need to learn a little about you.
+          </Animated.Text>
+          <Animated.Text style={{ ...styles.subHeader, opacity, marginTop: 30 }}>
+            Set aside 5 minutes to chat with Sabio about your needs and goals.
+          </Animated.Text>
+        </Animated.View>
+        <Animated.View style={{ ...styles.buttonContainer, opacity }}>
+          <Pressable onPress={handlePress} style={{ ...styles.pressable }}>
+            <Text style={styles.text}>Get started with Sabio</Text>
+          </Pressable>
+        </Animated.View>
+      </Animated.View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0f1013',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  header: {
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+  },
+  subHeader: {
+    lineHeight: 30,
+    color: '#fff',
+    fontSize: 20,
+  },
+  buttonContainer: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 70,
+    marginBottom: 30,
+  },
+  pressable: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    backgroundColor: '#1F2025',
+    borderRadius: 10,
+    padding: 22,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 11,
+    elevation: 10,
+  },
+  text: {
+    color: '#fff',
+    fontWeight: '500',
+    fontSize: 20,
+  },
+});
+export default Landing;
