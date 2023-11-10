@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Animated, useWindowDimensions, View, StyleSheet } from 'react-native';
 import moment from 'moment-timezone';
 import DateItem from './DateItem';
+import styled from 'styled-components';
 import Selector from './Selector';
 import { hapticImpact } from '../../../../../../utils/haptics';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,24 +23,22 @@ const generateDates = (centerDate) => {
   return dates;
 };
 
-const styles = StyleSheet.create({
-  container: {
-    position: 'relative',
-    top: 40,
-    backgroundColor: '#0f1013',
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 3,
-    shadowOpacity: 0.3,
-    shadowColor: 'black',
-  },
-  inner: {
-    flexDirection: 'row',
-  },
-  padder: {
-    height: 68,
-    marginVertical: 9,
-  },
-});
+const Container = styled(Animated.View)`
+  background-color: #0f1013;
+  shadow-offset: 0 4px;
+  shadow-radius: 3px;
+  shadow-opacity: 0.3;
+  shadow-color: black;
+`;
+
+const Inner = styled(Animated.View)`
+  flex-direction: row;
+`;
+
+const Padder = styled(Animated.View)`
+  height: 68px;
+  margin: 9px 0;
+`;
 
 const DateSelector = () => {
   const dispatch = useDispatch();
@@ -144,9 +143,9 @@ const DateSelector = () => {
   const padRight = DATE_LIMIT * DATE_ITEM_WIDTH - offsetX;
 
   return (
-    <View style={styles.container}>
-      <Animated.View style={[styles.inner, innerStyle]}>
-        <View style={{ ...styles.padder, width: padLeft }} />
+    <Container>
+      <Inner style={innerStyle}>
+        <Padder style={{ width: padLeft }} />
 
         {dates.map(({ date, index }) => (
           <DateItem
@@ -160,11 +159,11 @@ const DateSelector = () => {
           />
         ))}
 
-        <View style={{ ...styles.padder, width: padRight }} />
-      </Animated.View>
+        <Padder style={{ width: padRight }} />
+      </Inner>
 
       <Selector width={DATE_ITEM_WIDTH} />
-    </View>
+    </Container>
   );
 };
 

@@ -40,7 +40,7 @@ const DateItem = ({ date, width, isSelected, isToday, onPress }) => {
   const handlePress = () => onPress(date);
 
   return (
-    <GestureHandlerRootView style={{ width, borderWidth: 1, borderColor: 'red' }}>
+    <GestureHandlerRootView style={{ width }}>
       <Container style={{ width }} onPress={handlePress}>
         <Inner>
           <DayOfWeekContainer>
