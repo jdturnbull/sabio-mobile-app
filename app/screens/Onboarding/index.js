@@ -26,6 +26,10 @@ const Onboarding = () => {
     setStep((currentStep) => currentStep + 1);
   };
 
+  const prevStep = () => {
+    setStep((currentStep) => currentStep - 1);
+  };
+
   return (
     <View style={styles.container}>
       <Animated.View
@@ -37,8 +41,10 @@ const Onboarding = () => {
           },
         ]}>
         <FirstScreen handleNext={nextStep} />
-        <SecondScreen handleNext={nextStep} />
-        {onboardingState.goal === 'Custom - Chat with Sabio' && <GoalChat handleNext={nextStep} />}
+        <SecondScreen handleNext={nextStep} handleBack={prevStep} />
+        {onboardingState.goal === 'Custom - Chat with Sabio' && (
+          <GoalChat handleNext={nextStep} handleBack={prevStep} />
+        )}
         <ThirdScreen handleNext={nextStep} />
       </Animated.View>
     </View>

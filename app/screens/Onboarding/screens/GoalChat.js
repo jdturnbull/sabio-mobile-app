@@ -10,6 +10,7 @@ import {
   Animated,
   KeyboardAvoidingView,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import { ScrollView, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { retrieveAssistant, createThread, retrieveMessages, run, config, addUserMessage } from '../../../utils/openai';
@@ -49,11 +50,14 @@ const UserMessage = ({ message }) => {
   );
 };
 
-const GoalChat = ({ handleNext }) => {
+const GoalChat = ({ handleNext, handleBack }) => {
   const dispatch = useDispatch();
   const width = useWindowDimensions().width;
 
+  const [loading, setLoading] = useState(true);
+
   const [animatedWidth] = useState(new Animated.Value(width * 0.9));
+  const [animatedMargin] = useState(new Animated.Value(120));
   const state = useSelector((state) => state.user.onboardingState);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -107,6 +111,8 @@ const GoalChat = ({ handleNext }) => {
 
         // If this is the first message of the conversation, lets instruct the assistant on the motivations set by the user
         const instructions = `The user has identified in a previous step that their motivations for using the app are ${motivations}. Given this is the start of the conversation, ask the user if they are interested in setting a specific goal related to one of their motivations, or if they want to set an endurance based goal. Remember, KEEP YOUR MESSAGES TO THE USER SHORT!`;
+        setLoading(true);
+
         runId = await run(thread.id, assistant.id, instructions);
       }
 
@@ -145,6 +151,8 @@ const GoalChat = ({ handleNext }) => {
         try {
           const messages = await retrieveMessages(state.ai.thread.id);
           dispatch(setOnboardingState({ ...state, ai: { ...state.ai, messages, runId: null } }));
+          scrollRef.current.scrollToEnd({ animated: true });
+          setLoading(false);
           setCanSend(true);
           clearInterval(intervalId);
         } catch (error) {
@@ -170,9 +178,15 @@ const GoalChat = ({ handleNext }) => {
 
   // Handles animating the width of the input container when the keyboard is shown / hidden
   useEffect(() => {
+    Animated.timing(animatedMargin, {
+      toValue: isKeyboardVisible ? 90 : 110,
+      duration: 200, // This is the duration of the animation
+      useNativeDriver: false, // Set to true if you are only animating non-layout properties
+    }).start();
+
     Animated.timing(animatedWidth, {
       toValue: isKeyboardVisible ? width * 0.98 : width * 0.9,
-      duration: 300, // This is the duration of the animation
+      duration: 200, // This is the duration of the animation
       useNativeDriver: false, // Set to true if you are only animating non-layout properties
     }).start();
   }, [isKeyboardVisible, width]);
@@ -200,11 +214,19 @@ const GoalChat = ({ handleNext }) => {
       const messages = await retrieveMessages(state.ai.thread.id);
       setUserMessage('');
       dispatch(setOnboardingState({ ...state, ai: { ...state.ai, messages } }));
+      scrollRef.current.scrollToEnd({ animated: true });
     }
   };
 
+  const BackIcon = getIconFromLabel('back');
+
   return (
     <View style={{ ...styles.container, width }}>
+      <View style={{ display: 'flex', width, paddingHorizontal: 30, alignItems: 'flex-start' }}>
+        <Pressable onPress={handleBack}>
+          <BackIcon />
+        </Pressable>
+      </View>
       <Text style={styles.header}>
         Custom <Text style={{ color: '#E66642', fontWeight: '700' }}>Goal</Text>
       </Text>
@@ -224,12 +246,16 @@ const GoalChat = ({ handleNext }) => {
             })}
           </ScrollView>
         </GestureHandlerRootView>
-        <Animated.View style={{ ...styles.inputContainer, width: animatedWidth }}>
+        <Animated.View style={{ ...styles.inputContainer, width: animatedWidth, marginBottom: animatedMargin }}>
           <TextInput multiline style={styles.input} value={userMessage} onChangeText={(text) => setUserMessage(text)} />
           <View style={{ height: '100%', width: 34 }}>
             <Pressable disabled={!canSend} style={{ ...styles.inputPressable }} onPress={handleSendUserMessage}>
-              <Animated.View style={{ opacity }}>
-                <SendIcon />
+              <Animated.View style={loading ? {} : { opacity }}>
+                {!loading ? (
+                  <SendIcon />
+                ) : (
+                  <ActivityIndicator color="#fff" style={{ marginBottom: 5, marginRight: 4 }} />
+                )}
               </Animated.View>
             </Pressable>
           </View>
@@ -274,7 +300,6 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 7,
     paddingBottom: 7,
-    marginBottom: 90,
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
