@@ -192,14 +192,14 @@ const GoalChat = () => {
         </Text>
       </View>
       <KeyboardAvoidingView behavior="padding">
-        <GestureHandlerRootView style={{ flex: 1 }}>
+        <GestureHandlerRootView style={{ flex: 1, paddingTop: 116 }}>
           <Animated.ScrollView
             ref={scrollRef}
             showsVerticalScrollIndicator={false}
             style={{
               ...styles.scrollable,
               opacity: scrollOpacity,
-              width: width * 0.9,
+              marginHorizontal: 20,
             }}>
             {state.ai.messages.map((message, index) => {
               if (message?.role === 'assistant') {
@@ -210,7 +210,15 @@ const GoalChat = () => {
             })}
           </Animated.ScrollView>
         </GestureHandlerRootView>
-        <Animated.View style={{ alignItems: 'center' }}>
+        <Animated.View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            backgroundColor: '#0f1013',
+            minHeight: 85,
+            paddingTop: 10,
+            width,
+          }}>
           <Animated.View style={{ ...styles.inputContainer, width: animatedWidth, marginBottom: animatedMargin }}>
             <TextInput
               multiline
@@ -265,13 +273,10 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   scrollable: {
-    top: 116,
     paddingTop: 18,
     height: '100%',
   },
   inputContainer: {
-    position: 'absolute',
-    bottom: 0,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
