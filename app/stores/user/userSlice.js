@@ -70,6 +70,7 @@ export const counterSlice = createSlice({
         assistant: null,
         thread: null,
         messages: [],
+        dataGathered: {},
         runId: null,
       },
     },

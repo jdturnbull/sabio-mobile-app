@@ -27,10 +27,12 @@ import { getIconFromLabel } from '../../../utils/icon';
 import AssistantMessage from './components/AssistantMessage';
 import UserMessage from './components/UserMessage';
 import LoadingIndicator from './components/LoadingIndicator';
+import { useNavigation } from '@react-navigation/native';
 
 const GoalChat = () => {
   const scrollRef = useRef();
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const width = useWindowDimensions().width;
 
   const [loading, setLoading] = useState(true);
@@ -101,8 +103,9 @@ const GoalChat = () => {
       );
 
       if (runResponse.data.status === 'requires_action') {
-        const { name, args } = extractFunctionData(runResponse);
-        // TODO: Handle the action
+        const { args } = extractFunctionData(runResponse);
+        dispatch(setOnboardingState({ ...state, ai: { ...state.ai, dataGathered: args } }));
+        navigation.navigate('Login');
       }
 
       if (runResponse.data.status === 'completed') {

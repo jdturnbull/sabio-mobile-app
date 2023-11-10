@@ -1,16 +1,20 @@
 import React, { useEffect, useRef } from 'react';
 import { Text, Animated, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { getIconFromLabel } from '../../../utils/icon';
+import { useDispatch } from 'react-redux';
+import { continueWithApple } from '../../../stores/user/userSlice';
 
-const Landing = () => {
-  const navigation = useNavigation();
+const Login = () => {
+  const dispatch = useDispatch();
   const width = useWindowDimensions().width;
 
   const opacity = useRef(new Animated.Value(0)).current;
 
   const handlePress = () => {
-    navigation.navigate('Chat');
+    dispatch(continueWithApple());
   };
+
+  const Icon = getIconFromLabel('appleWhite');
 
   useEffect(() => {
     Animated.timing(opacity, {
@@ -24,19 +28,20 @@ const Landing = () => {
     <View style={{ ...styles.container, width }}>
       <Animated.View style={{ ...styles.header, width: width * 0.8 }}>
         <Animated.Text style={{ ...styles.headerText, opacity }}>
-          Welcome to <Text style={{ color: '#E66642', fontWeight: '600' }}>Sabio</Text>
+          Are you ready to <Text style={{ color: '#E66642', fontWeight: '600' }}>Login</Text>?
         </Animated.Text>
         <Animated.View style={{ marginTop: 60, fontWeight: 500 }}>
           <Animated.Text style={{ ...styles.subHeader, opacity }}>
-            To get started we need to learn a little about you.
+            Sabio is busy creating your training plan using your conversation.
           </Animated.Text>
           <Animated.Text style={{ ...styles.subHeader, opacity, marginTop: 30 }}>
-            Set aside 5 minutes to chat with Sabio about your needs and goals.
+            While he does this, you can login to your account and if you have one, pair your smart watch.
           </Animated.Text>
         </Animated.View>
         <Animated.View style={{ ...styles.buttonContainer, opacity }}>
           <Pressable onPress={handlePress} style={{ ...styles.pressable }}>
-            <Text style={styles.text}>Get started with Sabio</Text>
+            <Icon />
+            <Text style={styles.text}>Continue with Apple</Text>
           </Pressable>
         </Animated.View>
       </Animated.View>
@@ -77,6 +82,7 @@ const styles = StyleSheet.create({
   },
   pressable: {
     display: 'flex',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
@@ -94,8 +100,9 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#fff',
-    fontWeight: '500',
+    fontWeight: '600',
     fontSize: 20,
+    marginLeft: 12,
   },
 });
-export default Landing;
+export default Login;

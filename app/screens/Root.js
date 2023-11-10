@@ -6,6 +6,7 @@ import LottieView from 'lottie-react-native';
 import { useNetInfo } from '@react-native-community/netinfo';
 import { useSelector } from 'react-redux';
 import Onboarding from './Onboarding';
+import Main from './Main';
 
 const fadeTransition = {
   animation: 'timing',
@@ -63,8 +64,6 @@ const AuthedStack = createNativeStackNavigator();
 
 const AuthedApp = () => {
   const { isConnected } = useNetInfo();
-
-  const { user } = useSelector((state) => state.user.session);
 
   return (
     <React.Fragment>

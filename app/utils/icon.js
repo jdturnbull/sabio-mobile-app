@@ -8,6 +8,7 @@ import Strava from '../components/icons/brands/Strava';
 import Stop from '../components/icons/general/Stop';
 import Send from '../components/icons/general/Send';
 import Back from '../components/icons/general/Back';
+import AppleWhite from '../components/icons/brands/AppleWhite';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -20,6 +21,7 @@ export const ICONS = [
   { label: 'send', icon: Send },
   { label: 'logoMedium', icon: LogoMedium },
   { label: 'back', icon: Back },
+  { label: 'appleWhite', icon: AppleWhite },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;
