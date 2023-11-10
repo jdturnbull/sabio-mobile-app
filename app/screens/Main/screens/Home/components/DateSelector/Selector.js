@@ -5,7 +5,6 @@ const Container = styled.View`
   position: absolute;
   padding: 9px 4px;
   z-index: -1;
-  border: 1px solid red;
 `;
 const Inner = styled.View`
   height: 68px;

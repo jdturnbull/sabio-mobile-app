@@ -34,7 +34,7 @@ const DateItem = ({ date, width, isSelected, isToday, onPress }) => {
   const m = moment.utc(date);
 
   const colorStyle = {
-    color: isSelected ? '#97B7F8' : isToday ? '#fff' : '#7F8080',
+    color: isSelected ? '#E66642' : isToday ? '#fff' : '#7F8080',
   };
 
   const handlePress = () => onPress(date);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './screens/Home';
 import Feed from './screens/Feed';
@@ -24,16 +24,18 @@ const options = {
 
 const TabBar = ({ state, descriptors, navigation }) => {
   const navigate = useNavigation();
+
   return (
     <View style={styles.container}>
       {state.routes.map((route, index) => {
+        const selected = state.index === index;
         const Icon = getIconFromLabel(route.name);
 
         const handlePress = () => navigate.navigate(route.name);
 
         return (
-          <Pressable onPress={handlePress} style={styles.tab} key={route.name}>
-            <Icon />
+          <Pressable onPress={handlePress} style={{ ...styles.tab }} key={route.name}>
+            <Icon selected={selected} />
           </Pressable>
         );
       })}
