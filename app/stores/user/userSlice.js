@@ -28,40 +28,33 @@ export const setup = createAsyncThunk('user/setup', async () => {
 });
 
 export const continueWithApple = createAsyncThunk('user/continueWithApple', async (data) => {
-  const name = 'James Turnbull';
-  const email = 'jdturnbull98@gmail.com';
-  const timezone = RNLocalize.getTimeZone();
+  try {
+    const appleAuthResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    });
+    const { email, fullName, identityToken } = appleAuthResponse;
 
-  const session = await call('POST', 'users/auth', {
-    identityToken: '123',
-    timezone,
-    email,
-    name,
-    onboardingData: data,
-  });
+    if (identityToken) {
+      const name = `${fullName.givenName || ''} ${fullName.familyName || ''}`;
+      const timezone = RNLocalize.getTimeZone();
 
-  await AsyncStorage.setItem('session', JSON.stringify(session));
+      const session = await call('POST', 'users/auth', {
+        identityToken,
+        timezone,
+        email,
+        name,
+        onboardingData: data,
+      });
+      await AsyncStorage.setItem('session', JSON.stringify(session));
 
-  return session;
-
-  // try {
-  //   const appleAuthResponse = await appleAuth.performRequest({
-  //     requestedOperation: appleAuth.Operation.LOGIN,
-  //     requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-  //   });
-  //   const { email, fullName, identityToken } = appleAuthResponse;
-  //   if (identityToken) {
-  //     const name = `${fullName.givenName || ''} ${fullName.familyName || ''}`;
-  //     const timezone = RNLocalize.getTimeZone();
-  //     const session = await call('POST', 'users/auth', { identityToken, timezone, email, name });
-  //     const user = await call('GET', `users/${session.userId}`);
-  //     await AsyncStorage.setItem('session', JSON.stringify(session));
-  //   } else {
-  //     // Error with apple signin
-  //   }
-  // } catch (err) {
-  //   console.log(err);
-  // }
+      return session;
+    } else {
+      // Error with Apple Signin
+    }
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 export const counterSlice = createSlice({
@@ -77,16 +70,11 @@ export const counterSlice = createSlice({
     messages: [],
     runId: null,
     onboardingState: {
-      motivations: [],
-      goal: '',
-      achieveBy: '',
-      ai: {
-        assistant: null,
-        thread: null,
-        messages: [],
-        dataGathered: {},
-        runId: null,
-      },
+      assistant: null,
+      thread: null,
+      messages: [],
+      dataGathered: {},
+      runId: null,
     },
   },
   reducers: {
@@ -107,9 +95,11 @@ export const counterSlice = createSlice({
       state.signedIn = !!action.payload.session;
     });
     builder.addCase(continueWithApple.fulfilled, (state, action) => {
-      state.session = action.payload;
-      state.signedIn = true;
-      state.loaded = true;
+      if (action.payload) {
+        state.session = action.payload;
+        state.signedIn = true;
+        state.loaded = true;
+      }
     });
   },
 });

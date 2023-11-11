@@ -486,6 +486,8 @@
 			baseConfigurationReference = 94EC6745877889F7561FE6CB /* Pods-Sabio.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=iphoneos*]" = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Sabio/Sabio.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -518,6 +520,8 @@
 			baseConfigurationReference = C5BE10B08868ABD59C25AED3 /* Pods-Sabio.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=iphoneos*]" = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Sabio/Sabio.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";

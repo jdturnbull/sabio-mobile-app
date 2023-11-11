@@ -64,16 +64,16 @@ const GoalChat = () => {
   // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
     const setup = async () => {
-      let assistant = state.ai.assistant;
-      let thread = state.ai.thread;
-      let messages = state.ai.messages;
-      let runId = state.ai.runId;
+      let assistant = state.assistant;
+      let thread = state.thread;
+      let messages = state.messages;
+      let runId = state.runId;
 
-      if (!state.ai.assistant) {
+      if (!state.assistant) {
         assistant = await retrieveAssistant('goal');
       }
 
-      if (!state.ai.thread) {
+      if (!state.thread) {
         thread = await createThread('goal');
       }
 
@@ -86,7 +86,7 @@ const GoalChat = () => {
         runId = await run(thread.id, assistant.id);
       }
 
-      dispatch(setOnboardingState({ ...state, ai: { assistant, thread, messages, runId } }));
+      dispatch(setOnboardingState({ ...state, assistant, thread, messages, runId }));
     };
 
     setup();
@@ -94,24 +94,24 @@ const GoalChat = () => {
 
   // Handles adding AI responses to the message thread
   useEffect(() => {
-    if (!state.ai.runId || !state.ai.thread) return;
+    if (!state.runId || !state.thread) return;
 
     const intervalId = setInterval(async () => {
       const runResponse = await axios.get(
-        `https://api.openai.com/v1/threads/${state.ai.thread.id}/runs/${state.ai.runId}`,
+        `https://api.openai.com/v1/threads/${state.thread.id}/runs/${state.runId}`,
         config,
       );
 
       if (runResponse.data.status === 'requires_action') {
         const { args } = extractFunctionData(runResponse);
-        dispatch(setOnboardingState({ ...state, ai: { ...state.ai, dataGathered: args } }));
+        dispatch(setOnboardingState({ ...state, dataGathered: args }));
         navigation.navigate('Login');
       }
 
       if (runResponse.data.status === 'completed') {
         try {
-          const messages = await retrieveMessages(state.ai.thread.id);
-          dispatch(setOnboardingState({ ...state, ai: { ...state.ai, messages, runId: null } }));
+          const messages = await retrieveMessages(state.thread.id);
+          dispatch(setOnboardingState({ ...state, messages, runId: null }));
 
           setLoading(false);
           setCanSend(true);
@@ -121,23 +121,23 @@ const GoalChat = () => {
         }
       }
     }, 500);
-  }, [state.ai.runId]);
+  }, [state.runId]);
 
   // Handles initialising the response from the AI to a new user message
   useEffect(() => {
     scrollRef.current.scrollToEnd({ animated: true });
 
     const _run = async () => {
-      const latestMessage = state.ai.messages[state.ai.messages.length - 1];
+      const latestMessage = state.messages[state.messages.length - 1];
 
       if (latestMessage && latestMessage.role === 'user') {
-        const runId = await run(state.ai.thread.id, state.ai.assistant.id);
-        dispatch(setOnboardingState({ ...state, ai: { ...state.ai, runId } }));
+        const runId = await run(state.thread.id, state.assistant.id);
+        dispatch(setOnboardingState({ ...state, runId }));
       }
     };
 
     _run();
-  }, [state.ai.messages]);
+  }, [state.messages]);
 
   // Handles animating the width of the input container when the keyboard is shown / hidden
   useEffect(() => {
@@ -177,12 +177,12 @@ const GoalChat = () => {
 
   const handleSendUserMessage = async () => {
     setCanSend(false);
-    const success = await addUserMessage(state.ai.thread.id, userMessage);
+    const success = await addUserMessage(state.thread.id, userMessage);
 
     if (success) {
-      const messages = await retrieveMessages(state.ai.thread.id);
+      const messages = await retrieveMessages(state.thread.id);
       setUserMessage('');
-      dispatch(setOnboardingState({ ...state, ai: { ...state.ai, messages } }));
+      dispatch(setOnboardingState({ ...state, messages }));
       scrollRef.current.scrollToEnd({ animated: true });
     }
   };
@@ -204,7 +204,7 @@ const GoalChat = () => {
               opacity: scrollOpacity,
               marginHorizontal: 20,
             }}>
-            {state.ai.messages.map((message, index) => {
+            {state.messages.map((message, index) => {
               if (message?.role === 'assistant') {
                 return <AssistantMessage key={index} message={message.content[0].text.value} />;
               } else {
