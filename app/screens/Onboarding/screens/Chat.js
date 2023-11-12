@@ -40,7 +40,6 @@ const GoalChat = () => {
   const state = useSelector((state) => state.user.onboardingState);
 
   const [animatedWidth] = useState(new Animated.Value(width * 0.9));
-  const [scrollOpacity] = useState(new Animated.Value(1));
   const [animatedMargin] = useState(new Animated.Value(120));
 
   const Send = getIconFromLabel('send');
@@ -152,12 +151,6 @@ const GoalChat = () => {
       duration: 200, // This is the duration of the animation
       useNativeDriver: false, // Set to true if you are only animating non-layout properties
     }).start();
-
-    Animated.timing(scrollOpacity, {
-      toValue: isKeyboardVisible ? 0.3 : 1,
-      duration: 200, // This is the duration of the animation
-      useNativeDriver: false, // Set to true if you are only animating non-layout properties
-    }).start();
   }, [isKeyboardVisible, width]);
 
   const [userMessage, setUserMessage] = useState('');
@@ -201,7 +194,6 @@ const GoalChat = () => {
             showsVerticalScrollIndicator={false}
             style={{
               ...styles.scrollable,
-              opacity: scrollOpacity,
               marginHorizontal: 20,
             }}>
             {state.messages.map((message, index) => {
