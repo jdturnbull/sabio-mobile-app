@@ -31,7 +31,7 @@ const Landing = () => {
             To get started we need to learn a little about you.
           </Animated.Text>
           <Animated.Text style={{ ...styles.subHeader, opacity, marginTop: 30 }}>
-            Set aside 5 minutes to chat with Sabio about your needs and goals.
+            Set aside <Text style={{ fontWeight: 700 }}>5 minutes</Text> to chat with Sabio about your needs and goals.
           </Animated.Text>
         </Animated.View>
         <Animated.View style={{ ...styles.buttonContainer, opacity }}>

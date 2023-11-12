@@ -9,7 +9,7 @@ const AssistantMessage = ({ message }) => {
         borderRadius: 10,
         padding: 10,
         marginBottom: 20,
-        marginLeft: 30,
+        marginRight: 30,
         alignSelf: 'flex-end',
       }}>
       <Text style={{ color: '#ffffff90', fontWeight: '500', fontSize: 18 }}>{message}</Text>

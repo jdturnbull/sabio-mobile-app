@@ -9,8 +9,8 @@ const UserMessage = ({ message }) => {
         borderRadius: 10,
         padding: 10,
         marginBottom: 20,
-        marginRight: 30,
-        alignSelf: 'flex-start',
+        marginLeft: 30,
+        alignSelf: 'flex-end',
       }}>
       <Text style={{ color: '#fff', fontWeight: '500', fontSize: 18 }}>{message}</Text>
     </View>

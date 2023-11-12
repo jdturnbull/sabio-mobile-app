@@ -3,7 +3,7 @@ const CONFIG_DEV = {
 };
 
 const CONFIG_PROD = {
-  API_BASE: 'https://api.example.com',
+  API_BASE: 'https://api.heysabio.com',
 };
 
 const CONFIG = process.env.NODE_ENV === 'production' ? CONFIG_PROD : CONFIG_DEV;
