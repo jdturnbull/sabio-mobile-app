@@ -112,6 +112,8 @@ const GoalChat = () => {
           const messages = await retrieveMessages(state.thread.id);
           dispatch(setOnboardingState({ ...state, messages, runId: null }));
 
+          scrollRef.current.scrollToEnd({ animated: true });
+
           setLoading(false);
           setCanSend(true);
           clearInterval(intervalId);
@@ -176,9 +178,11 @@ const GoalChat = () => {
       const messages = await retrieveMessages(state.thread.id);
       setUserMessage('');
       dispatch(setOnboardingState({ ...state, messages }));
-      scrollRef.current.scrollToEnd({ animated: true });
     }
+    scrollRef.current.scrollToEnd({ animated: true });
   };
+
+  //TODO: Fix scrollview not auto scrolling
 
   return (
     <View style={styles.container}>
