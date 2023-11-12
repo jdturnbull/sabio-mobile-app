@@ -8,7 +8,7 @@ const Onboarding = () => {
   const OnboardingStack = createNativeStackNavigator();
 
   return (
-    <OnboardingStack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false }}>
+    <OnboardingStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
       <OnboardingStack.Screen name="Landing" component={Landing} />
       <OnboardingStack.Screen name="Chat" component={Chat} />
       <OnboardingStack.Screen name="Login" component={Login} />

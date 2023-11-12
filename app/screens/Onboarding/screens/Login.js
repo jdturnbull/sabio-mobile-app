@@ -30,14 +30,14 @@ const Login = () => {
     <View style={{ ...styles.container, width }}>
       <Animated.View style={{ ...styles.header, width: width * 0.8 }}>
         <Animated.Text style={{ ...styles.headerText, opacity }}>
-          That's the hard bit <Text style={{ color: '#E66642', fontWeight: '600' }}>done!</Text>
+          Let's save this <Text style={{ color: '#E66642', fontWeight: '600' }}>progress</Text>
         </Animated.Text>
         <Animated.View style={{ marginTop: 60, fontWeight: 500 }}>
           <Animated.Text style={{ ...styles.subHeader, opacity }}>
             Sabio is busy creating your training plan from your conversation.
           </Animated.Text>
           <Animated.Text style={{ ...styles.subHeader, opacity, marginTop: 30 }}>
-            <Text style={{ fontWeight: 700 }}>Let's save this progress,</Text> sign in with Apple below.
+            To continue, <Text style={{ fontWeight: 700 }}>create an account</Text> with Apple below.
           </Animated.Text>
         </Animated.View>
         <Animated.View style={{ ...styles.buttonContainer, opacity }}>
