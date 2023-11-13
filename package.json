@@ -21,6 +21,7 @@
     "@reduxjs/toolkit": "^1.9.7",
     "axios": "^1.6.0",
     "expo-sqlite": "^11.6.0",
+    "https": "^1.0.0",
     "lottie-react-native": "^6.4.0",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
