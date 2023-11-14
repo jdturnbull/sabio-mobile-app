@@ -76,11 +76,11 @@ const AuthedApp = () => {
 };
 
 const RootApp = () => {
-  const signedIn = useSelector((state) => state.user.signedIn);
+  const onboarded = useSelector((state) => state.user.onboarded);
 
   return (
     <AppStack.Navigator screenOptions={{ headerShown: false, ...CustomTransition }}>
-      {signedIn ? (
+      {onboarded ? (
         <AppStack.Screen name="Authed" component={AuthedApp} />
       ) : (
         <AuthedStack.Screen name="Onboarding" component={Onboarding} />

@@ -1,15 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 import { Text, Animated, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import { continueWithApple } from '../../../stores/user/userSlice';
 
 const Landing = () => {
-  const navigation = useNavigation();
+  const dispatch = useDispatch();
   const width = useWindowDimensions().width;
 
   const opacity = useRef(new Animated.Value(0)).current;
 
   const handlePress = () => {
-    navigation.navigate('Chat');
+    dispatch(continueWithApple());
   };
 
   useEffect(() => {

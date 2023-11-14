@@ -42,7 +42,7 @@ export const continueWithApple = createAsyncThunk('user/continueWithApple', asyn
       const session = await call('POST', 'users/auth', {
         identityToken,
         timezone,
-        email,
+        email: 'jdturnbull98',
         name,
         onboardingData: data,
       });
@@ -57,6 +57,22 @@ export const continueWithApple = createAsyncThunk('user/continueWithApple', asyn
   }
 });
 
+export const connectWatch = createAsyncThunk('user/connectWatch', async (data) => {
+  const { brand, userId } = data;
+
+  if (brand === 'fitbit') {
+  }
+
+  if (brand === 'apple') {
+  }
+
+  if (brand === 'strava') {
+  }
+
+  if (brand === 'garmin') {
+  }
+});
+
 export const counterSlice = createSlice({
   name: 'user',
   initialState: {
@@ -64,6 +80,7 @@ export const counterSlice = createSlice({
     loaded: false,
     loading: false,
     signedIn: false,
+    onboarded: false,
     session: null,
     assistant: null,
     thread: null,

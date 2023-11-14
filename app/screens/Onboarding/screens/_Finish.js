@@ -4,7 +4,7 @@ import { getIconFromLabel } from '../../../utils/icon';
 import { useDispatch, useSelector } from 'react-redux';
 import { continueWithApple } from '../../../stores/user/userSlice';
 
-const Login = () => {
+const Finish = () => {
   const dispatch = useDispatch();
   const width = useWindowDimensions().width;
 
@@ -107,4 +107,4 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
 });
-export default Login;
+export default Finish;

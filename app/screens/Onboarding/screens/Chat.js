@@ -9,9 +9,13 @@ import {
   Animated,
   KeyboardAvoidingView,
   Keyboard,
+  ImageBackground,
 } from 'react-native';
 import axios from 'axios';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import SafariView from 'react-native-safari-view';
 import {
   retrieveAssistant,
   createThread,
@@ -21,13 +25,13 @@ import {
   addUserMessage,
   extractFunctionData,
 } from '../../../utils/openai';
-import { useDispatch, useSelector } from 'react-redux';
-import { setOnboardingState } from '../../../stores/user/userSlice';
+import { continueWithApple, setOnboardingState } from '../../../stores/user/userSlice';
 import { getIconFromLabel } from '../../../utils/icon';
 import AssistantMessage from '../../../components/chat/AssistantMessage';
 import UserMessage from '../../../components/chat/UserMessage';
 import LoadingIndicator from '../../../components/chat/LoadingIndicator';
-import { useNavigation } from '@react-navigation/native';
+import background from '../../../assets/background-chat.png';
+import call from '../../../utils/call';
 
 const GoalChat = () => {
   const scrollRef = useRef();
@@ -102,9 +106,28 @@ const GoalChat = () => {
       );
 
       if (runResponse.data.status === 'requires_action') {
-        const { args } = extractFunctionData(runResponse);
-        dispatch(setOnboardingState({ ...state, dataGathered: args }));
-        navigation.navigate('Login');
+        const { args, name } = extractFunctionData(runResponse);
+
+        if (name === 'connectSmartWatch') {
+          let brand;
+          const _args = args.toLowerCase();
+
+          if (_args.includes('fitbit')) {
+            brand = 'fitbit';
+          }
+
+          const redirect = await call('GET', `connect/getUrl/${brand}`);
+          clearInterval(intervalId);
+
+          SafariView.show({
+            url: redirect,
+          });
+        }
+
+        if (name === 'nextStep') {
+          dispatch(setOnboardingState({ ...state, dataGathered: args }));
+          navigation.navigate('Login');
+        }
       }
 
       if (runResponse.data.status === 'completed') {
@@ -112,11 +135,12 @@ const GoalChat = () => {
           const messages = await retrieveMessages(state.thread.id);
           dispatch(setOnboardingState({ ...state, messages, runId: null }));
 
-          scrollRef.current.scrollToEnd({ animated: true });
-
           setLoading(false);
           setCanSend(true);
           clearInterval(intervalId);
+          setTimeout(() => {
+            scrollRef.current.scrollToEnd({ animated: true });
+          }, 200);
         } catch (error) {
           console.log(`Error retrieving messages (GoalChat.js): ${error.message}`);
         }
@@ -126,8 +150,6 @@ const GoalChat = () => {
 
   // Handles initialising the response from the AI to a new user message
   useEffect(() => {
-    scrollRef.current.scrollToEnd({ animated: true });
-
     const _run = async () => {
       const latestMessage = state.messages[state.messages.length - 1];
 
@@ -178,8 +200,10 @@ const GoalChat = () => {
       const messages = await retrieveMessages(state.thread.id);
       setUserMessage('');
       dispatch(setOnboardingState({ ...state, messages }));
+      setTimeout(() => {
+        scrollRef.current.scrollToEnd({ animated: true });
+      }, 100);
     }
-    scrollRef.current.scrollToEnd({ animated: true });
   };
 
   //TODO: Fix scrollview not auto scrolling
@@ -191,50 +215,52 @@ const GoalChat = () => {
           Chat with <Text style={{ color: '#E66642', fontWeight: '600' }}>Sabio</Text>
         </Text>
       </View>
-      <KeyboardAvoidingView behavior="padding">
-        <GestureHandlerRootView style={{ flex: 1, paddingTop: 116 }}>
-          <Animated.ScrollView
-            ref={scrollRef}
-            showsVerticalScrollIndicator={false}
+      <ImageBackground source={background} resizeMode="cover" style={styles.background}>
+        <KeyboardAvoidingView behavior="padding">
+          <GestureHandlerRootView style={{ flex: 1, paddingTop: 116 }}>
+            <Animated.ScrollView
+              ref={scrollRef}
+              showsVerticalScrollIndicator={false}
+              style={{
+                ...styles.scrollable,
+                marginHorizontal: 20,
+              }}>
+              {state.messages.map((message, index) => {
+                if (message?.role === 'assistant') {
+                  return <AssistantMessage key={index} message={message.content[0].text.value} />;
+                } else {
+                  return <UserMessage key={index} message={message.content[0].text.value} />;
+                }
+              })}
+            </Animated.ScrollView>
+          </GestureHandlerRootView>
+          <Animated.View
             style={{
-              ...styles.scrollable,
-              marginHorizontal: 20,
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              backgroundColor: '#0f1013',
+              minHeight: 85,
+              paddingTop: 10,
+              width,
             }}>
-            {state.messages.map((message, index) => {
-              if (message?.role === 'assistant') {
-                return <AssistantMessage key={index} message={message.content[0].text.value} />;
-              } else {
-                return <UserMessage key={index} message={message.content[0].text.value} />;
-              }
-            })}
-          </Animated.ScrollView>
-        </GestureHandlerRootView>
-        <Animated.View
-          style={{
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            backgroundColor: '#0f1013',
-            minHeight: 85,
-            paddingTop: 10,
-            width,
-          }}>
-          <Animated.View style={{ ...styles.inputContainer, width: animatedWidth, marginBottom: animatedMargin }}>
-            <TextInput
-              multiline
-              style={styles.input}
-              value={userMessage}
-              onChangeText={(text) => setUserMessage(text)}
-            />
-            <View style={{ height: '100%', width: 34 }}>
-              <Pressable disabled={!canSend} style={{ ...styles.inputPressable }} onPress={handleSendUserMessage}>
-                <Animated.View style={loading ? {} : { opacity }}>
-                  {!loading ? <Send /> : <LoadingIndicator />}
-                </Animated.View>
-              </Pressable>
-            </View>
+            <Animated.View style={{ ...styles.inputContainer, width: animatedWidth, marginBottom: animatedMargin }}>
+              <TextInput
+                multiline
+                style={styles.input}
+                value={userMessage}
+                onChangeText={(text) => setUserMessage(text)}
+              />
+              <View style={{ height: '100%', width: 34 }}>
+                <Pressable style={{ ...styles.inputPressable }} onPress={handleSendUserMessage}>
+                  <Animated.View style={loading ? {} : { opacity }}>
+                    {!loading ? <Send /> : <LoadingIndicator />}
+                  </Animated.View>
+                </Pressable>
+              </View>
+            </Animated.View>
           </Animated.View>
-        </Animated.View>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
     </View>
   );
 };
@@ -246,6 +272,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     backgroundColor: '#0f1013',
+  },
+  background: {
+    flex: 1,
   },
   headerContainer: {
     zIndex: 1,
@@ -273,7 +302,6 @@ const styles = StyleSheet.create({
   },
   scrollable: {
     paddingTop: 18,
-    height: '100%',
   },
   inputContainer: {
     display: 'flex',
