@@ -103,6 +103,18 @@ const Chat = () => {
               dispatch(updateState({ connectingDevice: true, redirect, showSafari: true }));
               clearInterval(interval);
             }
+            if (args.toLowerCase().includes('garmin')) {
+              const redirect = await call('GET', `connect/getUrl/garmin/${session.user.id}`);
+              setActiveToolId(id);
+              dispatch(updateState({ connectingDevice: true, redirect, showSafari: true }));
+              clearInterval(interval);
+            }
+            if (args.toLowerCase().includes('strava')) {
+              const redirect = await call('GET', `connect/getUrl/strava/${session.user.id}`);
+              setActiveToolId(id);
+              dispatch(updateState({ connectingDevice: true, redirect, showSafari: true }));
+              clearInterval(interval);
+            }
           }
 
           if (name === 'nextStep') {
@@ -194,6 +206,10 @@ const Chat = () => {
     }).start();
   }, [userMessage]);
 
+  useEffect(() => {
+    scrollRef.current.scrollToEnd({ animated: true });
+  }, [keyboard.keyboardShown]);
+
   // Handles sending user message to the assistant
   const handleSendUserMessage = async () => {
     setCanSend(false);
@@ -239,7 +255,7 @@ const Chat = () => {
             style={{
               alignItems: 'center',
               justifyContent: 'flex-end',
-              minHeight: 60,
+              minHeight: 63,
               paddingTop: 10,
               width,
             }}>
