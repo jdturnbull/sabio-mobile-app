@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 import * as RNLocalize from 'react-native-localize';
 import call from '../../utils/call';
+import * as openai from '../../utils/openai';
 
 export const setup = createAsyncThunk('user/setup', async () => {
   try {
@@ -57,23 +58,7 @@ export const continueWithApple = createAsyncThunk('user/continueWithApple', asyn
   }
 });
 
-export const connectWatch = createAsyncThunk('user/connectWatch', async (data) => {
-  const { brand, userId } = data;
-
-  if (brand === 'fitbit') {
-  }
-
-  if (brand === 'apple') {
-  }
-
-  if (brand === 'strava') {
-  }
-
-  if (brand === 'garmin') {
-  }
-});
-
-export const counterSlice = createSlice({
+export const userSlice = createSlice({
   name: 'user',
   initialState: {
     error: null,
@@ -82,24 +67,10 @@ export const counterSlice = createSlice({
     signedIn: false,
     onboarded: false,
     session: null,
-    assistant: null,
-    thread: null,
-    messages: [],
-    runId: null,
-    onboardingState: {
-      assistant: null,
-      thread: null,
-      messages: [],
-      dataGathered: {},
-      runId: null,
-    },
   },
   reducers: {
     updateState: (state, action) => {
       state = { ...state, ...action.payload };
-    },
-    setOnboardingState: (state, action) => {
-      state.onboardingState = action.payload;
     },
     setSelectedDate: (state, action) => {
       state.selectedDate = action.payload;
@@ -122,6 +93,6 @@ export const counterSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setOnboardingState, setSelectedDate, updateState } = counterSlice.actions;
+export const { setSelectedDate, updateState } = userSlice.actions;
 
-export default counterSlice.reducer;
+export default userSlice.reducer;

@@ -21,10 +21,9 @@ const initial_goal_chat_messages = JSON.stringify({
 });
 
 export const extractFunctionData = (res) => {
-  const { tool_calls } = res.data.required_action.submit_tool_outputs;
+  const { tool_calls } = res.required_action.submit_tool_outputs;
   const { arguments: args, name } = tool_calls[0].function;
-
-  return { name, args };
+  return { name, args, id: tool_calls[0].id };
 };
 
 const sortMessagesByDate = (messages) => {
@@ -32,7 +31,7 @@ const sortMessagesByDate = (messages) => {
 };
 
 export const retrieveAssistant = async (type) => {
-  if (type === 'goal') {
+  if (type === 'onboarding') {
     try {
       const assistant = await axios.get('https://api.openai.com/v1/assistants/asst_2dIzoiqvI7mSqU8iEpvVBUxW', config);
       return assistant.data;
@@ -43,7 +42,7 @@ export const retrieveAssistant = async (type) => {
 };
 
 export const createThread = async (type, id) => {
-  if (type === 'goal') {
+  if (type === 'onboarding') {
     try {
       const thread = await axios.post('https://api.openai.com/v1/threads', initial_goal_chat_messages, config);
       return thread.data;
@@ -71,9 +70,12 @@ export const retrieveMessages = async (thread_id) => {
   }
 };
 
-export const run = async (thread_id, assistant_id) => {
+export const run = async (thread_id, assistant_id, extraInstructions) => {
   const today = moment().format('YYYY-MM-DD');
-  const instructions = `You are Sabio, the experienced AI fitness trainer behind a mobile app, aimed at providing coaching services to users, you have the ability to connect with their smart watch to personalise and dynamically update their training plan based on their real-time performance and smart watch data. You are starting a conversation with a new client, during this conversation it is crucial to understand the clients needs and setting realistic goals. If the client already has a specific, quantifiable and time bound goal they want to achieve you should be accepting of this, however if this is not the case, you need to guide them towards such a goal.\nDesired Conversation Structure:\nIdentify the client’s goal - Invite the client to share their primary fitness goal (e.g, weight loss, running a 5k, competing in a triathlon).\nUnderstanding the clients background - Ask the user about their previous fitness experience.\nPrevious injuries or health concerns - Inquire into any previous injuries or health concerns that may affect training.\nEstablishing the time frame - Discuss the client’s timeline for achieving this goal, they may have already specified a timeline based on a start date for a race or event. If the timeline is already set, you should be accepting of this. If the timeline is up for discussion, assess whether their timeline is realistic and adjust accordingly.\nConnecting a Smart Watch - Inform the user of your smart watch abilities, ask for their watch brand and if they are happy for you to connect their watch. Assume they have a watch, but if they dont have a watch you can connect their strava. If they are happy for you to, connect their watch or their Strava.\nExploring Commitment Level - Assess their commitment level and availability for training.\nSetting Short-Term and Long-Term Goals - Break down the main goal into smaller, measurable targets. Set short-term goals to create a sense of achievement and maintain motivation.\nAddressing Questions and Concerns - Open the floor for any questions they might have, address any concerns and reassure them of their capability to achieve their goals with proper guidance.\nFinalising the conversation - Briefly make the user aware of your capabilities when they connect a smart watch, note they will be able to do this after your conversation. Thank the user for their time and confirm they are happy for you to process it, and move them onto the next step.\n\nThroughout the conversation, it's important to be empathetic and supportive, while maintaining a professional approach to set the tone for a successful trainer-client relationship, remember the user is viewing this conversation on a mobile device, so avoid sending long messages as much as possible. For context, the date today is ${today}`;
+  let instructions = `You are Sabio, the experienced AI fitness trainer behind a mobile app, aimed at providing coaching services to users, you have the ability to connect with their smart watch to personalise and dynamically update their training plan based on their real-time performance and smart watch data. You are starting a conversation with a new client, during this conversation it is crucial to understand the clients needs and setting realistic goals. If the client already has a specific, quantifiable and time bound goal they want to achieve you should be accepting of this, however if this is not the case, you need to guide them towards such a goal.\nDesired Conversation Structure:\nIdentify the client’s goal - Invite the client to share their primary fitness goal (e.g, weight loss, running a 5k, competing in a triathlon).\nUnderstanding the clients background - Ask the user about their previous fitness experience.\nPrevious injuries or health concerns - Inquire into any previous injuries or health concerns that may affect training.\nEstablishing the time frame - Discuss the client’s timeline for achieving this goal, they may have already specified a timeline based on a start date for a race or event. If the timeline is already set, you should be accepting of this. If the timeline is up for discussion, assess whether their timeline is realistic and adjust accordingly.\nConnecting a Smart Watch - Inform the user of your smart watch abilities, ask for their watch brand and if they are happy for you to connect their watch. Assume they have a watch, but if they dont have a watch you can connect their strava. If they are happy for you to, connect their watch or their Strava.\nExploring Commitment Level - Assess their commitment level and availability for training.\nSetting Short-Term and Long-Term Goals - Break down the main goal into smaller, measurable targets. Set short-term goals to create a sense of achievement and maintain motivation.\nAddressing Questions and Concerns - Open the floor for any questions they might have, address any concerns and reassure them of their capability to achieve their goals with proper guidance.\nFinalising the conversation - Briefly make the user aware of your capabilities when they connect a smart watch, note they will be able to do this after your conversation. Thank the user for their time and confirm they are happy for you to process it, and move them onto the next step.\n\nThroughout the conversation, it's important to be empathetic and supportive, while maintaining a professional approach to set the tone for a successful trainer-client relationship, remember the user is viewing this conversation on a mobile device, so avoid sending long messages as much as possible. For context, the date today is ${today}`;
+  if (extraInstructions !== '') {
+    instructions += extraInstructions;
+  }
   const body = JSON.stringify({
     assistant_id,
     instructions,
@@ -81,9 +83,10 @@ export const run = async (thread_id, assistant_id) => {
 
   try {
     const runRequest = await axios.post(`https://api.openai.com/v1/threads/${thread_id}/runs`, body, config);
-    return runRequest.data.id;
+    return runRequest.data?.id;
   } catch (error) {
     console.log(`Error running assistant: ${error.message}`);
+    console.log(error.response.data);
   }
 };
 
@@ -94,6 +97,30 @@ export const addUserMessage = async (thread_id, message) => {
     return true;
   } catch (error) {
     console.log(`Error adding user message: ${error.message}`);
+    console.log(error.response.data);
     return false;
+  }
+};
+
+export const submitToolResponse = async (thread_id, run_id, tool_id, output) => {
+  const body = JSON.stringify({
+    tool_outputs: [{ tool_call_id: tool_id, output }],
+  });
+
+  try {
+    await axios.post(`https://api.openai.com/v1/threads/${thread_id}/runs/${run_id}/submit_tool_outputs`, body, config);
+  } catch (error) {
+    console.log(`Error submitting tool response: ${error.message}`);
+    console.log(error.response.data);
+  }
+};
+
+export const retrieveRun = async (thread_id, run_id) => {
+  try {
+    const response = await axios.get(`https://api.openai.com/v1/threads/${thread_id}/runs/${run_id}`, config);
+    return response.data;
+  } catch (error) {
+    console.log(`Error retrieving run: ${error.message}`);
+    console.log(error.response.data);
   }
 };

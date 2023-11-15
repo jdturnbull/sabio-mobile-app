@@ -61,38 +61,6 @@ const Chat = () => {
     };
   }, []);
 
-  // Handles setting up the assistant and thread & retrieving messages
-
-  // TODO: Set thread id against user in backend, check if it exists, if it doesn't create thread and set it, if it does then retrieve thread
-  // useEffect(() => {
-  //   const setup = async () => {
-  //     let assistant = state.assistant;
-  //     let thread = state.thread;
-  //     let messages = state.messages;
-  //     let runId = state.runId;
-
-  //     if (!state.assistant) {
-  //       assistant = await retrieveAssistant('chat');
-  //     }
-
-  //     if (!state.thread) {
-  //       thread = await createThread('chat', state.session.userId);
-  //     }
-
-  //     messages = await retrieveMessages(thread.id);
-
-  //     const latest = messages[messages.length - 1];
-
-  //     if (latest && latest.role === 'user') {
-  //       setLoading(true);
-  //       runId = await run(thread.id, assistant.id);
-  //     }
-
-  //     dispatch(updateState({ assistant, thread, messages, runId }));
-  //   };
-
-  //   setup();
-  // }, []);
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>

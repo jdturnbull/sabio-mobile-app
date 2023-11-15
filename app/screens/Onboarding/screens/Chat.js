@@ -8,61 +8,39 @@ import {
   Pressable,
   Animated,
   KeyboardAvoidingView,
-  Keyboard,
   ImageBackground,
 } from 'react-native';
-import axios from 'axios';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useKeyboard } from '@react-native-community/hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
 import SafariView from 'react-native-safari-view';
-import {
-  retrieveAssistant,
-  createThread,
-  retrieveMessages,
-  run,
-  config,
-  addUserMessage,
-  extractFunctionData,
-} from '../../../utils/openai';
-import { continueWithApple, setOnboardingState } from '../../../stores/user/userSlice';
+import * as openai from '../../../utils/openai';
+import { updateState } from '../../../stores/onboarding/onboardingSlice';
 import { getIconFromLabel } from '../../../utils/icon';
 import AssistantMessage from '../../../components/chat/AssistantMessage';
 import UserMessage from '../../../components/chat/UserMessage';
-import LoadingIndicator from '../../../components/chat/LoadingIndicator';
 import background from '../../../assets/background-chat.png';
 import call from '../../../utils/call';
 
-const GoalChat = () => {
+const Chat = () => {
   const scrollRef = useRef();
   const dispatch = useDispatch();
-  const navigation = useNavigation();
+  const keyboard = useKeyboard();
   const width = useWindowDimensions().width;
 
-  const [loading, setLoading] = useState(true);
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const state = useSelector((state) => state.user.onboardingState);
+  const session = useSelector((state) => state.user.session);
+  const state = useSelector((state) => state.onboarding);
 
   const [animatedWidth] = useState(new Animated.Value(width * 0.9));
   const [animatedMargin] = useState(new Animated.Value(120));
 
+  const [userMessage, setUserMessage] = useState('');
+  const [canSend, setCanSend] = useState(false);
+  const [activeToolId, setActiveToolId] = useState(null);
+
+  const [opacity] = useState(new Animated.Value(userMessage.split('').length > 0 ? 1 : 0.2));
+
   const Send = getIconFromLabel('send');
-
-  // Handles setting up the keyboard listeners to animate the input container & scroll up the scrollview
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setKeyboardVisible(true);
-      scrollRef.current.scrollToEnd({ animated: true });
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardVisible(false);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
 
   // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
@@ -73,23 +51,23 @@ const GoalChat = () => {
       let runId = state.runId;
 
       if (!state.assistant) {
-        assistant = await retrieveAssistant('goal');
+        assistant = await openai.retrieveAssistant('onboarding');
       }
 
       if (!state.thread) {
-        thread = await createThread('goal');
+        thread = await openai.createThread('onboarding');
       }
 
-      messages = await retrieveMessages(thread.id);
+      messages = await openai.retrieveMessages(thread.id);
 
       const latest = messages[messages.length - 1];
 
       if (latest && latest.role === 'user') {
-        setLoading(true);
-        runId = await run(thread.id, assistant.id);
+        console.log('Creating run from setup');
+        runId = await openai.run(thread.id, assistant.id);
       }
 
-      dispatch(setOnboardingState({ ...state, assistant, thread, messages, runId }));
+      dispatch(updateState({ ...state, assistant, thread, messages, runId }));
     };
 
     setup();
@@ -97,56 +75,49 @@ const GoalChat = () => {
 
   // Handles adding AI responses to the message thread
   useEffect(() => {
-    if (!state.runId || !state.thread) return;
+    const _run = async () => {
+      if (!state.runId || !state.thread) return;
 
-    const intervalId = setInterval(async () => {
-      const runResponse = await axios.get(
-        `https://api.openai.com/v1/threads/${state.thread.id}/runs/${state.runId}`,
-        config,
-      );
+      const interval = setInterval(async () => {
+        const runResponse = await openai.retrieveRun(state.thread.id, state.runId);
 
-      if (runResponse.data.status === 'requires_action') {
-        const { args, name } = extractFunctionData(runResponse);
+        if (!runResponse) return;
 
-        if (name === 'connectSmartWatch') {
-          let brand;
-          const _args = args.toLowerCase();
+        if (runResponse.status === 'completed') {
+          const messages = await openai.retrieveMessages(state.thread.id);
+          dispatch(updateState({ messages, connectingDevice: false }));
 
-          if (_args.includes('fitbit')) {
-            brand = 'fitbit';
-          }
-
-          const redirect = await call('GET', `connect/getUrl/${brand}`);
-          clearInterval(intervalId);
-
-          SafariView.show({
-            url: redirect,
-          });
-        }
-
-        if (name === 'nextStep') {
-          dispatch(setOnboardingState({ ...state, dataGathered: args }));
-          navigation.navigate('Login');
-        }
-      }
-
-      if (runResponse.data.status === 'completed') {
-        try {
-          const messages = await retrieveMessages(state.thread.id);
-          dispatch(setOnboardingState({ ...state, messages, runId: null }));
-
-          setLoading(false);
-          setCanSend(true);
-          clearInterval(intervalId);
           setTimeout(() => {
             scrollRef.current.scrollToEnd({ animated: true });
-          }, 200);
-        } catch (error) {
-          console.log(`Error retrieving messages (GoalChat.js): ${error.message}`);
+          }, 100);
+
+          setCanSend(true);
+          clearInterval(interval);
+        } else if (runResponse.status === 'requires_action' && !activeToolId) {
+          const { args, name, id } = openai.extractFunctionData(runResponse);
+
+          if (name === 'connectSmartWatch') {
+            if (args.toLowerCase().includes('fitbit')) {
+              const redirect = await call('GET', `connect/getUrl/fitbit/${session.user.id}`);
+              setActiveToolId(id);
+              dispatch(updateState({ connectingDevice: true, redirect, showSafari: true }));
+              clearInterval(interval);
+            }
+          }
+
+          if (name === 'nextStep') {
+            await call('POST', `users/completeOnboarding`, { data: args, id: session.user.id });
+            dispatch(updateState({ onboarded: true }));
+            clearInterval(interval);
+          }
         }
-      }
-    }, 500);
-  }, [state.runId]);
+      }, 500); // This is where the interval is set to 500ms
+    };
+
+    _run();
+
+    // The dependencies array was missing brackets and should include the variables used within the useEffect hook.
+  }, [state.runId, activeToolId]);
 
   // Handles initialising the response from the AI to a new user message
   useEffect(() => {
@@ -154,31 +125,64 @@ const GoalChat = () => {
       const latestMessage = state.messages[state.messages.length - 1];
 
       if (latestMessage && latestMessage.role === 'user') {
-        const runId = await run(state.thread.id, state.assistant.id);
-        dispatch(setOnboardingState({ ...state, runId }));
+        const runResponse = await openai.retrieveRun(state.thread.id, state.runId);
+
+        if (runResponse && runResponse.status === 'completed') {
+          const runId = await openai.run(state.thread.id, state.assistant.id);
+          dispatch(updateState({ ...state, runId }));
+        }
       }
     };
 
     _run();
   }, [state.messages]);
 
-  // Handles animating the width of the input container when the keyboard is shown / hidden
+  // Handles user closing the safari view when making watch connection
+
+  useEffect(() => {
+    SafariView.addEventListener('onDismiss', async () => {
+      if (activeToolId) {
+        let output = '';
+
+        const connected = await call('GET', `connect/list/${session.user.id}`);
+
+        if (connected.length > 0) {
+          output = 'success';
+        } else {
+          output = 'failure';
+        }
+
+        try {
+          await openai.submitToolResponse(state.thread.id, state.runId, activeToolId, output);
+          dispatch(updateState({ connectingDevice: false, showSafari: false }));
+          setActiveToolId(null);
+        } catch (error) {
+          console.log('Error submitting tool response');
+          console.log(error);
+        }
+      }
+    });
+  }, [activeToolId]);
+
+  // Handles opening the safari view when making watch connection
+  useEffect(() => {
+    if (!state.showSafari) return;
+    SafariView.show({ url: state.redirect });
+  }, [state.showSafari]);
+
+  // Handles animating the width of the input container (can't use native driver when animating layout props)
   useEffect(() => {
     Animated.timing(animatedMargin, {
-      toValue: isKeyboardVisible ? 10 : 30,
-      duration: 200, // This is the duration of the animation
-      useNativeDriver: false, // Set to true if you are only animating non-layout properties
+      toValue: keyboard.keyboardShown ? 10 : 30,
+      duration: 200,
+      useNativeDriver: false,
     }).start();
-
     Animated.timing(animatedWidth, {
-      toValue: isKeyboardVisible ? width * 0.98 : width * 0.9,
-      duration: 200, // This is the duration of the animation
-      useNativeDriver: false, // Set to true if you are only animating non-layout properties
+      toValue: keyboard.keyboardShown ? width * 0.98 : width * 0.9,
+      duration: 200,
+      useNativeDriver: false,
     }).start();
-  }, [isKeyboardVisible, width]);
-
-  const [userMessage, setUserMessage] = useState('');
-  const [opacity] = useState(new Animated.Value(userMessage.split('').length > 0 ? 1 : 0.2));
+  }, [keyboard.keyboardShown, width]);
 
   // Handles animating the opacity of the send button when text is entered / removed
   useEffect(() => {
@@ -190,23 +194,20 @@ const GoalChat = () => {
     }).start();
   }, [userMessage]);
 
-  const [canSend, setCanSend] = useState(false);
-
+  // Handles sending user message to the assistant
   const handleSendUserMessage = async () => {
     setCanSend(false);
-    const success = await addUserMessage(state.thread.id, userMessage);
+    const success = await openai.addUserMessage(state.thread.id, userMessage);
 
     if (success) {
-      const messages = await retrieveMessages(state.thread.id);
+      const messages = await openai.retrieveMessages(state.thread.id);
       setUserMessage('');
-      dispatch(setOnboardingState({ ...state, messages }));
+      dispatch(updateState({ messages }));
       setTimeout(() => {
         scrollRef.current.scrollToEnd({ animated: true });
       }, 100);
     }
   };
-
-  //TODO: Fix scrollview not auto scrolling
 
   return (
     <View style={styles.container}>
@@ -238,8 +239,7 @@ const GoalChat = () => {
             style={{
               alignItems: 'center',
               justifyContent: 'flex-end',
-              backgroundColor: '#0f1013',
-              minHeight: 85,
+              minHeight: 60,
               paddingTop: 10,
               width,
             }}>
@@ -252,8 +252,8 @@ const GoalChat = () => {
               />
               <View style={{ height: '100%', width: 34 }}>
                 <Pressable style={{ ...styles.inputPressable }} onPress={handleSendUserMessage}>
-                  <Animated.View style={loading ? {} : { opacity }}>
-                    {!loading ? <Send /> : <LoadingIndicator />}
+                  <Animated.View style={{ opacity }}>
+                    <Send />
                   </Animated.View>
                 </Pressable>
               </View>
@@ -265,7 +265,7 @@ const GoalChat = () => {
   );
 };
 
-export default GoalChat;
+export default Chat;
 
 const styles = StyleSheet.create({
   container: {
