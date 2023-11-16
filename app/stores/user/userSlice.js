@@ -3,7 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 import * as RNLocalize from 'react-native-localize';
 import call from '../../utils/call';
-import * as openai from '../../utils/openai';
 
 export const setup = createAsyncThunk('user/setup', async () => {
   try {
@@ -43,7 +42,7 @@ export const continueWithApple = createAsyncThunk('user/continueWithApple', asyn
       const session = await call('POST', 'users/auth', {
         identityToken,
         timezone,
-        email: 'jdturnbull98',
+        email,
         name,
         onboardingData: data,
       });

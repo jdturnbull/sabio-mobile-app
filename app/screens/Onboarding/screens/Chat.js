@@ -153,6 +153,7 @@ const Chat = () => {
 
   useEffect(() => {
     SafariView.addEventListener('onDismiss', async () => {
+      scrollRef.current.scrollToEnd({ animated: true });
       if (activeToolId) {
         let output = '';
 
@@ -212,7 +213,15 @@ const Chat = () => {
 
   // Handles sending user message to the assistant
   const handleSendUserMessage = async () => {
+    if (!userMessage) return;
+    if (!canSend) return;
+
+    const latestMessage = state.messages[state.messages.length - 1];
+
+    if (latestMessage && latestMessage.role === 'user') return;
+
     setCanSend(false);
+
     const success = await openai.addUserMessage(state.thread.id, userMessage);
 
     if (success) {
