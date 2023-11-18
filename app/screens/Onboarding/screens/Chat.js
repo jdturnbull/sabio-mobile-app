@@ -64,7 +64,7 @@ const Chat = () => {
 
       if (latest && latest.role === 'user') {
         console.log('Creating run from setup');
-        runId = await openai.run(thread.id, assistant.id);
+        runId = await openai.run(thread.id, assistant.id, null, session.user.id);
       }
 
       dispatch(updateState({ ...state, assistant, thread, messages, runId }));
@@ -140,7 +140,7 @@ const Chat = () => {
         const runResponse = await openai.retrieveRun(state.thread.id, state.runId);
 
         if (runResponse && runResponse.status === 'completed') {
-          const runId = await openai.run(state.thread.id, state.assistant.id);
+          const runId = await openai.run(state.thread.id, state.assistant.id, null, session.user.id);
           dispatch(updateState({ ...state, runId }));
         }
       }
