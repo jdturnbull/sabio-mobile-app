@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -21,8 +21,13 @@ const AppContainer = styled.View`
 
 const App = () => {
   const dispatch = useDispatch();
+  const loaded = useSelector((state) => state.user.loaded);
 
-  dispatch(setup());
+  useEffect(() => {
+    if (!loaded) {
+      dispatch(setup());
+    }
+  }, [loaded]);
 
   return (
     <AppContainer>
