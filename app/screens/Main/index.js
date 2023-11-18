@@ -60,7 +60,7 @@ export default Main;
 
 const styles = StyleSheet.create({
   container: {
-    height: 80,
+    height: 90,
     backgroundColor: '#16171B',
     alignItems: 'center',
     justifyContent: 'center',

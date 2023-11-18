@@ -32,7 +32,7 @@ const App = () => {
       <StatusBar barStyle="light-content" hidden={false} translucent={false} />
       <UIStateProvider>
         <Root />
-        {/* <OverlayPortal /> */}
+        <OverlayPortal />
       </UIStateProvider>
     </AppContainer>
   );

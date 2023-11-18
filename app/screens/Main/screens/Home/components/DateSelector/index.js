@@ -31,13 +31,13 @@ const generateDates = (centerDate) => {
 };
 
 const Container = styled.View`
-  margin-top: 45px;
+  margin-top: 50px;
   background-color: #0f1013;
   shadow-offset: 0 4px;
   shadow-radius: 3px;
   shadow-opacity: 0.3;
   shadow-color: black;
-  height: 85px;
+  height: 95px;
 `;
 
 const Inner = styled(Animated.View)`

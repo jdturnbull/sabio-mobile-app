@@ -11,13 +11,14 @@ export const setup = createAsyncThunk('user/setup', async () => {
     if (session) {
       try {
         const { id } = JSON.parse(session);
-        const valid = await call('GET', `users/session/${id}`);
+        const updatedSession = await call('GET', `users/session/${id}`);
 
-        if (valid) {
-          return { session: JSON.parse(session) };
+        if (updatedSession) {
+          await AsyncStorage.setItem('session', JSON.stringify(updatedSession));
+          return { session: updatedSession };
+        } else {
+          await AsyncStorage.removeItem('session');
         }
-
-        await AsyncStorage.removeItem('session');
       } catch (error) {
         console.log(error);
       }
@@ -57,12 +58,24 @@ export const continueWithApple = createAsyncThunk('user/continueWithApple', asyn
   }
 });
 
+export const getPlan = createAsyncThunk('user/getPlan', async (data, { getState }) => {
+  try {
+    const user = getState().user.session.user;
+
+    const plan = await call('GET', `users/retrievePlan/${user.id}`);
+    return plan;
+  } catch (error) {
+    console.log('Error getting plan', error);
+  }
+});
+
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
     error: null,
     loaded: false,
     loading: false,
+    plannedActivities: [],
     signedIn: false,
     onboarded: false,
     session: null,
@@ -87,6 +100,9 @@ export const userSlice = createSlice({
         state.signedIn = true;
         state.loaded = true;
       }
+    });
+    builder.addCase(getPlan.fulfilled, (state, action) => {
+      state.plannedActivities = action.payload;
     });
   },
 });

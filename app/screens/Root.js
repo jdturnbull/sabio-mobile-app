@@ -76,7 +76,7 @@ const AuthedApp = () => {
 };
 
 const RootApp = () => {
-  const _onboarded = useSelector((state) => state.user.onboarded);
+  const _onboarded = useSelector((state) => state.user.session?.user.onboarded);
   const onboarded = useSelector((state) => state.onboarding.onboarded);
 
   return (

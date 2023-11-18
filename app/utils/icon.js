@@ -13,6 +13,12 @@ import Home from '../components/icons/tabs/Home';
 import Feed from '../components/icons/tabs/Feed';
 import Chat from '../components/icons/tabs/Chat';
 import Settings from '../components/icons/tabs/Settings';
+import Strength from '../components/icons/cards/Strength';
+import Run from '../components/icons/cards/Run';
+import Swim from '../components/icons/cards/Swim';
+import Bike from '../components/icons/cards/Bike';
+import Rest from '../components/icons/cards/Rest';
+import Default from '../components/icons/cards/Default';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -30,6 +36,12 @@ export const ICONS = [
   { label: 'feed', icon: Feed },
   { label: 'chat', icon: Chat },
   { label: 'settings', icon: Settings },
+  { label: 'strength', icon: Strength },
+  { label: 'run', icon: Run },
+  { label: 'swim', icon: Swim },
+  { label: 'bike', icon: Bike },
+  { label: 'rest', icon: Rest },
+  { label: 'default', icon: Default },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;
