@@ -21,11 +21,8 @@ const AppContainer = styled.View`
 
 const App = () => {
   const dispatch = useDispatch();
-  const loaded = useSelector((state) => state.user.loaded);
 
-  if (!loaded) {
-    dispatch(setup());
-  }
+  dispatch(setup());
 
   return (
     <AppContainer>
