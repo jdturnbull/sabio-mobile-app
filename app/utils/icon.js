@@ -19,6 +19,7 @@ import Swim from '../components/icons/cards/Swim';
 import Bike from '../components/icons/cards/Bike';
 import Rest from '../components/icons/cards/Rest';
 import Default from '../components/icons/cards/Default';
+import FloatingButton from '../components/icons/home/FloatingButton';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -42,6 +43,7 @@ export const ICONS = [
   { label: 'bike', icon: Bike },
   { label: 'rest', icon: Rest },
   { label: 'default', icon: Default },
+  { label: 'floatingButton', icon: FloatingButton },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

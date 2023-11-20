@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import moment from 'moment-timezone';
-import { useWindowDimensions } from 'react-native';
+import { useWindowDimensions, Text } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useAnimatedReaction,
@@ -37,7 +37,7 @@ const Container = styled.View`
   shadow-radius: 3px;
   shadow-opacity: 0.3;
   shadow-color: black;
-  height: 95px;
+  height: 115px;
 `;
 
 const Inner = styled(Animated.View)`
@@ -137,6 +137,9 @@ const DateSelector = () => {
 
   return (
     <Container>
+      <Text style={{ color: '#fff', fontSize: 20, marginLeft: 18, marginBottom: 5, fontWeight: '500' }}>
+        {moment(selectedDate, 'YYYY-MM-DD').format('MMMM')}
+      </Text>
       <Inner style={innerStyle}>
         <Padder style={{ width: padLeft }} />
 
