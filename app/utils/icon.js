@@ -21,6 +21,8 @@ import Rest from '../components/icons/cards/Rest';
 import Default from '../components/icons/cards/Default';
 import FloatingButton from '../components/icons/home/FloatingButton';
 import Analytics from '../components/icons/tabs/Analytics';
+import Runner from '../components/icons/general/Runner';
+import Bolt from '../components/icons/general/Bolt';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -46,6 +48,8 @@ export const ICONS = [
   { label: 'default', icon: Default },
   { label: 'floatingButton', icon: FloatingButton },
   { label: 'analytics', icon: Analytics },
+  { label: 'runner', icon: Runner },
+  { label: 'bolt', icon: Bolt },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

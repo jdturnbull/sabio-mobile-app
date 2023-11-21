@@ -12,7 +12,7 @@ export const config = {
   },
 };
 
-const initial_goal_chat_messages = JSON.stringify({
+const initial_chat_messages = JSON.stringify({
   messages: [
     {
       role: 'user',
@@ -40,21 +40,40 @@ export const retrieveAssistant = async (type) => {
       console.log(`Error retrieving assistant: ${error.message}`);
     }
   }
+  if (type === 'main') {
+    try {
+      const assistant = await axios.get('https://api.openai.com/v1/assistants/asst_WI46ok4oWekUzErXAouxuP7e', config);
+      return assistant.data;
+    } catch (error) {
+      console.log(`Error retrieving assistant: ${error.message}`);
+    }
+  }
 };
 
-export const createThread = async (type, id) => {
+export const createThread = async (type, activity) => {
   if (type === 'onboarding') {
     try {
-      const thread = await axios.post('https://api.openai.com/v1/threads', initial_goal_chat_messages, config);
+      const thread = await axios.post('https://api.openai.com/v1/threads', initial_chat_messages, config);
       return thread.data;
     } catch (error) {
       console.log(`Error creating thread: ${error.message}`);
     }
   }
 
-  if (type === 'chat') {
+  if (type === 'main') {
     try {
-      const thread = await axios.post('https://api.openai.com/v1/threads', initial_chat_messages, config);
+      const initMessages = activity
+        ? JSON.stringify({
+            messages: [
+              {
+                role: 'user',
+                content: `Hey Sabio! I want to chat about my ${activity.title} today.`,
+              },
+            ],
+          })
+        : initial_chat_messages;
+
+      const thread = await axios.post('https://api.openai.com/v1/threads', initMessages, config);
       return thread.data;
     } catch (error) {
       console.log(`Error creating thread: ${error.message}`);

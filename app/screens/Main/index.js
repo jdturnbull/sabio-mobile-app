@@ -61,7 +61,6 @@ const MainStack = createStackNavigator();
 const Main = () => {
   return (
     <MainStack.Navigator
-      mode="modal"
       screenOptions={{
         headerShown: false,
         cardStyle: { backgroundColor: 'transparent' },
@@ -70,17 +69,7 @@ const Main = () => {
         keyboardHandlingEnabled: false,
       }}>
       <MainStack.Screen name="TabStack" component={TabStackScreen} />
-      <MainStack.Screen
-        name="OverlayStack"
-        component={OverlayStackScreen}
-        options={{
-          cardStyle: {
-            marginTop: 100,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-          },
-        }}
-      />
+      <MainStack.Screen name="OverlayStack" component={OverlayStackScreen} />
     </MainStack.Navigator>
   );
 };
