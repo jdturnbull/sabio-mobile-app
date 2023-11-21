@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const CardView = () => {
+const Content = () => {
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
   // Activities by selected Date
   const [activities, setActivities] = React.useState([]);
@@ -37,4 +37,4 @@ const CardView = () => {
   );
 };
 
-export default CardView;
+export default Content;

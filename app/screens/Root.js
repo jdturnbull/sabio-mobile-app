@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Easing, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import LottieView from 'lottie-react-native';
 import { useNetInfo } from '@react-native-community/netinfo';
 import { useSelector } from 'react-redux';
@@ -58,16 +58,17 @@ const Splash = () => {
     </View>
   );
 };
-const TopStack = createNativeStackNavigator();
-const AppStack = createNativeStackNavigator();
-const AuthedStack = createNativeStackNavigator();
+const TopStack = createStackNavigator();
+const AppStack = createStackNavigator();
+const AuthedStack = createStackNavigator();
 
 const AuthedApp = () => {
   const { isConnected } = useNetInfo();
 
   return (
     <React.Fragment>
-      <AuthedStack.Navigator screenOptions={{ headerShown: false, ...CustomTransition }}>
+      <AuthedStack.Navigator
+        screenOptions={{ headerShown: false, ...CustomTransition, cardStyle: { backgroundColor: 'transparent' } }}>
         <AuthedStack.Screen name="Main" component={Main} />
       </AuthedStack.Navigator>
       {isConnected === false && <LostConnectionScreen />}
@@ -80,7 +81,8 @@ const RootApp = () => {
   const onboarded = useSelector((state) => state.onboarding.onboarded);
 
   return (
-    <AppStack.Navigator screenOptions={{ headerShown: false, ...CustomTransition }}>
+    <AppStack.Navigator
+      screenOptions={{ headerShown: false, ...CustomTransition, cardStyle: { backgroundColor: 'transparent' } }}>
       {onboarded || _onboarded ? (
         <AppStack.Screen name="Authed" component={AuthedApp} />
       ) : (
@@ -92,7 +94,9 @@ const RootApp = () => {
 
 const Root = () => {
   return (
-    <TopStack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false, ...CustomTransition }}>
+    <TopStack.Navigator
+      initialRouteName="Splash"
+      screenOptions={{ headerShown: false, ...CustomTransition, cardStyle: { backgroundColor: 'transparent' } }}>
       <TopStack.Screen name="Splash" component={Splash} />
       <TopStack.Screen name="App" component={RootApp} />
     </TopStack.Navigator>

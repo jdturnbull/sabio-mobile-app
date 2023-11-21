@@ -137,7 +137,7 @@ const DateSelector = () => {
 
   return (
     <Container>
-      <Text style={{ color: '#fff', fontSize: 20, marginLeft: 18, marginBottom: 5, fontWeight: '500' }}>
+      <Text style={{ color: '#fff', fontSize: 20, marginLeft: 18, marginBottom: 5, fontWeight: '600' }}>
         {moment(selectedDate, 'YYYY-MM-DD').format('MMMM')}
       </Text>
       <Inner style={innerStyle}>

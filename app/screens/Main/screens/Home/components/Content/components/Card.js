@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { getIconFromLabel } from '../../../../../../../utils/icon';
+import { useNavigation } from '@react-navigation/native';
 
 const styles = StyleSheet.create({
   container: {
@@ -39,9 +40,15 @@ const styles = StyleSheet.create({
 });
 
 const Card = ({ activity }) => {
+  const { navigate } = useNavigation();
   let Icon = getIconFromLabel(activity.type.toLowerCase()) || getIconFromLabel('default');
+
+  const handlePress = () => {
+    navigate('OverlayStack', { screen: 'activity', params: { activity } });
+  };
+
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={handlePress}>
       <View style={styles.header}>
         <Icon />
         <Text style={styles.title}>{activity.title}</Text>
@@ -49,7 +56,7 @@ const Card = ({ activity }) => {
       <View style={styles.body}>
         <Text style={styles.bodyText}>{activity.guidance}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
