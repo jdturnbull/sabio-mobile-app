@@ -23,6 +23,8 @@ import FloatingButton from '../components/icons/home/FloatingButton';
 import Analytics from '../components/icons/tabs/Analytics';
 import Runner from '../components/icons/general/Runner';
 import Bolt from '../components/icons/general/Bolt';
+import Yoga from '../components/icons/cards/Yoga';
+import Next from '../components/icons/general/Next';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -40,16 +42,18 @@ export const ICONS = [
   { label: 'feed', icon: Feed },
   { label: 'chat', icon: Chat },
   { label: 'settings', icon: Settings },
-  { label: 'strength', icon: Strength },
   { label: 'run', icon: Run },
   { label: 'swim', icon: Swim },
   { label: 'bike', icon: Bike },
   { label: 'rest', icon: Rest },
-  { label: 'default', icon: Default },
+  { label: 'strength', icon: Strength },
   { label: 'floatingButton', icon: FloatingButton },
   { label: 'analytics', icon: Analytics },
   { label: 'runner', icon: Runner },
   { label: 'bolt', icon: Bolt },
+  { label: 'yoga', icon: Yoga },
+  { label: 'default', icon: Run },
+  { label: 'next', icon: Next },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

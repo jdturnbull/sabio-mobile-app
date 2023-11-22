@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 25,
     marginHorizontal: 10,
-    paddingBottom: 20,
+    paddingBottom: 25,
   },
   scrollable: {
     paddingTop: 18,

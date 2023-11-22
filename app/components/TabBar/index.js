@@ -20,7 +20,7 @@ const TabBar = ({ state, navigation, width }) => {
   };
 
   return (
-    <View style={{ height: 120, backgroundColor: '#0f1013' }}>
+    <View style={{ height: 80, backgroundColor: '#0f1013' }}>
       <View
         style={{
           display: 'flex',
@@ -120,7 +120,7 @@ const TabBar = ({ state, navigation, width }) => {
           width: radius * 2,
           borderRadius: radius * 4,
           backgroundColor: '#0f1013',
-          bottom: -18,
+          bottom: 20,
           left,
           display: 'flex',
           alignItems: 'center',
