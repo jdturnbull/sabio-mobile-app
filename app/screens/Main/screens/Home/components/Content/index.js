@@ -36,7 +36,7 @@ const Content = () => {
       : "Sabio hasn't planned this day yet";
 
   useEffect(() => {
-    const filteredActivities = plannedActivities.filter((activity) => {
+    const filteredActivities = plannedActivities?.filter((activity) => {
       return activity.date === selectedDate;
     });
     setActivities(filteredActivities);
@@ -63,13 +63,13 @@ const Content = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      {plannedActivities.length > 0 && activities.length > 0 ? (
+      {plannedActivities?.length > 0 && activities.length > 0 ? (
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           {activities.map((activity) => (
             <Card key={activity.id} activity={activity} />
           ))}
         </ScrollView>
-      ) : plannedActivities.length === 0 ? (
+      ) : plannedActivities?.length === 0 ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <YogaIcon />
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 30 }}>
@@ -77,7 +77,7 @@ const Content = () => {
             <Animated.Text style={[styles.pulseText, { opacity: fadeAnim }]}>Sabio is creating your plan</Animated.Text>
           </View>
         </View>
-      ) : plannedActivities.length > 0 && activities.length === 0 ? (
+      ) : plannedActivities?.length > 0 && activities.length === 0 ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
           <Logo />
           <Text

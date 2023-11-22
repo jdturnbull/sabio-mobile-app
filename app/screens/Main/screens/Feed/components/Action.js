@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { getIconFromLabel } from '../../../../../utils/icon';
 import { useNavigation } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
+import moment from 'moment';
+import { getIconFromLabel } from '../../../../../utils/icon';
 
 const Action = ({ action }) => {
   const { navigate } = useNavigation();
@@ -11,6 +11,8 @@ const Action = ({ action }) => {
   const handlePress = () => {
     navigate('OverlayStack', { screen: 'action', params: { action } });
   };
+
+  const createdAt = moment(action.createdAt).fromNow();
 
   return (
     <View style={styles.container}>
@@ -31,6 +33,9 @@ const Action = ({ action }) => {
       <Pressable onPress={handlePress} style={styles.pressable}>
         <Text style={styles.pressableText}>View</Text>
       </Pressable>
+      <Text style={{ color: '#ffffff40', fontWeight: '600', fontSize: 14, marginTop: 20, alignSelf: 'flex-end' }}>
+        {createdAt}
+      </Text>
     </View>
   );
 };
@@ -42,7 +47,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#1F2025',
     borderRadius: 8,
     padding: 16,
-    marginBottom: 16,
+    paddingBottom: 12,
+    marginBottom: 20,
   },
   header: {
     flexDirection: 'row',

@@ -17,7 +17,7 @@ const Home = () => {
 
     fetchPlans();
 
-    if (plannedActivities.length === 0) {
+    if (plannedActivities?.length === 0) {
       intervalRef.current = setInterval(() => {
         fetchPlans();
       }, 5000);
@@ -31,10 +31,10 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    if (plannedActivities.length > 0 && intervalRef.current) {
+    if (plannedActivities?.length > 0 && intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-  }, [plannedActivities.length]);
+  }, [plannedActivities?.length]);
 
   return (
     <View style={{ flex: 1 }}>
