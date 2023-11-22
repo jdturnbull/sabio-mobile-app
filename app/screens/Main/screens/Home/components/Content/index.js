@@ -31,6 +31,8 @@ const Content = () => {
   const textString =
     selectedDate < moment.utc(user.createdAt).format('YYYY-MM-DD')
       ? 'You had not hired Sabio yet!'
+      : selectedDate === moment.utc(user.createdAt).format('YYYY-MM-DD')
+      ? 'Sabio created your plan! View the rest of the week via the date selector above.'
       : "Sabio hasn't planned this day yet";
 
   useEffect(() => {
@@ -78,7 +80,17 @@ const Content = () => {
       ) : plannedActivities.length > 0 && activities.length === 0 ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
           <Logo />
-          <Text style={{ fontWeight: '600', fontSize: 16, color: '#ffffff60', marginTop: 40, marginBottom: 40 }}>
+          <Text
+            style={{
+              fontWeight: '600',
+              fontSize: 16,
+              color: '#ffffff60',
+              marginTop: 40,
+              marginBottom: 40,
+              paddingHorizontal: 40,
+              textAlign: 'center',
+              lineHeight: 24,
+            }}>
             {textString}
           </Text>
         </View>
