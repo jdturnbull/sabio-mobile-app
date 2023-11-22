@@ -1,71 +1,20 @@
-import React, { useEffect, useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  useWindowDimensions,
-  TextInput,
-  Pressable,
-  Animated,
-  KeyboardAvoidingView,
-  Keyboard,
-} from 'react-native';
-import axios from 'axios';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import {
-  retrieveAssistant,
-  createThread,
-  retrieveMessages,
-  run,
-  config,
-  addUserMessage,
-  extractFunctionData,
-} from '../../../../utils/openai';
-import { useDispatch, useSelector } from 'react-redux';
-import { getIconFromLabel } from '../../../../utils/icon';
-import AssistantMessage from '../../../../components/chat/AssistantMessage';
-import UserMessage from '../../../../components/chat/UserMessage';
-import LoadingIndicator from '../../../../components/chat/LoadingIndicator';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { updateState } from '../../../../stores/user/userSlice';
 
 const Data = () => {
-  const scrollRef = useRef();
-  const dispatch = useDispatch();
   const navigation = useNavigation();
-  const width = useWindowDimensions().width;
-
-  const [loading, setLoading] = useState(true);
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const state = useSelector((state) => state.user);
-
-  const [animatedWidth] = useState(new Animated.Value(width * 0.9));
-  const [scrollOpacity] = useState(new Animated.Value(1));
-  const [animatedMargin] = useState(new Animated.Value(120));
-
-  const Send = getIconFromLabel('send');
-
-  // Handles setting up the keyboard listeners to animate the input container & scroll up the scrollview
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setKeyboardVisible(true);
-      scrollRef.current.scrollToEnd({ animated: true });
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardVisible(false);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.header}>
           Your <Text style={{ color: '#E66642', fontWeight: '600' }}>Progress</Text>
+        </Text>
+      </View>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 30 }}>
+        <Text style={{ color: '#ffffff60', fontWeight: '600', fontSize: 16, textAlign: 'center', lineHeight: 24 }}>
+          No progress reports yet, Sabio will post one at the end of each training week.
         </Text>
       </View>
     </View>
