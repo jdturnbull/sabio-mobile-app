@@ -7,6 +7,7 @@ export const chatSlice = createSlice({
     activeToolId: null,
     thread: null,
     activity: null,
+    action: null,
     messages: [],
     runId: null,
   },

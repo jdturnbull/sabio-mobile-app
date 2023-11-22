@@ -7,6 +7,7 @@ import Chat from './screens/Chat';
 import Data from './screens/Data';
 import Settings from './screens/Settings';
 import Activity from './screens/Activity';
+import Action from './screens/Action';
 import TabBar from '../../components/TabBar';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 
@@ -52,6 +53,7 @@ const OverlayStackScreen = () => {
   return (
     <OverlayStack.Navigator screenOptions={overlayScreenOpts}>
       <OverlayStack.Screen name="activity" component={Activity} />
+      <OverlayStack.Screen name="action" component={Action} />
     </OverlayStack.Navigator>
   );
 };

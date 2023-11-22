@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
 });
 
 const Content = () => {
-  const user = useSelector((state) => state.user.session.user);
+  const user = useSelector((state) => state.user.session?.user);
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
   const [activities, setActivities] = useState([]);
   const { selectedDate } = useUIState();
@@ -29,9 +29,9 @@ const Content = () => {
   const Logo = getIconFromLabel('logoLarge');
 
   const textString =
-    selectedDate < moment.utc(user.createdAt).format('YYYY-MM-DD')
+    selectedDate < moment.utc(user?.createdAt).format('YYYY-MM-DD')
       ? 'You had not hired Sabio yet!'
-      : selectedDate === moment.utc(user.createdAt).format('YYYY-MM-DD')
+      : selectedDate === moment.utc(user?.createdAt).format('YYYY-MM-DD')
       ? 'Sabio created your plan! View the rest of the week via the date selector above.'
       : "Sabio hasn't planned this day yet";
 

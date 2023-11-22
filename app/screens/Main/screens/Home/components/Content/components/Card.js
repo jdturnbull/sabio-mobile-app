@@ -45,26 +45,66 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginRight: 10,
   },
+  completedContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    backgroundColor: '#1F2025',
+    borderTopWidth: 1,
+    borderBottomWidth: 2,
+    borderRightWidth: 0.5,
+    borderLeftWidth: 0.5,
+    borderColor: '#E66642',
+    marginBottom: 15,
+    padding: 30,
+    borderRadius: 27,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowRadius: 3,
+    shadowOpacity: 0.3,
+    shadowColor: 'black',
+  },
+  completedButton: {
+    padding: 10,
+    borderRadius: 8,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  completedButtonText: {
+    color: '#A4D714',
+    fontWeight: '700',
+    fontSize: 14,
+  },
 });
 
 const Card = ({ activity }) => {
   const { navigate } = useNavigation();
-  const NextIcon = getIconFromLabel('next');
   const Icon = getIconFromLabel(activity.type.toLowerCase()) || getIconFromLabel('default');
+  const SmallIcon = getIconFromLabel(`${activity.type.toLowerCase()}small`) || getIconFromLabel('defaultsmall');
+
+  const ViewAnalysisIcon = getIconFromLabel('viewAnalysis');
 
   const handlePress = () => {
     navigate('OverlayStack', { screen: 'activity', params: { activity } });
   };
 
   return (
-    <Pressable style={styles.container} onPress={handlePress}>
-      <Text style={styles.title}>{activity.title}</Text>
-      <Icon />
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, paddingHorizontal: 30 }}>
-        <Text style={styles.bodyText} numberOfLines={1}>
-          {activity.guidance}
-        </Text>
-      </View>
+    <Pressable style={activity.completed ? styles.completedContainer : styles.container} onPress={handlePress}>
+      {activity.completed && <SmallIcon />}
+      <Text style={[styles.title, activity.completed ? { marginBottom: 0, flex: 1 } : {}]}>{activity.title}</Text>
+      {activity.completed ? null : <Icon />}
+      {activity.completed ? null : (
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, paddingHorizontal: 30 }}>
+          <Text style={styles.bodyText} numberOfLines={1}>
+            {activity.guidance}
+          </Text>
+        </View>
+      )}
+      {activity.completed && <ViewAnalysisIcon />}
     </Pressable>
   );
 };

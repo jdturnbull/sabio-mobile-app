@@ -19,12 +19,22 @@ import Swim from '../components/icons/cards/Swim';
 import Bike from '../components/icons/cards/Bike';
 import Rest from '../components/icons/cards/Rest';
 import Default from '../components/icons/cards/Default';
+import DefaultSmall from '../components/icons/cards/DefaultSmall';
 import FloatingButton from '../components/icons/home/FloatingButton';
 import Analytics from '../components/icons/tabs/Analytics';
 import Runner from '../components/icons/general/Runner';
 import Bolt from '../components/icons/general/Bolt';
 import Yoga from '../components/icons/cards/Yoga';
 import Next from '../components/icons/general/Next';
+import Create from '../components/icons/actions/Create';
+import Delete from '../components/icons/actions/Delete';
+import Update from '../components/icons/actions/Update';
+import Completed from '../components/icons/cards/Completed';
+import RunSmall from '../components/icons/cards/RunSmall';
+import BikeSmall from '../components/icons/cards/BikeSmall';
+import SwimSmall from '../components/icons/cards/SwimSmall';
+import StrengthSmall from '../components/icons/cards/StrengthSmall';
+import ViewAnalysis from '../components/icons/cards/View';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -52,8 +62,18 @@ export const ICONS = [
   { label: 'runner', icon: Runner },
   { label: 'bolt', icon: Bolt },
   { label: 'yoga', icon: Yoga },
-  { label: 'default', icon: Run },
+  { label: 'default', icon: Default },
   { label: 'next', icon: Next },
+  { label: 'create', icon: Create },
+  { label: 'delete', icon: Delete },
+  { label: 'update', icon: Update },
+  { label: 'completed', icon: Completed },
+  { label: 'defaultsmall', icon: DefaultSmall },
+  { label: 'runsmall', icon: RunSmall },
+  { label: 'viewAnalysis', icon: ViewAnalysis },
+  { label: 'bikesmall', icon: BikeSmall },
+  { label: 'strengthsmall', icon: StrengthSmall },
+  { label: 'swimsmall', icon: SwimSmall },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

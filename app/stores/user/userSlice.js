@@ -60,12 +60,23 @@ export const continueWithApple = createAsyncThunk('user/continueWithApple', asyn
 
 export const getPlan = createAsyncThunk('user/getPlan', async (data, { getState }) => {
   try {
-    const user = getState().user.session.user;
+    const user = getState().user.session?.user;
 
     const plan = await call('GET', `users/retrievePlan/${user.id}`);
     return plan;
   } catch (error) {
     console.log('Error getting plan', error);
+  }
+});
+
+export const getActions = createAsyncThunk('user/getActions', async (data, { getState }) => {
+  try {
+    const user = getState().user.session?.user;
+
+    const actions = await call('GET', `users/retrieveActions/${user.id}`);
+    return actions;
+  } catch (error) {
+    console.log('Error getting actions', error);
   }
 });
 
@@ -76,6 +87,7 @@ export const userSlice = createSlice({
     loaded: false,
     loading: false,
     plannedActivities: [],
+    actions: [],
     signedIn: false,
     onboarded: false,
     session: null,
@@ -103,6 +115,9 @@ export const userSlice = createSlice({
     });
     builder.addCase(getPlan.fulfilled, (state, action) => {
       state.plannedActivities = action.payload;
+    });
+    builder.addCase(getActions.fulfilled, (state, action) => {
+      state.actions = action.payload;
     });
   },
 });
