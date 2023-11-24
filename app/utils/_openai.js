@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { REACT_APP_OPENAI_API_KEY } from '@env';
 import _ from 'lodash';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import call from './call';
 
 export const config = {
@@ -22,13 +22,9 @@ const initial_chat_messages = JSON.stringify({
 });
 
 export const extractFunctionData = (res) => {
-  try {
-    const { tool_calls } = res.required_action.submit_tool_outputs;
-    const { arguments: args, name } = tool_calls[0].function;
-    return { name, args, id: tool_calls[0].id };
-  } catch (error) {
-    console.log(`Error extracting function data: ${error.message}`);
-  }
+  const { tool_calls } = res.required_action.submit_tool_outputs;
+  const { arguments: args, name } = tool_calls[0].function;
+  return { name, args, id: tool_calls[0].id };
 };
 
 const sortMessagesByDate = (messages) => {
@@ -54,7 +50,7 @@ export const retrieveAssistant = async (type) => {
   }
 };
 
-export const createThread = async (type, activity) => {
+export const createThread = async (type, activity, user) => {
   if (type === 'onboarding') {
     try {
       const thread = await axios.post('https://api.openai.com/v1/threads', initial_chat_messages, config);
@@ -66,12 +62,27 @@ export const createThread = async (type, activity) => {
 
   if (type === 'main') {
     try {
+      const today = moment.tz(user.timezone).format('YYYY-MM-DD');
+      const tomorrow = moment.tz(user.timezone).add(1, 'days').format('YYYY-MM-DD');
+      const yesterday = moment.tz(user.timezone).subtract(1, 'days').format('YYYY-MM-DD');
+      const activityDate = moment(activity.date).format('dddd');
+      const typeString = activity.type === 'strength' ? 'strength workout' : activity.type;
+
+      const dateString =
+        activity.date === today
+          ? 'today'
+          : activity.date === tomorrow
+          ? 'tomorrow'
+          : activity.date === yesterday
+          ? 'yesterday'
+          : `this ${activityDate}`;
+
       const initMessages = activity
         ? JSON.stringify({
             messages: [
               {
                 role: 'user',
-                content: `Hey Sabio! I want to chat about my ${activity.title} today.`,
+                content: `Hey Sabio! I want to chat about the ${typeString} you've assigned me ${dateString}.`,
               },
             ],
           })
@@ -94,8 +105,12 @@ export const retrieveMessages = async (thread_id) => {
   }
 };
 
-export const run = async (thread_id, assistant_id, userId) => {
+export const run = async (thread_id, assistant_id, extraInstructions, userId) => {
   let instructions = await call('GET', `users/instructions/${userId}`);
+
+  if (extraInstructions !== '') {
+    instructions += extraInstructions;
+  }
 
   const body = JSON.stringify({
     assistant_id,

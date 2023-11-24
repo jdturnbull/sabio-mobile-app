@@ -10,18 +10,17 @@ import {
   KeyboardAvoidingView,
   ImageBackground,
 } from 'react-native';
-import axios from 'axios';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as openai from '../../../../utils/openai';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIconFromLabel } from '../../../../utils/icon';
 import AssistantMessage from '../../../../components/chat/AssistantMessage';
 import UserMessage from '../../../../components/chat/UserMessage';
-import LoadingIndicator from '../../../../components/chat/LoadingIndicator';
 import { useNavigation } from '@react-navigation/native';
-import { updateState } from '../../../../stores/user/userSlice';
+import { updateState } from '../../../../stores/chat/chatSlice';
 import { useKeyboard } from '@react-native-community/hooks';
 import background from '../../../../assets/background-chat.png';
+import call from '../../../../utils/call';
 
 const Chat = () => {
   const scrollRef = useRef();
@@ -29,17 +28,20 @@ const Chat = () => {
   const navigation = useNavigation();
   const keyboard = useKeyboard();
   const width = useWindowDimensions().width;
-
-  const [loading, setLoading] = useState(true);
-  const [activeToolId, setActiveToolId] = useState(null);
+  const [isSetup, setIsSetup] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [toolId, setToolId] = useState(null);
+  const [toolOutput, setToolOutput] = useState(null);
+  const [shouldCompleteTool, setShouldCompleteTool] = useState(false);
   const [canSend, setCanSend] = useState(false);
   const [userMessage, setUserMessage] = useState('');
+  const [requiresResponse, setRequiresResponse] = useState(false);
+  const [responsePending, setResponsePending] = useState(false);
 
   const session = useSelector((state) => state.user.session);
   const state = useSelector((state) => state.chat);
 
   const [animatedWidth] = useState(new Animated.Value(width * 0.9));
-  const [scrollOpacity] = useState(new Animated.Value(1));
   const [animatedMargin] = useState(new Animated.Value(120));
   const [opacity] = useState(new Animated.Value(userMessage.split('').length > 0 ? 1 : 0.2));
 
@@ -48,10 +50,11 @@ const Chat = () => {
   // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
     const setup = async () => {
+      if (isSetup) return;
+
       let assistant = state.assistant;
       let thread = state.thread;
       let messages = state.messages;
-      let runId = state.runId;
 
       if (!state.assistant) {
         assistant = await openai.retrieveAssistant('main');
@@ -61,99 +64,164 @@ const Chat = () => {
         thread = await openai.createThread('main', state.activity);
       }
 
+      // Get the messages from the thread
       messages = await openai.retrieveMessages(thread.id);
 
-      const latest = messages[messages.length - 1];
+      // Update the state with the assistant, thread and messages
+      dispatch(updateState({ ...state, assistant, thread, messages }));
 
-      if (latest && latest.role === 'user') {
-        try {
-          runId = await openai.run(thread.id, assistant.id, null, session.user.id);
-        } catch (error) {
-          console.log(error.message);
-        }
+      // Get the most recent message
+      const latestMessage = messages[messages.length - 1];
+
+      // If the most recent message is from the user trigger an AI response
+      if (latestMessage?.role === 'user') {
+        setRequiresResponse(true);
       }
 
-      dispatch(updateState({ ...state, assistant, thread, messages, runId }));
+      setIsSetup(true);
     };
 
     setup();
   }, []);
 
-  // Handles adding AI responses to the message thread
-  useEffect(() => {
-    const _run = async () => {
-      if (!state.runId || !state.thread) return;
-
-      const interval = setInterval(async () => {
-        const runResponse = await openai.retrieveRun(state.thread.id, state.runId);
-
-        if (!runResponse) return;
-
-        if (runResponse.status === 'completed') {
-          const messages = await openai.retrieveMessages(state.thread.id);
-          dispatch(updateState({ messages, connectingDevice: false }));
-
-          setTimeout(() => {
-            scrollRef.current.scrollToEnd({ animated: true });
-          }, 100);
-
-          setCanSend(true);
-          clearInterval(interval);
-        } else if (runResponse.status === 'requires_action' && !activeToolId) {
-          const { args, name, id } = openai.extractFunctionData(runResponse);
-
-          if (name === 'connectSmartWatch') {
-            if (args.toLowerCase().includes('fitbit')) {
-              const redirect = await call('GET', `connect/getUrl/fitbit/${session.user.id}`);
-              setActiveToolId(id);
-              dispatch(updateState({ connectingDevice: true, redirect, showSafari: true }));
-              clearInterval(interval);
-            }
-            if (args.toLowerCase().includes('garmin')) {
-              const redirect = await call('GET', `connect/getUrl/garmin/${session.user.id}`);
-              setActiveToolId(id);
-              dispatch(updateState({ connectingDevice: true, redirect, showSafari: true }));
-              clearInterval(interval);
-            }
-            if (args.toLowerCase().includes('strava')) {
-              const redirect = await call('GET', `connect/getUrl/strava/${session.user.id}`);
-              setActiveToolId(id);
-              dispatch(updateState({ connectingDevice: true, redirect, showSafari: true }));
-              clearInterval(interval);
-            }
-          }
-
-          if (name === 'nextStep') {
-            await call('POST', `users/completeOnboarding`, { data: args, id: session.user.id });
-            dispatch(updateState({ onboarded: true }));
-            clearInterval(interval);
-          }
-        }
-      }, 500); // This is where the interval is set to 500ms
-    };
-
-    _run();
-
-    // The dependencies array was missing brackets and should include the variables used within the useEffect hook.
-  }, [state.runId, activeToolId]);
-
   // Handles initialising the response from the AI to a new user message
   useEffect(() => {
     const _run = async () => {
-      const latestMessage = state.messages[state.messages.length - 1];
+      // If no response is required, then don't run
+      if (!requiresResponse) return;
 
-      if (latestMessage && latestMessage.role === 'user') {
-        const runResponse = await openai.retrieveRun(state.thread.id, state.runId);
+      // Set loading to true to show the loading indicator
+      setLoading(true);
 
-        if (runResponse && runResponse.status === 'completed') {
-          const runId = await openai.run(state.thread.id, state.assistant.id, null, session.user.id);
-          dispatch(updateState({ ...state, runId }));
-        }
-      }
+      // Initialise a response from the AI
+      const id = await openai.run(state.thread.id, state.assistant.id, session.user.id);
+
+      // Save the id of the response
+      dispatch(updateState({ ...state, runId: id }));
+
+      // Tell the component that a response is no longer required
+      setRequiresResponse(false);
+
+      // Tell the component that a response is pending
+      setResponsePending(true);
     };
 
     _run();
-  }, [state.messages]);
+  }, [requiresResponse]);
+
+  // Handles capturing the response and adding it to the message thread.
+  useEffect(() => {
+    let timeoutId = null;
+
+    const _captureResponse = async () => {
+      if (!responsePending) return;
+
+      // Retrieve the response from the AI
+      const response = await openai.retrieveRun(state.thread.id, state.runId);
+      console.log('Retrieved response, status is:' + response.status);
+
+      if (response.status === 'in_progress' || response.status === 'queued') {
+        // If the response isn't ready yet, run the function again in 2 seconds
+        timeoutId = setTimeout(_captureResponse, 2000);
+      } else if (response.status === 'completed') {
+        // Get the new messages from the message thread and save them
+        const messages = await openai.retrieveMessages(state.thread.id);
+
+        // Set loading to false to remove the loading indicator
+        setLoading(false);
+
+        // Update the state with the new messages
+        dispatch(updateState({ messages }));
+
+        // Scroll to the bottom of the chat so the user can see the new message
+        setTimeout(() => {
+          scrollRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+
+        // Set canSend true to enable the user to send a new message
+        setCanSend(true);
+
+        // Tell the component that a response is no longer pending
+        setResponsePending(false);
+      } else if (response.status === 'requires_action') {
+        // Extract the function data from the response
+        const { args, name, id } = openai.extractFunctionData(response);
+
+        // Save the tool id so we can use it when getting the tool completion
+        setToolId(id);
+
+        if (name === 'replan') {
+          // Send the data to the backend to replan the week
+          const response = await call('POST', 'users/replan', { data: args, userId: session.user.id });
+
+          // Save the response to the tool output so it can be used when completing the tool
+          setToolOutput(response);
+
+          // Trigger the tool completion
+          setShouldCompleteTool(true);
+        }
+
+        // Tell the component that a response is no longer pending
+        setResponsePending(false);
+      }
+    };
+
+    _captureResponse();
+
+    // Cleanup function to clear the timeout when the component unmounts or before the useEffect runs again
+    return () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [responsePending]);
+
+  // Handles completing the tool
+  useEffect(() => {
+    const _completeTool = async () => {
+      if (!shouldCompleteTool) return;
+
+      // Complete the tool
+      await openai.submitToolResponse(state.thread.id, state.runId, toolId, toolOutput);
+
+      // Tell the component that the tool no longer needs to be completed
+      setShouldCompleteTool(false);
+
+      // Tell the component a response is pending
+      setResponsePending(true);
+    };
+
+    _completeTool();
+  }, [shouldCompleteTool]);
+
+  // Handles sending user message to the assistant
+  const handleSendUserMessage = async () => {
+    if (!userMessage) return;
+    if (!canSend) return;
+
+    // Stop the user from sending a message while the AI is responding
+    setCanSend(false);
+
+    // Add the user message to the message thread
+    await openai.addUserMessage(state.thread.id, userMessage);
+
+    // Clear the user message
+    setUserMessage('');
+
+    // Retrieve the messages from the message thread
+    const messages = await openai.retrieveMessages(state.thread.id);
+
+    // Update the state with the new messages
+    dispatch(updateState({ messages }));
+
+    // Tell the AI to respond to the user message
+    setRequiresResponse(true);
+
+    // Scroll to the bottom of the chat so the user can see the new message
+    setTimeout(() => {
+      scrollRef.current.scrollToEnd({ animated: true });
+    }, 100);
+  };
 
   // Handles animating the width of the input container (can't use native driver when animating layout props)
   useEffect(() => {
@@ -183,29 +251,6 @@ const Chat = () => {
     scrollRef.current.scrollToEnd({ animated: true });
   }, [keyboard.keyboardShown]);
 
-  // Handles sending user message to the assistant
-  const handleSendUserMessage = async () => {
-    if (!userMessage) return;
-    if (!canSend) return;
-
-    const latestMessage = state.messages[state.messages.length - 1];
-
-    if (latestMessage && latestMessage.role === 'user') return;
-
-    setCanSend(false);
-
-    const success = await openai.addUserMessage(state.thread.id, userMessage);
-
-    if (success) {
-      const messages = await openai.retrieveMessages(state.thread.id);
-      setUserMessage('');
-      dispatch(updateState({ messages }));
-      setTimeout(() => {
-        scrollRef.current.scrollToEnd({ animated: true });
-      }, 100);
-    }
-  };
-
   return (
     <View style={styles.container}>
       <View style={{ ...styles.headerContainer, width }}>
@@ -230,6 +275,11 @@ const Chat = () => {
                   return <UserMessage key={index} message={message.content[0].text.value} />;
                 }
               })}
+              {loading && (
+                <View style={{ height: 100, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 16, fontWeight: '500' }}>Sabio is typing...</Text>
+                </View>
+              )}
             </Animated.ScrollView>
           </GestureHandlerRootView>
           <Animated.View

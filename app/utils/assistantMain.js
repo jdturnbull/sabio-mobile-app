@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { REACT_APP_OPENAI_API_KEY } from '@env';
 import _ from 'lodash';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import call from './call';
+import * as helpers from './openai';
 
 export const config = {
   headers: {
@@ -12,90 +13,47 @@ export const config = {
   },
 };
 
-const initial_chat_messages = JSON.stringify({
-  messages: [
-    {
-      role: 'user',
-      content: 'Hey Sabio!',
-    },
-  ],
-});
-
 export const extractFunctionData = (res) => {
+  const { tool_calls } = res.required_action.submit_tool_outputs;
+  const { arguments: args, name } = tool_calls[0].function;
+  return { name, args, id: tool_calls[0].id };
+};
+
+export const retrieveAssistant = async () => {
   try {
-    const { tool_calls } = res.required_action.submit_tool_outputs;
-    const { arguments: args, name } = tool_calls[0].function;
-    return { name, args, id: tool_calls[0].id };
+    const assistant = await axios.get('https://api.openai.com/v1/assistants/asst_WI46ok4oWekUzErXAouxuP7e', config);
+    return assistant.data;
   } catch (error) {
-    console.log(`Error extracting function data: ${error.message}`);
+    console.log(`Error retrieving assistant: ${error.message}`);
   }
 };
 
-const sortMessagesByDate = (messages) => {
-  return _.orderBy(messages, ['created_at'], ['asc']);
-};
+export const createThread = async (activity, user) => {
+  try {
+    const initMessages = helpers.getInitMessages(activity, user);
 
-export const retrieveAssistant = async (type) => {
-  if (type === 'onboarding') {
-    try {
-      const assistant = await axios.get('https://api.openai.com/v1/assistants/asst_2dIzoiqvI7mSqU8iEpvVBUxW', config);
-      return assistant.data;
-    } catch (error) {
-      console.log(`Error retrieving assistant: ${error.message}`);
-    }
-  }
-  if (type === 'main') {
-    try {
-      const assistant = await axios.get('https://api.openai.com/v1/assistants/asst_WI46ok4oWekUzErXAouxuP7e', config);
-      return assistant.data;
-    } catch (error) {
-      console.log(`Error retrieving assistant: ${error.message}`);
-    }
-  }
-};
-
-export const createThread = async (type, activity) => {
-  if (type === 'onboarding') {
-    try {
-      const thread = await axios.post('https://api.openai.com/v1/threads', initial_chat_messages, config);
-      return thread.data;
-    } catch (error) {
-      console.log(`Error creating thread: ${error.message}`);
-    }
-  }
-
-  if (type === 'main') {
-    try {
-      const initMessages = activity
-        ? JSON.stringify({
-            messages: [
-              {
-                role: 'user',
-                content: `Hey Sabio! I want to chat about my ${activity.title} today.`,
-              },
-            ],
-          })
-        : initial_chat_messages;
-
-      const thread = await axios.post('https://api.openai.com/v1/threads', initMessages, config);
-      return thread.data;
-    } catch (error) {
-      console.log(`Error creating thread: ${error.message}`);
-    }
+    const thread = await axios.post('https://api.openai.com/v1/threads', initMessages, config);
+    return thread.data;
+  } catch (error) {
+    console.log(`Error creating thread: ${error.message}`);
   }
 };
 
 export const retrieveMessages = async (thread_id) => {
   try {
     const messages = await axios.get(`https://api.openai.com/v1/threads/${thread_id}/messages`, config);
-    return sortMessagesByDate(messages.data.data);
+    return helpers.sortMessagesByDate(messages.data.data);
   } catch (error) {
     console.log(`Error retrieving messages: ${error.message}`);
   }
 };
 
-export const run = async (thread_id, assistant_id, userId) => {
+export const run = async (thread_id, assistant_id, extraInstructions, userId) => {
   let instructions = await call('GET', `users/instructions/${userId}`);
+
+  if (extraInstructions !== '') {
+    instructions += extraInstructions;
+  }
 
   const body = JSON.stringify({
     assistant_id,
