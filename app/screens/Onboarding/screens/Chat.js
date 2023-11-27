@@ -9,6 +9,8 @@ import {
   Animated,
   KeyboardAvoidingView,
   ImageBackground,
+  InputAccessoryView,
+  Appearance,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useKeyboard } from '@react-native-community/hooks';
@@ -28,160 +30,316 @@ const Chat = () => {
   const keyboard = useKeyboard();
   const width = useWindowDimensions().width;
 
+  const inputAccessoryViewID = 'uniqueID';
+
   const session = useSelector((state) => state.user.session);
   const state = useSelector((state) => state.onboarding);
 
+  const [isSetup, setIsSetup] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showSafari, setShowSafari] = useState(false);
+  const [redirect, setRedirect] = useState(null);
+  const [toolId, setToolId] = useState(null);
+  const [toolOutput, setToolOutput] = useState(null);
+  const [programmaticDismissal, setProgrammaticDismissal] = useState(false);
+  const [shouldCompleteTool, setShouldCompleteTool] = useState(false);
+  const [canSend, setCanSend] = useState(false);
+  const [userMessage, setUserMessage] = useState('');
+  const [requiresResponse, setRequiresResponse] = useState(false);
+  const [responsePending, setResponsePending] = useState(false);
+
   const [animatedWidth] = useState(new Animated.Value(width * 0.9));
   const [animatedMargin] = useState(new Animated.Value(120));
-
-  const [userMessage, setUserMessage] = useState('');
-  const [canSend, setCanSend] = useState(false);
-  const [activeToolId, setActiveToolId] = useState(null);
-
   const [opacity] = useState(new Animated.Value(userMessage.split('').length > 0 ? 1 : 0.2));
+
+  const colorScheme = Appearance.getColorScheme();
 
   const Send = getIconFromLabel('send');
 
   // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
     const setup = async () => {
+      if (isSetup) return;
+
       let assistant = state.assistant;
       let thread = state.thread;
       let messages = state.messages;
-      let runId = state.runId;
 
       if (!state.assistant) {
         assistant = await openai.retrieveAssistant('onboarding');
       }
 
       if (!state.thread) {
-        thread = await openai.createThread('onboarding');
+        thread = await openai.createThread('onboarding', state.activity);
       }
 
+      // Get the messages from the thread
       messages = await openai.retrieveMessages(thread.id);
 
-      const latest = messages[messages.length - 1];
+      // Update the state with the assistant, thread and messages
+      dispatch(updateState({ ...state, assistant, thread, messages }));
 
-      if (latest && latest.role === 'user') {
-        console.log('Creating run from setup');
-        runId = await openai.run(thread.id, assistant.id, null, session.user.id);
+      // Get the most recent message
+      const latestMessage = messages[messages.length - 1];
+
+      // If the most recent message is from the user trigger an AI response
+      if (latestMessage?.role === 'user') {
+        setRequiresResponse(true);
       }
 
-      dispatch(updateState({ ...state, assistant, thread, messages, runId }));
+      setIsSetup(true);
     };
 
     setup();
   }, []);
 
-  // Handles adding AI responses to the message thread
-  useEffect(() => {
-    const _run = async () => {
-      if (!state.runId || !state.thread) return;
-
-      const interval = setInterval(async () => {
-        const runResponse = await openai.retrieveRun(state.thread.id, state.runId);
-
-        if (!runResponse) return;
-
-        if (runResponse.status === 'completed') {
-          const messages = await openai.retrieveMessages(state.thread.id);
-          dispatch(updateState({ messages, connectingDevice: false }));
-
-          setTimeout(() => {
-            scrollRef.current.scrollToEnd({ animated: true });
-          }, 100);
-
-          setCanSend(true);
-          clearInterval(interval);
-        } else if (runResponse.status === 'requires_action' && !activeToolId) {
-          const { args, name, id } = openai.extractFunctionData(runResponse);
-
-          if (name === 'connectSmartWatch') {
-            if (args.toLowerCase().includes('fitbit')) {
-              const redirect = await call('GET', `connect/getUrl/fitbit/${session.user.id}`);
-              setActiveToolId(id);
-              dispatch(updateState({ connectingDevice: true, redirect, showSafari: true }));
-              clearInterval(interval);
-            }
-            if (args.toLowerCase().includes('garmin')) {
-              const redirect = await call('GET', `connect/getUrl/garmin/${session.user.id}`);
-              setActiveToolId(id);
-              dispatch(updateState({ connectingDevice: true, redirect, showSafari: true }));
-              clearInterval(interval);
-            }
-            if (args.toLowerCase().includes('strava')) {
-              const redirect = await call('GET', `connect/getUrl/strava/${session.user.id}`);
-              setActiveToolId(id);
-              dispatch(updateState({ connectingDevice: true, redirect, showSafari: true }));
-              clearInterval(interval);
-            }
-          }
-
-          if (name === 'nextStep') {
-            await call('POST', `users/completeOnboarding`, { data: args, id: session.user.id });
-            dispatch(updateState({ onboarded: true }));
-            clearInterval(interval);
-          }
-        }
-      }, 500); // This is where the interval is set to 500ms
-    };
-
-    _run();
-
-    // The dependencies array was missing brackets and should include the variables used within the useEffect hook.
-  }, [state.runId, activeToolId]);
-
   // Handles initialising the response from the AI to a new user message
   useEffect(() => {
     const _run = async () => {
-      const latestMessage = state.messages[state.messages.length - 1];
+      // If no response is required, then don't run
+      if (!requiresResponse) return;
 
-      if (latestMessage && latestMessage.role === 'user') {
-        const runResponse = await openai.retrieveRun(state.thread.id, state.runId);
+      // Set loading to true to show the loading indicator
+      setLoading(true);
 
-        if (runResponse && runResponse.status === 'completed') {
-          const runId = await openai.run(state.thread.id, state.assistant.id, null, session.user.id);
-          dispatch(updateState({ ...state, runId }));
-        }
-      }
+      // Initialise a response from the AI
+      const id = await openai.run(state.thread.id, state.assistant.id, session.user.id);
+
+      // Save the id of the response
+      dispatch(updateState({ ...state, runId: id }));
+
+      // Tell the component that a response is no longer required
+      setRequiresResponse(false);
+
+      // Tell the component that a response is pending
+      setResponsePending(true);
     };
 
     _run();
-  }, [state.messages]);
+  }, [requiresResponse]);
 
-  // Handles user closing the safari view when making watch connection
-
+  // Handles capturing the response and adding it to the message thread.
   useEffect(() => {
-    SafariView.addEventListener('onDismiss', async () => {
-      scrollRef.current.scrollToEnd({ animated: true });
-      if (activeToolId) {
-        let output = '';
+    let timeoutId = null;
 
-        const connected = await call('GET', `connect/list/${session.user.id}`);
+    const _captureResponse = async () => {
+      if (!responsePending) return;
 
-        if (connected.length > 0) {
-          output = 'success';
-        } else {
-          output = 'failure';
+      // Retrieve the response from the AI
+      const response = await openai.retrieveRun(state.thread.id, state.runId);
+      console.log('Retrieved response, status is:' + response.status);
+
+      if (response.status === 'in_progress' || response.status === 'queued') {
+        // If the response isn't ready yet, run the function again in 2 seconds
+        timeoutId = setTimeout(_captureResponse, 2000);
+      } else if (response.status === 'completed') {
+        // Get the new messages from the message thread and save them
+        const messages = await openai.retrieveMessages(state.thread.id);
+
+        // Set loading to false to remove the loading indicator
+        setLoading(false);
+
+        // Update the state with the new messages
+        dispatch(updateState({ messages }));
+
+        // Scroll to the bottom of the chat so the user can see the new message
+        setTimeout(() => {
+          scrollRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+
+        // Set canSend true to enable the user to send a new message
+        setCanSend(true);
+
+        // Tell the component that a response is no longer pending
+        setResponsePending(false);
+      } else if (response.status === 'requires_action') {
+        // Extract the function data from the response
+        const { args, name, id } = openai.extractFunctionData(response);
+
+        // Save the tool id so we can use it when getting the tool completion
+        setToolId(id);
+
+        if (name === 'connectSmartWatch') {
+          if (args.toLowerCase().includes('strava')) {
+            // Get and store the redirect url
+            const redirect = await call('GET', `connect/getUrl/strava/${session.user.id}`);
+            setRedirect(redirect);
+            // Trigger opening the safari view
+            setShowSafari(true);
+          }
         }
 
-        try {
-          await openai.submitToolResponse(state.thread.id, state.runId, activeToolId, output);
-          dispatch(updateState({ connectingDevice: false, showSafari: false }));
-          setActiveToolId(null);
-        } catch (error) {
-          console.log('Error submitting tool response');
-          console.log(error);
+        // TODO: The catch seems to fail here, need to investigate
+
+        if (name === 'nextStep') {
+          try {
+            // Complete the onboarding process
+            await call('POST', `users/completeOnboarding`, { data: args, id: session.user.id });
+
+            // Update the state to move the user into the app
+            dispatch(updateState({ onboarded: true }));
+          } catch (error) {
+            console.log('Error completing onboarding: ' + error.message);
+
+            setToolOutput(
+              "Error completing onboarding, you'll need to apologise to the user, tell them you've notified the team and ask them to reload the app and try again later on.",
+            );
+
+            setShouldCompleteTool(true);
+          }
         }
+
+        // Tell the component that a response is no longer pending
+        setResponsePending(false);
       }
-    });
-  }, [activeToolId]);
+    };
 
-  // Handles opening the safari view when making watch connection
+    _captureResponse();
+
+    // Cleanup function to clear the timeout when the component unmounts or before the useEffect runs again
+    return () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [responsePending]);
+
+  // Handles opening the safari view when showSafrari is true
   useEffect(() => {
-    if (!state.showSafari) return;
-    SafariView.show({ url: state.redirect });
-  }, [state.showSafari]);
+    if (!showSafari) return;
+
+    SafariView.show({ url: redirect });
+  }, [showSafari]);
+
+  // Handles closing the safari view when the user has connected their watch
+  useEffect(() => {
+    let timeoutId = null;
+
+    const _captureResponse = async () => {
+      if (!showSafari) return;
+
+      try {
+        // Retrieve the connections from the backend
+        const response = await call('GET', `connect/list/${session.user.id}`);
+
+        if (response.length === 0) {
+          // If the user hasn't connected their watch, run the function again in 2 seconds
+          timeoutId = setTimeout(_captureResponse, 2000);
+        } else {
+          // If the user has connected their watch, close the safari view
+          SafariView.dismiss();
+          // So we know we auto closed the safari view
+          setProgrammaticDismissal(true);
+
+          // If the user has connected their watch, complete the tool
+          setToolOutput('User has connected their smart tracker successfully.');
+          setShouldCompleteTool(true);
+        }
+      } catch (error) {
+        console.log("Error retrieving user's connections" + error.message);
+        // If there was an error connecting the user to their smart tracker, complete the tool
+        setToolOutput('Error connecting user to smart tracker.');
+        setShouldCompleteTool(true);
+      }
+    };
+
+    _captureResponse();
+
+    // Cleanup function to clear the timeout when the component unmounts or before the useEffect runs again
+    return () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [showSafari]);
+
+  // Handles the user manually closing the safari view
+  const handleSafariViewDismiss = async () => {
+    // If the dismissal was done by the user
+    if (!programmaticDismissal) {
+      // Retrieve the connections from the backend
+      const response = await call('GET', `connect/list/${session.user.id}`);
+
+      if (response.length === 0) {
+        // If the user hasn't connected their watch, complete the tool
+        setToolOutput(
+          'User cancelled the safari view allowing them to connect their smart tracker. No smart tracker has been connected, you need to ask the user to connect something before continuing.',
+        );
+        setShouldCompleteTool(true);
+      } else {
+        // If the user has connected their watch, complete the tool
+        setToolOutput('User has connected their smart tracker successfully.');
+        setShouldCompleteTool(true);
+      }
+    }
+
+    // Scroll to the bottom of the chat
+    setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+
+    setShowSafari(false);
+    setProgrammaticDismissal(false); // Reset the dismissal flag
+  };
+
+  // Event listener to handle user manually closing the safari view
+  useEffect(() => {
+    SafariView.addEventListener('onDismiss', handleSafariViewDismiss);
+
+    // return () => {
+    //   // Remove event listener on cleanup if there is one
+    //   if (SafariView.removeEventListener) {
+    //     SafariView.removeEventListener('onDismiss', handleSafariViewDismiss);
+    //   }
+    // };
+  }, []);
+
+  // Handles completing the tool
+  useEffect(() => {
+    const _completeTool = async () => {
+      if (!shouldCompleteTool) return;
+
+      // Complete the tool
+      await openai.submitToolResponse(state.thread.id, state.runId, toolId, toolOutput);
+
+      // Tell the component that the tool no longer needs to be completed
+      setShouldCompleteTool(false);
+
+      // Tell the component a response is pending
+      setResponsePending(true);
+    };
+
+    _completeTool();
+  }, [shouldCompleteTool]);
+
+  // Handles sending user message to the assistant
+  const handleSendUserMessage = async () => {
+    if (!userMessage) return;
+    if (!canSend) return;
+
+    // Stop the user from sending a message while the AI is responding
+    setCanSend(false);
+
+    // Add the user message to the message thread
+    await openai.addUserMessage(state.thread.id, userMessage);
+
+    // Clear the user message
+    setUserMessage('');
+
+    // Retrieve the messages from the message thread
+    const messages = await openai.retrieveMessages(state.thread.id);
+
+    // Update the state with the new messages
+    dispatch(updateState({ messages }));
+
+    // Tell the AI to respond to the user message
+    setRequiresResponse(true);
+
+    // Scroll to the bottom of the chat so the user can see the new message
+    setTimeout(() => {
+      scrollRef.current.scrollToEnd({ animated: true });
+    }, 100);
+  };
 
   // Handles animating the width of the input container (can't use native driver when animating layout props)
   useEffect(() => {
@@ -207,33 +365,6 @@ const Chat = () => {
     }).start();
   }, [userMessage]);
 
-  useEffect(() => {
-    scrollRef.current.scrollToEnd({ animated: true });
-  }, [keyboard.keyboardShown]);
-
-  // Handles sending user message to the assistant
-  const handleSendUserMessage = async () => {
-    if (!userMessage) return;
-    if (!canSend) return;
-
-    const latestMessage = state.messages[state.messages.length - 1];
-
-    if (latestMessage && latestMessage.role === 'user') return;
-
-    setCanSend(false);
-
-    const success = await openai.addUserMessage(state.thread.id, userMessage);
-
-    if (success) {
-      const messages = await openai.retrieveMessages(state.thread.id);
-      setUserMessage('');
-      dispatch(updateState({ messages }));
-      setTimeout(() => {
-        scrollRef.current.scrollToEnd({ animated: true });
-      }, 100);
-    }
-  };
-
   return (
     <View style={styles.container}>
       <View style={{ ...styles.headerContainer, width }}>
@@ -258,6 +389,11 @@ const Chat = () => {
                   return <UserMessage key={index} message={message.content[0].text.value} />;
                 }
               })}
+              {loading && (
+                <View style={{ height: 100, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 16, fontWeight: '500' }}>Sabio is typing...</Text>
+                </View>
+              )}
             </Animated.ScrollView>
           </GestureHandlerRootView>
           <Animated.View
@@ -271,6 +407,7 @@ const Chat = () => {
             <Animated.View style={{ ...styles.inputContainer, width: animatedWidth, marginBottom: animatedMargin }}>
               <TextInput
                 multiline
+                inputAccessoryViewID={inputAccessoryViewID}
                 style={styles.input}
                 value={userMessage}
                 onChangeText={(text) => setUserMessage(text)}
@@ -284,6 +421,10 @@ const Chat = () => {
               </View>
             </Animated.View>
           </Animated.View>
+          <InputAccessoryView nativeID={inputAccessoryViewID}>
+            <View
+              style={{ height: 50, backgroundColor: '#1F2025', justifyContent: 'center', alignItems: 'center' }}></View>
+          </InputAccessoryView>
         </KeyboardAvoidingView>
       </ImageBackground>
     </View>
@@ -291,6 +432,10 @@ const Chat = () => {
 };
 
 export default Chat;
+
+const InputAccessoryLightStyle = StyleSheet.create({});
+
+const InputAccessoryDarkStyle = StyleSheet.create({});
 
 const styles = StyleSheet.create({
   container: {

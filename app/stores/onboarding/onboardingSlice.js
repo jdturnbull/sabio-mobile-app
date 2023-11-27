@@ -4,10 +4,7 @@ export const onboardingSlice = createSlice({
   name: 'onboarding',
   initialState: {
     onboarded: false,
-    redirect: null,
-    showSafari: false,
     assistant: null,
-    connectingDevice: false,
     activeToolId: null,
     thread: null,
     messages: [],
