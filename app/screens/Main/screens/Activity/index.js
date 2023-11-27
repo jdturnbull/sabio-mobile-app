@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
 
 const Activity = () => {
   const dispatch = useDispatch();
-  const threshold = 200;
+  const threshold = 100;
   const navigation = useNavigation();
   const translateY = useRef(new Animated.Value(0)).current;
 

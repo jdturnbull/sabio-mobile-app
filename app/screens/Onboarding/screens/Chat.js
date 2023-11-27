@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,11 @@ import {
   Animated,
   KeyboardAvoidingView,
   ImageBackground,
-  InputAccessoryView,
-  Appearance,
+  Modal,
+  FlatList,
+  Alert,
 } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useKeyboard } from '@react-native-community/hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import SafariView from 'react-native-safari-view';
@@ -30,7 +31,7 @@ const Chat = () => {
   const keyboard = useKeyboard();
   const width = useWindowDimensions().width;
 
-  const inputAccessoryViewID = 'uniqueID';
+  const threshold = 100;
 
   const session = useSelector((state) => state.user.session);
   const state = useSelector((state) => state.onboarding);
@@ -41,6 +42,7 @@ const Chat = () => {
   const [redirect, setRedirect] = useState(null);
   const [toolId, setToolId] = useState(null);
   const [toolOutput, setToolOutput] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const [programmaticDismissal, setProgrammaticDismissal] = useState(false);
   const [shouldCompleteTool, setShouldCompleteTool] = useState(false);
   const [canSend, setCanSend] = useState(false);
@@ -50,11 +52,12 @@ const Chat = () => {
 
   const [animatedWidth] = useState(new Animated.Value(width * 0.9));
   const [animatedMargin] = useState(new Animated.Value(120));
+  const translateY = useRef(new Animated.Value(0)).current;
   const [opacity] = useState(new Animated.Value(userMessage.split('').length > 0 ? 1 : 0.2));
 
-  const colorScheme = Appearance.getColorScheme();
-
+  const LogoSmall = getIconFromLabel('logoSmall');
   const Send = getIconFromLabel('send');
+  const HelpIcon = getIconFromLabel('help');
 
   // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
@@ -365,16 +368,82 @@ const Chat = () => {
     }).start();
   }, [userMessage]);
 
+  const handleHelp = () => {
+    setModalOpen(true);
+  };
+
+  const handleGestureEvent = useCallback(
+    Animated.event(
+      [
+        {
+          nativeEvent: {
+            translationY: translateY,
+          },
+        },
+      ],
+      { useNativeDriver: true },
+    ),
+    [],
+  );
+
+  const onHandlerStateChange = (event) => {
+    if (event.nativeEvent.oldState === State.ACTIVE) {
+      let { translationY } = event.nativeEvent;
+
+      if (translationY > threshold) {
+        setModalOpen(false);
+        translateY.setValue(0);
+      } else {
+        Animated.spring(translateY, {
+          toValue: 0,
+          speed: 14,
+          bounciness: 12,
+          useNativeDriver: true,
+        }).start();
+      }
+    }
+  };
+
+  const handleContactSupport = async () => {
+    Alert.alert('Contact Support', 'Please email help@heysabio.com', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+    ]);
+  };
+
+  const renderItem = ({ item }) => (
+    <View style={{ display: 'flex', flexDirection: 'row', width: '100%', alignItems: 'center', marginVertical: 2 }}>
+      <View style={{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#737476', marginRight: 4 }} />
+      <Text style={{ color: '#737476', fontSize: 15, fontWeight: '600', marginLeft: 5 }}>{item}</Text>
+    </View>
+  );
+
+  const CONSTRAINTS = [
+    'The goal must be quantifiable',
+    'The plan must be atleast a month long',
+    'The plan must be at most a year long',
+    'Access to a smart tracker is required',
+  ];
+
   return (
     <View style={styles.container}>
       <View style={{ ...styles.headerContainer, width }}>
-        <Text style={styles.header}>
-          Chat with <Text style={{ color: '#E66642', fontWeight: '600' }}>Sabio</Text>
-        </Text>
+        <View style={styles.logoContainer}>
+          <LogoSmall />
+        </View>
+        <View style={{ marginBottom: 2, flex: 1 }}>
+          <Text style={styles.headerText}>Sabio</Text>
+          <Text style={styles.headerSubtext}>Online</Text>
+        </View>
+        <Pressable onPress={handleHelp} style={{ marginBottom: 5 }}>
+          <HelpIcon />
+        </Pressable>
       </View>
       <ImageBackground source={background} resizeMode="cover" style={styles.background}>
         <KeyboardAvoidingView behavior="padding">
-          <GestureHandlerRootView style={{ flex: 1, paddingTop: 116 }}>
+          <GestureHandlerRootView style={{ flex: 1, paddingTop: 130 }}>
             <Animated.ScrollView
               ref={scrollRef}
               showsVerticalScrollIndicator={false}
@@ -407,7 +476,6 @@ const Chat = () => {
             <Animated.View style={{ ...styles.inputContainer, width: animatedWidth, marginBottom: animatedMargin }}>
               <TextInput
                 multiline
-                inputAccessoryViewID={inputAccessoryViewID}
                 style={styles.input}
                 value={userMessage}
                 onChangeText={(text) => setUserMessage(text)}
@@ -422,6 +490,37 @@ const Chat = () => {
             </Animated.View>
           </Animated.View>
         </KeyboardAvoidingView>
+        <Modal style={styles.modal} animationType="slide" transparent={true} visible={modalOpen}>
+          <View style={styles.modal}>
+            <View style={{ height: 250 }} />
+            <PanGestureHandler onGestureEvent={handleGestureEvent} onHandlerStateChange={onHandlerStateChange}>
+              <Animated.View style={{ ...styles.modalContent, transform: [{ translateY }] }}>
+                <View style={styles.modalTop}>
+                  <View style={styles.line} />
+                </View>
+                <View style={styles.modalBody}>
+                  <View>
+                    <Text style={styles.modalTitle}>Chatting with Sabio</Text>
+                    <Text style={styles.modalText}>
+                      Sabio's goal for this conversation is to understand a quantifiable and timebound fitness goal that
+                      he can help you work towards.
+                    </Text>
+                    <Text style={styles.modalText}>
+                      There are a few constaints that Sabio has to work within, these are listed below:
+                    </Text>
+                    <FlatList style={{ marginTop: 20 }} data={CONSTRAINTS} renderItem={renderItem} />
+                    <Text style={styles.modalText}>
+                      If this app is behaving unexpectedly, please reload the app to reset the conversation.
+                    </Text>
+                    <Pressable onPress={handleContactSupport} style={styles.pressable}>
+                      <Text style={styles.pressableText}>Contact Support</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </Animated.View>
+            </PanGestureHandler>
+          </View>
+        </Modal>
       </ImageBackground>
     </View>
   );
@@ -442,10 +541,13 @@ const styles = StyleSheet.create({
     zIndex: 1,
     position: 'absolute',
     display: 'flex',
-    alignItems: 'flex-start',
-    paddingTop: 65,
-    paddingLeft: 10,
+    height: 130,
+    paddingHorizontal: 15,
+    paddingBottom: 20,
     backgroundColor: '#16171B',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -454,6 +556,28 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 11,
     elevation: 10,
+  },
+  logoContainer: {
+    width: 50,
+    height: 50,
+    marginRight: 5,
+    backgroundColor: '#1F2025',
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 22,
+    marginHorizontal: 10,
+  },
+  headerSubtext: {
+    color: '#A4D714',
+    fontWeight: '400',
+    fontSize: 12,
+    marginHorizontal: 10,
+    marginLeft: 11,
   },
   header: {
     color: '#fff',
@@ -508,5 +632,67 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 11,
     elevation: 10,
+  },
+  modal: {
+    flex: 1,
+  },
+  modalContent: {
+    height: '100%',
+    backgroundColor: '#16171B',
+    borderTopRightRadius: 35,
+    borderTopLeftRadius: 35,
+    zIndex: 100,
+    padding: 20,
+  },
+  modalTop: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  line: {
+    width: 40,
+    height: 4,
+    borderRadius: 4,
+    backgroundColor: '#ffffff40',
+  },
+  modalBody: {
+    flex: 1,
+    marginTop: 30,
+    padding: 20,
+  },
+  modalTitle: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 20,
+    marginBottom: 20,
+  },
+  modalText: {
+    marginTop: 20,
+    fontSize: 15,
+    lineHeight: 20,
+    color: '#737476',
+    fontWeight: '600',
+  },
+  pressable: {
+    marginTop: 40,
+    marginRight: 10,
+    backgroundColor: '#1F2025',
+    padding: 20,
+    borderRadius: 8,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowRadius: 3,
+    shadowOpacity: 0.3,
+    shadowColor: '#000',
+  },
+  pressableText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
   },
 });
