@@ -12,6 +12,7 @@ import {
   Modal,
   FlatList,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useKeyboard } from '@react-native-community/hooks';
@@ -22,6 +23,7 @@ import { updateState } from '../../../stores/onboarding/onboardingSlice';
 import { getIconFromLabel } from '../../../utils/icon';
 import AssistantMessage from '../../../components/chat/AssistantMessage';
 import UserMessage from '../../../components/chat/UserMessage';
+import TypingAnimation from '../../../components/chat/TypingAnimation';
 import background from '../../../assets/background-chat.png';
 import call from '../../../utils/call';
 
@@ -459,8 +461,17 @@ const Chat = () => {
                 }
               })}
               {loading && (
-                <View style={{ height: 100, justifyContent: 'center', alignItems: 'center' }}>
-                  <Text style={{ color: '#fff', fontSize: 16, fontWeight: '500' }}>Sabio is typing...</Text>
+                <View
+                  style={{
+                    backgroundColor: '#1F2025',
+                    borderRadius: 10,
+                    padding: 15,
+                    marginBottom: 20,
+                    marginRight: 30,
+                    alignSelf: 'flex-start',
+                    width: 65,
+                  }}>
+                  <TypingAnimation />
                 </View>
               )}
             </Animated.ScrollView>
