@@ -3,8 +3,6 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import call from '../../../../utils/call';
 import { useSelector } from 'react-redux';
 
-const developers = ['jdturnbull98@gmail.com', 'p17.turnbull@gmail.com'];
-
 const Settings = () => {
   const user = useSelector((state) => state.user.session?.user);
 
@@ -25,13 +23,12 @@ const Settings = () => {
       </View>
       <View style={{ flex: 1, padding: 30 }}>
         <Text style={{ color: '#fff', fontWeight: '600', fontSize: 16 }}>Hello, {user?.name}</Text>
-        {developers.includes(user.email) && (
-          <Pressable
-            style={{ padding: 15, backgroundColor: '#1F2025', borderRadius: 10, marginTop: 20 }}
-            onPress={handleDelPress}>
-            <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>Reset my account</Text>
-          </Pressable>
-        )}
+
+        <Pressable
+          style={{ padding: 15, backgroundColor: '#1F2025', borderRadius: 10, marginTop: 20 }}
+          onPress={handleDelPress}>
+          <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>Reset my account</Text>
+        </Pressable>
       </View>
     </View>
   );
