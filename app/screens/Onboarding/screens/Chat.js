@@ -421,10 +421,6 @@ const Chat = () => {
               </View>
             </Animated.View>
           </Animated.View>
-          <InputAccessoryView nativeID={inputAccessoryViewID}>
-            <View
-              style={{ height: 50, backgroundColor: '#1F2025', justifyContent: 'center', alignItems: 'center' }}></View>
-          </InputAccessoryView>
         </KeyboardAvoidingView>
       </ImageBackground>
     </View>
@@ -432,10 +428,6 @@ const Chat = () => {
 };
 
 export default Chat;
-
-const InputAccessoryLightStyle = StyleSheet.create({});
-
-const InputAccessoryDarkStyle = StyleSheet.create({});
 
 const styles = StyleSheet.create({
   container: {
