@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { ScrollView, GestureHandlerRootView } from 'react-native-gesture-handler';
-import { ActivityIndicator, StyleSheet, View, Animated, Text } from 'react-native';
-import { useSelector } from 'react-redux';
+import { ActivityIndicator, StyleSheet, View, Animated, Text, RefreshControl } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import useUIState from '../../../../../../hooks/useUIState';
 import { getIconFromLabel } from '../../../../../../utils/icon';
 import Card from './components/Card';
+import { getActions } from '../../../../../../stores/user/userSlice';
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -20,6 +21,8 @@ const styles = StyleSheet.create({
 });
 
 const Content = () => {
+  const dispatch = useDispatch();
+
   const user = useSelector((state) => state.user.session?.user);
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
   const [activities, setActivities] = useState([]);
@@ -41,6 +44,16 @@ const Content = () => {
     });
     setActivities(filteredActivities);
   }, [selectedDate, plannedActivities]);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      dispatch(getActions());
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   useEffect(() => {
     Animated.loop(
@@ -64,7 +77,10 @@ const Content = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       {plannedActivities?.length > 0 && activities.length > 0 ? (
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl tintColor={'#ffffff40'} refreshing={refreshing} onRefresh={onRefresh} />}>
           {activities.map((activity) => (
             <Card key={activity.id} activity={activity} />
           ))}

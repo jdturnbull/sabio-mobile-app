@@ -181,6 +181,28 @@ const Chat = () => {
           setShouldCompleteTool(true);
         }
 
+        if (name === 'add_activity') {
+          // Send the data to the backend to add an activity
+          const response = await call('POST', 'users/addActivity', { data: args, userId: session.user.id });
+
+          // Save the response to the tool output so it can be used when completing the tool
+          setToolOutput(response);
+
+          // Trigger the tool completion
+          setShouldCompleteTool(true);
+        }
+
+        if (name === 'delete_activity') {
+          // Send the data to the backend to delete an activity
+          const response = await call('POST', 'users/deleteActivity', { data: args, userId: session.user.id });
+
+          // Save the response to the tool output so it can be used when completing the tool
+          setToolOutput(response);
+
+          // Trigger the tool completion
+          setShouldCompleteTool(true);
+        }
+
         if (name === 'learn') {
           // Send the data to the backend to learn
           const response = await call('POST', 'users/learn', { data: args, userId: session.user.id });
