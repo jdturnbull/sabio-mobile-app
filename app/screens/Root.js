@@ -7,6 +7,7 @@ import { useNetInfo } from '@react-native-community/netinfo';
 import { useSelector } from 'react-redux';
 import Onboarding from './Onboarding';
 import Main from './Main';
+import LostConnectionScreen from './LostConnection';
 
 const fadeTransition = {
   animation: 'timing',

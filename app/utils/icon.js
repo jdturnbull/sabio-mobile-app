@@ -38,6 +38,7 @@ import ViewAnalysis from '../components/icons/cards/View';
 import Help from '../components/icons/general/Help';
 import Confidence from '../components/icons/general/Confidence';
 import Read from '../components/icons/general/Read';
+import Streak from '../components/icons/general/Streak';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -78,7 +79,7 @@ export const ICONS = [
   { label: 'strengthsmall', icon: StrengthSmall },
   { label: 'swimsmall', icon: SwimSmall },
   { label: 'help', icon: Help },
-  { label: 'streak', icon: DefaultSmall },
+  { label: 'streak', icon: Streak },
   { label: 'confidence', icon: Confidence },
   { label: 'read', icon: Read },
 ];
