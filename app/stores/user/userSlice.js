@@ -87,6 +87,7 @@ export const userSlice = createSlice({
     loaded: false,
     loading: false,
     plannedActivities: [],
+    plannedMonths: [],
     actions: [],
     signedIn: false,
     onboarded: false,
@@ -114,7 +115,8 @@ export const userSlice = createSlice({
       }
     });
     builder.addCase(getPlan.fulfilled, (state, action) => {
-      state.plannedActivities = action.payload;
+      state.plannedActivities = action.payload.data;
+      state.plannedMonths = action.payload.months;
     });
     builder.addCase(getActions.fulfilled, (state, action) => {
       state.actions = action.payload;

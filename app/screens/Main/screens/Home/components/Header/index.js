@@ -3,7 +3,7 @@ import { View, StyleSheet, Text } from 'react-native';
 import { getIconFromLabel } from '../../../../../../utils/icon';
 
 const Header = () => {
-  const TypeIcon = getIconFromLabel('runsmall');
+  const TypeIcon = getIconFromLabel('run');
   const StreakIcon = getIconFromLabel('streak');
   const ConfidenceIcon = getIconFromLabel('confidence');
 

@@ -1,10 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View } from 'react-native';
-import DateSelector from './components/DateSelector';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPlan } from '../../../../stores/user/userSlice';
-import Content from './components/Content';
-
 import Header from './components/Header';
 import Journey from './components/Journey';
 
