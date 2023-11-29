@@ -36,6 +36,8 @@ import SwimSmall from '../components/icons/cards/SwimSmall';
 import StrengthSmall from '../components/icons/cards/StrengthSmall';
 import ViewAnalysis from '../components/icons/cards/View';
 import Help from '../components/icons/general/Help';
+import Confidence from '../components/icons/general/Confidence';
+import Read from '../components/icons/general/Read';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -76,6 +78,9 @@ export const ICONS = [
   { label: 'strengthsmall', icon: StrengthSmall },
   { label: 'swimsmall', icon: SwimSmall },
   { label: 'help', icon: Help },
+  { label: 'streak', icon: DefaultSmall },
+  { label: 'confidence', icon: Confidence },
+  { label: 'read', icon: Read },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

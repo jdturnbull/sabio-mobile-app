@@ -5,6 +5,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getPlan } from '../../../../stores/user/userSlice';
 import Content from './components/Content';
 
+import Header from './components/Header';
+import Journey from './components/Journey';
+
 const Home = () => {
   const dispatch = useDispatch();
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
@@ -38,8 +41,8 @@ const Home = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <DateSelector />
-      <Content />
+      <Header />
+      <Journey />
     </View>
   );
 };
