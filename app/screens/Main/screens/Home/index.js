@@ -9,6 +9,7 @@ import Journey from './components/Journey';
 const Home = () => {
   const dispatch = useDispatch();
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
+
   const intervalRef = useRef(null);
 
   useEffect(() => {

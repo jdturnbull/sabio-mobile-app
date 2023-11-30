@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet, ImageBackground, Dimensions, Text } from 'react-native';
+import { View, StyleSheet, ImageBackground, Dimensions, Text, TouchableWithoutFeedback } from 'react-native';
 import moment from 'moment';
 import Top from './components/Top';
 import { FlatList } from 'react-native-gesture-handler';
@@ -16,7 +16,7 @@ const Journey = () => {
   const plannedMonths = useSelector((state) => state.user.plannedMonths);
   const [activeMonth, setActiveMonth] = useState(plannedMonths[0]?.toUpperCase());
 
-  const { width: screenWidth } = Dimensions.get('window');
+  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
   const center = screenWidth / 2 - BOX_WIDTH / 2;
 
   const onViewableItemsChanged = useCallback(({ viewableItems, changed }) => {
@@ -55,57 +55,63 @@ const Journey = () => {
     const label = arr.length === 3 ? `${arr[1]}${arr[2]}` : `${arr[2]}${arr[3]}`;
 
     return (
-      <View style={{ ...styles.box, left: item.x + center, top: item.y }}>
-        <View style={styles.boxBase}>
-          <View
-            style={{
-              ...styles.boxBase,
-              backgroundColor: item.completed ? '#E66642' : '#8AA1B130',
-              shadowOffset: {
-                width: 3,
-                height: 4,
-              },
-              shadowRadius: 0,
-              shadowOpacity: 1,
-              shadowColor: item.completed ? `#E6664250` : '#8AA1B110',
-            }}>
-            <View style={styles.boxLeft}>
-              <Icon color={item.completed ? null : '#8AA1B190'} />
-            </View>
-            <View style={styles.boxRight}>
-              {item.completed ? (
-                <View
-                  style={{ width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
-                  <Text style={{ fontFamily: 'Noto Sans', fontWeight: 700, color: '#fff', fontSize: 16 }}>
-                    {num}
+      <TouchableWithoutFeedback>
+        <View style={{ ...styles.box, left: item.x + center, top: item.y }}>
+          <View style={styles.boxBase}>
+            <View
+              style={{
+                ...styles.boxBase,
+                backgroundColor: item.completed ? '#E66642' : '#8AA1B130',
+                shadowOffset: {
+                  width: 3,
+                  height: 4,
+                },
+                shadowRadius: 0,
+                shadowOpacity: 1,
+                shadowColor: item.completed ? `#E6664250` : '#8AA1B110',
+              }}>
+              <View style={styles.boxLeft}>
+                <Icon color={item.completed ? null : '#8AA1B190'} />
+              </View>
+              <View style={styles.boxRight}>
+                {item.completed ? (
+                  <View
+                    style={{
+                      width: '100%',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-evenly',
+                    }}>
+                    <Text style={{ fontFamily: 'Noto Sans', fontWeight: 700, color: '#fff', fontSize: 16 }}>
+                      {num}
+                      <Text style={{ fontSize: 12 }}>{label}</Text>
+                    </Text>
+                    <TickIcon />
+                  </View>
+                ) : (
+                  <Text style={{ fontFamily: 'Noto Sans', fontWeight: 700, color: '#8AA1B190', fontSize: 16 }}>
+                    {`${date.format('ddd')} ${num}`}
                     <Text style={{ fontSize: 12 }}>{label}</Text>
                   </Text>
-                  <TickIcon />
-                </View>
-              ) : (
-                <Text style={{ fontFamily: 'Noto Sans', fontWeight: 700, color: '#8AA1B190', fontSize: 16 }}>
-                  {`${date.format('ddd')} ${num}`}
-                  <Text style={{ fontSize: 12 }}>{label}</Text>
-                </Text>
-              )}
+                )}
+              </View>
             </View>
           </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     );
   };
 
   return (
-    <ImageBackground source={background} resizeMode="cover" style={styles.background}>
+    <ImageBackground source={background} resizeMode="cover" style={{ flex: 1 }}>
       <Top month={activeMonth} />
       <FlatList
         onLayout={handleLayout}
         data={plannedActivities}
         renderItem={renderItem}
+        initialNumToRender={15}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{
-          paddingHorizontal: 10,
-        }}
+        contentContainerStyle={{ flex: 1 }}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
       />
@@ -116,9 +122,6 @@ const Journey = () => {
 export default Journey;
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
   box: {
     position: 'relative',
     width: BOX_WIDTH,
