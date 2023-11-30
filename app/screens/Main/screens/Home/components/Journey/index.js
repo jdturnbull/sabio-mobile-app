@@ -102,16 +102,17 @@ const Journey = () => {
     );
   };
 
+  console.log(plannedActivities.length);
+
   return (
     <ImageBackground source={background} resizeMode="cover" style={{ flex: 1 }}>
       <Top month={activeMonth} />
       <FlatList
+        style={{ maxHeight: screenHeight - 80 - 200, marginTop: 4 }}
         onLayout={handleLayout}
         data={plannedActivities}
         renderItem={renderItem}
-        initialNumToRender={15}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ flex: 1 }}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
       />
