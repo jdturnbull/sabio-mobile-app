@@ -58,7 +58,7 @@ export const ICONS = [
 
   { label: 'run', icon: Run },
   { label: 'swim', icon: Swim },
-  { label: 'bike', icon: Bike },
+  { label: 'ride', icon: Bike },
   { label: 'rest', icon: Rest },
   { label: 'strength', icon: Strength },
   { label: 'default', icon: Default },

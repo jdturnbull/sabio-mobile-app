@@ -11,26 +11,9 @@ import { getIconFromLabel } from '../../../../../../utils/icon';
 const BOX_WIDTH = 140;
 const BOX_HEIGHT = 60;
 
-const COLOR_MAP = {
-  0: '#E66642',
-  1: '#FFBE3F',
-  2: '#8E84FF',
-  3: '#FF5271',
-  4: '#E66642',
-  5: '#FFBE3F',
-  6: '#8E84FF',
-  7: '#FF5271',
-  8: '#E66642',
-  9: '#FFBE3F',
-  10: '#8E84FF',
-  11: '#FF5271',
-  12: '#E66642',
-};
-
 const Journey = () => {
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
   const plannedMonths = useSelector((state) => state.user.plannedMonths);
-  const [color, setColor] = useState(COLOR_MAP[moment(plannedMonths[0], 'MMMM YYYY').month()]);
   const [activeMonth, setActiveMonth] = useState(plannedMonths[0]?.toUpperCase());
 
   const { width: screenWidth } = Dimensions.get('window');
@@ -44,6 +27,7 @@ const Journey = () => {
 
     if (activeMonth !== month) {
       setActiveMonth(month.toUpperCase());
+      hapticImpact();
     }
   }, []);
 
@@ -76,14 +60,14 @@ const Journey = () => {
           <View
             style={{
               ...styles.boxBase,
-              backgroundColor: item.completed ? color : '#8AA1B130',
+              backgroundColor: item.completed ? '#E66642' : '#8AA1B130',
               shadowOffset: {
                 width: 3,
                 height: 4,
               },
               shadowRadius: 0,
               shadowOpacity: 1,
-              shadowColor: item.completed ? `${color}50` : '#8AA1B110',
+              shadowColor: item.completed ? `#E6664250` : '#8AA1B110',
             }}>
             <View style={styles.boxLeft}>
               <Icon color={item.completed ? null : '#8AA1B190'} />
@@ -111,16 +95,9 @@ const Journey = () => {
     );
   };
 
-  useEffect(() => {
-    if (!activeMonth) return;
-    setColor(COLOR_MAP[moment(activeMonth, 'MMMM YYYY').month()]);
-    hapticImpact();
-  }, [activeMonth]);
-
   return (
     <ImageBackground source={background} resizeMode="cover" style={styles.background}>
-      <Top month={activeMonth} color={color} />
-
+      <Top month={activeMonth} />
       <FlatList
         onLayout={handleLayout}
         data={plannedActivities}

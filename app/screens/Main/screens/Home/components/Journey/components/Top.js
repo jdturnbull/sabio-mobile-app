@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { getIconFromLabel } from '../../../../../../../utils/icon';
 
-const Top = ({ month, color }) => {
+const Top = ({ month }) => {
   const plannedMonths = useSelector((state) => state.user.plannedMonths);
   const ReadIcon = getIconFromLabel('read');
   const monthIndex = plannedMonths.indexOf(month) + 1;
@@ -29,8 +29,8 @@ const Top = ({ month, color }) => {
     <Animated.View
       style={{
         ...styles.container,
-        backgroundColor: color,
-        shadowColor: color,
+        backgroundColor: '#E66642',
+        shadowColor: '#E66642',
         transform: [{ scale }], // Apply the animated scale here
       }}>
       <View style={styles.left}>

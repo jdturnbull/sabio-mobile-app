@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPlan } from '../../../../stores/user/userSlice';
+import WaitingScreen from './components/WaitingScreen';
 import Header from './components/Header';
 import Journey from './components/Journey';
 
@@ -36,12 +37,20 @@ const Home = () => {
     }
   }, [plannedActivities?.length]);
 
-  return (
-    <View style={{ flex: 1 }}>
-      <Header />
-      <Journey />
-    </View>
-  );
+  if (!plannedActivities || plannedActivities?.length === 0) {
+    return (
+      <View style={{ flex: 1 }}>
+        <WaitingScreen />
+      </View>
+    );
+  } else {
+    return (
+      <View style={{ flex: 1 }}>
+        <Header />
+        <Journey />
+      </View>
+    );
+  }
 };
 
 export default Home;
