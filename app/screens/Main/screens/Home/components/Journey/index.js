@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet, ImageBackground, Dimensions, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, StyleSheet, ImageBackground, Dimensions, Text, TouchableWithoutFeedback, Pressable } from 'react-native';
 import moment from 'moment';
 import Top from './components/Top';
 import { FlatList } from 'react-native-gesture-handler';
@@ -15,13 +15,22 @@ const Journey = () => {
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
   const plannedMonths = useSelector((state) => state.user.plannedMonths);
   const [activeMonth, setActiveMonth] = useState(plannedMonths[0]?.toUpperCase());
+  const [startOfWeekDates, setStartOfWeekDates] = useState([]);
 
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
   const center = screenWidth / 2 - BOX_WIDTH / 2;
 
+  useEffect(() => {
+    if (!plannedActivities || plannedActivities.length === 0) return;
+
+    const dates = plannedActivities.map((activity) => activity.date);
+    const datesNoDuplicates = [...new Set(dates)];
+
+    setStartOfWeekDates(datesNoDuplicates.filter((date) => moment.utc(date).day() === 0));
+  }, [plannedActivities]);
+
   const onViewableItemsChanged = useCallback(({ viewableItems, changed }) => {
     const firstItem = viewableItems[0].item;
-
     const date = moment(firstItem.date, 'YYYY-MM-DD');
     const month = date.format('MMMM YYYY');
 
@@ -32,7 +41,7 @@ const Journey = () => {
   }, []);
 
   const viewabilityConfig = {
-    itemVisiblePercentThreshold: 100,
+    viewAreaCoveragePercentThreshold: 50,
   };
 
   const handleLayout = useCallback(() => {
@@ -41,7 +50,6 @@ const Journey = () => {
 
   const renderItem = ({ item }) => {
     const date = moment.utc(item.date, 'YYYY-MM-DD');
-    const isEndOfWeek = date.day() === 6;
 
     const Icon =
       item.type === 'unplanned'
@@ -55,8 +63,8 @@ const Journey = () => {
     const label = arr.length === 3 ? `${arr[1]}${arr[2]}` : `${arr[2]}${arr[3]}`;
 
     return (
-      <TouchableWithoutFeedback>
-        <View style={{ ...styles.box, left: item.x + center, top: item.y }}>
+      <Pressable style={{ ...styles.pressable, left: item.x + center }}>
+        <View style={{ ...styles.box }}>
           <View style={styles.boxBase}>
             <View
               style={{
@@ -98,20 +106,45 @@ const Journey = () => {
             </View>
           </View>
         </View>
-      </TouchableWithoutFeedback>
+      </Pressable>
     );
   };
 
-  console.log(plannedActivities.length);
+  const Separator = ({ item, index }) => {
+    let weekNumber = 0;
+    const date = moment.utc(item.leadingItem?.date, 'YYYY-MM-DD').format('YYYY-MM-DD');
+
+    if (startOfWeekDates.includes(date)) {
+      weekNumber = startOfWeekDates.indexOf(date) + 1;
+
+      return (
+        <View style={styles.separatorContainer}>
+          <View style={styles.separatorTop}>
+            <View style={styles.separatorDiv} />
+            <Text style={styles.separatorTitle}>{`Week ${weekNumber}`}</Text>
+            <View style={styles.separatorDiv} />
+          </View>
+          <View style={styles.separatorBody}>
+            <Text style={styles.separatorBodyText}>
+              Introduce dynamic stretches and post-run cool down sessions to build good running habits
+            </Text>
+          </View>
+        </View>
+      );
+    }
+  };
 
   return (
     <ImageBackground source={background} resizeMode="cover" style={{ flex: 1 }}>
       <Top month={activeMonth} />
       <FlatList
-        style={{ maxHeight: screenHeight - 80 - 200, marginTop: 4 }}
+        style={{ marginTop: 4 }}
+        contentContainerStyle={{ paddingTop: 35 }}
         onLayout={handleLayout}
         data={plannedActivities}
         renderItem={renderItem}
+        windowSize={10}
+        ItemSeparatorComponent={(item, index) => <Separator item={item} index={index} />}
         keyExtractor={(item) => item.id}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
@@ -123,8 +156,12 @@ const Journey = () => {
 export default Journey;
 
 const styles = StyleSheet.create({
+  pressable: {
+    height: BOX_HEIGHT,
+    marginBottom: 35,
+    width: BOX_WIDTH,
+  },
   box: {
-    position: 'relative',
     width: BOX_WIDTH,
     height: BOX_HEIGHT,
   },
@@ -156,5 +193,40 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  separatorContainer: {
+    width: '100%',
+  },
+  separatorTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+  },
+  separatorDiv: {
+    width: '30%',
+    height: 1,
+    backgroundColor: '#8AA1B190',
+  },
+  separatorTitle: {
+    color: '#8AA1B190',
+    fontWeight: '700',
+    fontSize: 16,
+    fontFamily: 'Noto Sans',
+  },
+  separatorBody: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    marginTop: 8,
+    marginBottom: 35,
+  },
+  separatorBodyText: {
+    color: '#8AA1B170',
+    fontWeight: '700',
+    fontSize: 12,
+    fontFamily: 'Noto Sans',
+    textAlign: 'center',
   },
 });
