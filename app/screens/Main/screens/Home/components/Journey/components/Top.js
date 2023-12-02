@@ -4,6 +4,8 @@ import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { getIconFromLabel } from '../../../../../../../utils/icon';
 
 const Top = ({ month }) => {
+  const user = useSelector((state) => state.user.session.user);
+  const monthlyFocuses = user.monthlyFocuses;
   const plannedMonths = useSelector((state) => state.user.plannedMonths);
   const ReadIcon = getIconFromLabel('read');
   const monthIndex = plannedMonths.indexOf(month) + 1;
@@ -35,7 +37,7 @@ const Top = ({ month }) => {
       }}>
       <View style={styles.left}>
         <Text style={styles.bottomHeader}>{`${month}, MONTH ${monthIndex}`}</Text>
-        <Text style={styles.bottomMain}>Building foundations, focusing on routine and consistency</Text>
+        <Text style={styles.bottomMain}>{monthlyFocuses[month]}</Text>
       </View>
       <Pressable style={styles.pressable}>
         <ReadIcon />

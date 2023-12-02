@@ -14,6 +14,7 @@ const BOX_HEIGHT = 60;
 const Journey = () => {
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
   const plannedMonths = useSelector((state) => state.user.plannedMonths);
+  const user = useSelector((state) => state.user.session.user);
   const [activeMonth, setActiveMonth] = useState(plannedMonths[0]?.toUpperCase());
   const [startOfWeekDates, setStartOfWeekDates] = useState([]);
 
@@ -116,6 +117,7 @@ const Journey = () => {
 
     if (startOfWeekDates.includes(date)) {
       weekNumber = startOfWeekDates.indexOf(date) + 1;
+      const focus = user.weeklyFocuses[`week ${weekNumber}`];
 
       return (
         <View style={styles.separatorContainer}>
@@ -125,9 +127,7 @@ const Journey = () => {
             <View style={styles.separatorDiv} />
           </View>
           <View style={styles.separatorBody}>
-            <Text style={styles.separatorBodyText}>
-              Introduce dynamic stretches and post-run cool down sessions to build good running habits
-            </Text>
+            <Text style={styles.separatorBodyText}>{focus || ''}</Text>
           </View>
         </View>
       );

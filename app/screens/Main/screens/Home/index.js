@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getPlan } from '../../../../stores/user/userSlice';
+import { getPlan, setup } from '../../../../stores/user/userSlice';
 import WaitingScreen from './components/WaitingScreen';
 import Header from './components/Header';
 import Journey from './components/Journey';
@@ -15,6 +15,7 @@ const Home = () => {
   useEffect(() => {
     const fetchPlans = () => {
       dispatch(getPlan());
+      dispatch(setup());
     };
 
     fetchPlans();
