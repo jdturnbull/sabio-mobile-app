@@ -1,31 +1,18 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
+import moment from 'moment';
 import { useSelector } from 'react-redux';
 import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { getIconFromLabel } from '../../../../../../../utils/icon';
 
-const Top = ({ month }) => {
+const Top = ({ viewableItems }) => {
   const user = useSelector((state) => state.user.session.user);
   const monthlyFocuses = user.monthlyFocuses;
   const plannedMonths = useSelector((state) => state.user.plannedMonths);
   const ReadIcon = getIconFromLabel('read');
+
+  const month = moment(viewableItems[0]?.item.date, 'YYYY-MM-DD').format('MMMM YYYY').toUpperCase();
+
   const monthIndex = plannedMonths.indexOf(month) + 1;
-
-  const scale = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    Animated.sequence([
-      Animated.timing(scale, {
-        toValue: 1.1,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scale, {
-        toValue: 1,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [month, scale]);
 
   return (
     <Animated.View
@@ -33,7 +20,6 @@ const Top = ({ month }) => {
         ...styles.container,
         backgroundColor: '#E66642',
         shadowColor: '#E66642',
-        transform: [{ scale }], // Apply the animated scale here
       }}>
       <View style={styles.left}>
         <Text style={styles.bottomHeader}>{`${month}, MONTH ${monthIndex}`}</Text>
@@ -67,14 +53,14 @@ const styles = StyleSheet.create({
   bottomHeader: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#F8F8F890',
+    color: '#F8F8F8',
     fontFamily: 'Noto Sans',
   },
   bottomMain: {
     marginTop: 5,
     fontSize: 12,
     fontWeight: '700',
-    color: '#ffffff95',
+    color: '#ffffff99',
     fontFamily: 'Noto Sans',
   },
   left: {
