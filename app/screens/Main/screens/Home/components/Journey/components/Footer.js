@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Pressable, Dimensions } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  runOnJS,
+  useAnimatedGestureHandler,
+} from 'react-native-reanimated';
 
 const Footer = ({ data }) => {
   const [isFirstRender, setIsFirstRender] = useState(true);
@@ -8,7 +15,8 @@ const Footer = ({ data }) => {
   const [expanded, setExpanded] = useState(false);
 
   const screenHeight = Dimensions.get('window').height;
-  const heightAnim = useSharedValue(155); // Initial height
+  const heightAnim = useSharedValue(155);
+  const gestureY = useSharedValue(0);
 
   useEffect(() => {
     if (data) {
@@ -26,6 +34,14 @@ const Footer = ({ data }) => {
     }
   }, [data, heightAnim, isFirstRender]);
 
+  // If data is null, reset everything
+  useEffect(() => {
+    if (!data) {
+      setExpanded(false);
+      setRenderFooter(false);
+    }
+  }, [data]);
+
   const handlePress = () => {
     if (expanded) {
       heightAnim.value = withTiming(0, { duration: 300 }, () => {
@@ -39,6 +55,27 @@ const Footer = ({ data }) => {
     }
   };
 
+  const gestureHandler = useAnimatedGestureHandler({
+    onStart: (_, context) => {
+      context.startY = gestureY.value;
+    },
+    onActive: (event, context) => {
+      gestureY.value = context.startY + event.translationY;
+    },
+    onEnd: () => {
+      if (gestureY.value > 100) {
+        // Threshold for closing the view
+        heightAnim.value = withTiming(0, { duration: 300 }, () => {
+          runOnJS(setRenderFooter)(false);
+          runOnJS(setExpanded)(false);
+        });
+      } else {
+        // Snap back to the expanded position
+        heightAnim.value = withTiming(screenHeight / 2, { duration: 300 });
+      }
+    },
+  });
+
   const animatedStyle = useAnimatedStyle(() => {
     return {
       height: heightAnim.value,
@@ -50,7 +87,7 @@ const Footer = ({ data }) => {
   }
 
   return (
-    <View>
+    <PanGestureHandler onGestureEvent={gestureHandler}>
       <Animated.View style={[styles.overlay, animatedStyle]}>
         <View style={styles.container}>
           <Text style={styles.title}>{data?.item.title}</Text>
@@ -74,7 +111,7 @@ const Footer = ({ data }) => {
           )}
         </View>
       </Animated.View>
-    </View>
+    </PanGestureHandler>
   );
 };
 

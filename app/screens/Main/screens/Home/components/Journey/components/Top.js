@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { getIconFromLabel } from '../../../../../../../utils/icon';
 
-const Top = ({ viewableItems }) => {
+const Top = ({ viewableItems, setShowPlan }) => {
   const user = useSelector((state) => state.user.session.user);
   const monthlyFocuses = user.monthlyFocuses;
   const plannedMonths = useSelector((state) => state.user.plannedMonths);
@@ -13,6 +13,10 @@ const Top = ({ viewableItems }) => {
   const month = moment(viewableItems[0]?.item.date, 'YYYY-MM-DD').format('MMMM YYYY').toUpperCase();
 
   const monthIndex = plannedMonths.indexOf(month) + 1;
+
+  const handlePress = () => {
+    setShowPlan(true);
+  };
 
   return (
     <Animated.View
@@ -25,7 +29,7 @@ const Top = ({ viewableItems }) => {
         <Text style={styles.bottomHeader}>{`${month}, MONTH ${monthIndex}`}</Text>
         <Text style={styles.bottomMain}>{monthlyFocuses[month]}</Text>
       </View>
-      <Pressable style={styles.pressable}>
+      <Pressable onPress={handlePress} style={styles.pressable}>
         <ReadIcon />
       </Pressable>
     </Animated.View>

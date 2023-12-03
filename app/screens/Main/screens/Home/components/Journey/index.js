@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, ImageBackground } from 'react-native';
+import { StyleSheet, ImageBackground, Modal } from 'react-native';
 import moment from 'moment';
 import { debounce } from 'lodash';
 import Top from './components/Top';
@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import ListItem from './components/ListItem';
 import Separator from './components/Separator';
 import Footer from './components/Footer';
+import ModalContent from './components/ModalContent';
 
 const Journey = () => {
   const flatListRef = useRef(null);
@@ -22,6 +23,7 @@ const Journey = () => {
   const [visibleIndexs, setVisibleIndexs] = useState([]);
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
   const [modalData, setModalData] = useState();
+  const [showPlan, setShowPlan] = useState(false);
 
   // Set the start of the week dates for the separators
   useEffect(() => {
@@ -67,7 +69,7 @@ const Journey = () => {
 
   return (
     <ImageBackground source={background} resizeMode="cover" style={{ flex: 1 }}>
-      <Top viewableItems={viewableItems} />
+      <Top viewableItems={viewableItems} setShowPlan={setShowPlan} />
       <FlatList
         onTouchStart={() => setModalData(null)}
         ref={flatListRef}
@@ -80,6 +82,7 @@ const Journey = () => {
           <ListItem
             item={item}
             setModalData={setModalData}
+            modalData={modalData}
             index={index}
             setIsAutoScrolling={setIsAutoScrolling}
             visibleIndexs={visibleIndexs}
@@ -94,6 +97,9 @@ const Journey = () => {
         viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
       />
       <Footer data={modalData} />
+      <Modal visible={showPlan} animationType="slide" transparent>
+        <ModalContent setShowPlan={setShowPlan} />
+      </Modal>
     </ImageBackground>
   );
 };

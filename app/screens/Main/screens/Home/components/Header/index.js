@@ -10,16 +10,13 @@ const Header = () => {
   return (
     <View style={styles.container}>
       <View style={styles.top}>
-        <View style={styles.type}>
-          <TypeIcon />
+        <View style={styles.confidence}>
+          <ConfidenceIcon />
+          <Text style={styles.confidenceText}>80%</Text>
         </View>
         <View style={styles.streak}>
           <StreakIcon />
           <Text style={styles.streakText}>2</Text>
-        </View>
-        <View style={styles.confidence}>
-          <ConfidenceIcon />
-          <Text style={styles.confidenceText}>80%</Text>
         </View>
       </View>
     </View>
@@ -31,7 +28,7 @@ export default Header;
 const styles = StyleSheet.create({
   container: {
     marginTop: 50,
-    paddingBottom: 20,
+    paddingBottom: 10,
     paddingHorizontal: 10,
     display: 'flex',
     flexDirection: 'column',
@@ -43,18 +40,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
   },
-  type: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-  },
   streak: {
     flex: 1,
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   streakText: {
@@ -68,7 +58,7 @@ const styles = StyleSheet.create({
     flex: 1,
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
   confidenceText: {
