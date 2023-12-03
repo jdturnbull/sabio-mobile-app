@@ -7,6 +7,7 @@ const TabBar = ({ state, navigation, width }) => {
   const Settings = getIconFromLabel('settings');
   const Feed = getIconFromLabel('feed');
   const Analytics = getIconFromLabel('analytics');
+  const Chat = getIconFromLabel('chat');
 
   const activeRoute = state.routes[state.index].name;
 
@@ -29,7 +30,7 @@ const TabBar = ({ state, navigation, width }) => {
         <Home active={activeRoute === 'home'} />
       </Pressable>
       <Pressable
-        onPress={() => handlePress('feed')}
+        onPress={() => handlePress('chat')}
         style={{
           width: '100%',
           height: '100%',
@@ -38,7 +39,7 @@ const TabBar = ({ state, navigation, width }) => {
           alignItems: 'center',
           paddingBottom: 20,
         }}>
-        <Feed active={activeRoute === 'feed'} />
+        <Chat active={activeRoute === 'chat'} />
       </Pressable>
 
       <Pressable

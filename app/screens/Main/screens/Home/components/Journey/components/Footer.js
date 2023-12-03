@@ -1,17 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Pressable, Dimensions } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 
 const Footer = ({ data }) => {
   const [isFirstRender, setIsFirstRender] = useState(true);
+  const [renderFooter, setRenderFooter] = useState(data !== null);
+  const [expanded, setExpanded] = useState(false);
 
   const screenHeight = Dimensions.get('window').height;
-
-  // Use a shared value for height instead of translateY
   const heightAnim = useSharedValue(155); // Initial height
 
   useEffect(() => {
-    heightAnim.value = withTiming(isFirstRender ? 0 : 155, { duration: 200 });
+    if (data) {
+      setRenderFooter(true);
+      heightAnim.value = withTiming(155, { duration: 200 });
+    } else {
+      heightAnim.value = withTiming(0, { duration: 200 }, () => {
+        runOnJS(setRenderFooter)(false);
+        runOnJS(setExpanded)(false);
+      });
+    }
 
     if (isFirstRender) {
       setTimeout(() => setIsFirstRender(false), 500);
@@ -19,8 +27,16 @@ const Footer = ({ data }) => {
   }, [data, heightAnim, isFirstRender]);
 
   const handlePress = () => {
-    // Animate height to half the screen height
-    heightAnim.value = withTiming(screenHeight / 2, { duration: 300 });
+    if (expanded) {
+      heightAnim.value = withTiming(0, { duration: 300 }, () => {
+        runOnJS(setRenderFooter)(false);
+        runOnJS(setExpanded)(false);
+      });
+    } else {
+      heightAnim.value = withTiming(screenHeight / 2, { duration: 300 }, () => {
+        runOnJS(setExpanded)(true);
+      });
+    }
   };
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -28,6 +44,10 @@ const Footer = ({ data }) => {
       height: heightAnim.value,
     };
   });
+
+  if (!renderFooter) {
+    return null;
+  }
 
   return (
     <View>
@@ -38,8 +58,20 @@ const Footer = ({ data }) => {
             {data?.item.guidance}
           </Text>
           <Pressable style={styles.pressable} onPress={handlePress}>
-            <Text style={styles.pressableText}>See more</Text>
+            <Text style={styles.pressableText}>{expanded ? 'Close' : 'Open'}</Text>
           </Pressable>
+          {expanded && (
+            <View style={styles.content}>
+              <View>
+                <Text style={styles.title}>Guidance</Text>
+                <Text style={styles.body}>{data?.item.guidance}</Text>
+              </View>
+              <View>
+                <Text style={styles.title}>Reasoning</Text>
+                <Text style={styles.body}>{data?.item.reasoning}</Text>
+              </View>
+            </View>
+          )}
         </View>
       </Animated.View>
     </View>
@@ -95,5 +127,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#f8f8f8',
     fontSize: 16,
+  },
+  content: {
+    marginTop: 20,
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-evenly',
   },
 });
