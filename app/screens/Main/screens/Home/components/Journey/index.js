@@ -5,11 +5,14 @@ import Top from './components/Top';
 import { FlatList } from 'react-native-gesture-handler';
 import background from '../../../../../../assets/background-chat.png';
 import { useSelector } from 'react-redux';
-import { hapticImpact } from '../../../../../../utils/haptics';
+import { hapticImpact, hapticImpactHeavy, hapticSelection } from '../../../../../../utils/haptics';
 import { getIconFromLabel } from '../../../../../../utils/icon';
 
 const BOX_WIDTH = 140;
 const BOX_HEIGHT = 60;
+const ITEM_HEIGHT = BOX_HEIGHT + 35;
+const TOP_HEIGHT = 100;
+const TAB_HEIGHT = 95;
 
 const Journey = () => {
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
@@ -47,9 +50,9 @@ const Journey = () => {
     const date = moment(firstItem.date, 'YYYY-MM-DD');
     const month = date.format('MMMM YYYY');
 
-    if (activeMonth !== month) {
+    if (activeMonth !== month.toUpperCase()) {
       setActiveMonth(month.toUpperCase());
-      hapticImpact();
+      hapticImpactHeavy();
     }
   }, []);
 
@@ -61,7 +64,7 @@ const Journey = () => {
     setActiveMonth(plannedMonths[0]?.toUpperCase());
   }, []);
 
-  const renderItem = (props) => {
+  const RenderItem = (props) => {
     const { item, index } = props;
 
     const date = moment.utc(item.date, 'YYYY-MM-DD');
@@ -78,21 +81,29 @@ const Journey = () => {
     const label = arr.length === 3 ? `${arr[1]}${arr[2]}` : `${arr[2]}${arr[3]}`;
 
     const handlePress = () => {
-      if (!visibleIndexs.includes(index)) {
-        hapticImpact();
-        const newScrollPosition = scrollPosition + 200;
-        flatListRef.current.scrollToOffset({ offset: newScrollPosition, animated: true });
-      } else if (visibleIndexs.includes(index) && index >= visibleIndexs[visibleIndexs.length - 2]) {
-        hapticImpact();
-        const newScrollPosition = scrollPosition + 200;
-        flatListRef.current.scrollToOffset({ offset: newScrollPosition, animated: true });
+      if (item.type === 'unplanned') {
+        return;
       }
 
+      if (index < visibleIndexs[0]) {
+        // Item is above the visible items, scroll up
+        flatListRef.current.scrollToOffset({ offset: scrollPosition - ITEM_HEIGHT, animated: true });
+      } else if (index > visibleIndexs[visibleIndexs.length - 1]) {
+        // Item is below the visible items, scroll down
+        flatListRef.current.scrollToOffset({ offset: scrollPosition + ITEM_HEIGHT, animated: true });
+      } else if (index === visibleIndexs[visibleIndexs.length - 1]) {
+        // Item is the last visible item, scroll down
+        flatListRef.current.scrollToOffset({ offset: scrollPosition + ITEM_HEIGHT, animated: true });
+      } else if (index === visibleIndexs[0] && scrollPosition > 99) {
+        // Item is the first visible item, scroll up
+        flatListRef.current.scrollToOffset({ offset: scrollPosition - ITEM_HEIGHT, animated: true });
+      }
       setOpenModalId(item.id);
+      hapticSelection();
     };
 
     return (
-      <View style={{ zIndex: item.id === openModalId ? 1 : 0 }}>
+      <View>
         <Pressable onPress={handlePress} style={{ ...styles.pressable, left: item.x + center }}>
           <View style={{ ...styles.box }}>
             <View style={styles.boxBase}>
@@ -191,6 +202,9 @@ const Journey = () => {
 
   const handleScroll = (event) => {
     setScrollPosition(event.nativeEvent.contentOffset.y);
+    if (openModalId) {
+      setOpenModalId(null);
+    }
   };
 
   return (
@@ -209,8 +223,13 @@ const Journey = () => {
             animated: true,
           });
         }}
-        renderItem={renderItem}
-        windowSize={10}
+        CellRendererComponent={({ children, ...props }) => {
+          // I want each cell to have a zIndex lower than the cell beforeit
+          return <View style={{ zIndex: 500 - props.index }}>{children}</View>;
+        }}
+        renderItem={(props) => <RenderItem {...props} />}
+        initialNumToRender={5}
+        windowSize={8}
         ItemSeparatorComponent={(item, index) => <Separator item={item} index={index} />}
         keyExtractor={(item) => item.id}
         onViewableItemsChanged={onViewableItemsChanged}
@@ -263,6 +282,7 @@ const styles = StyleSheet.create({
   },
   separatorContainer: {
     width: '100%',
+    zIndex: -1,
   },
   separatorTop: {
     flexDirection: 'row',
@@ -297,17 +317,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   callout: {
+    zIndex: 1000,
     position: 'absolute',
     top: BOX_HEIGHT + 10,
     backgroundColor: 'orange',
     padding: 10,
     borderRadius: 6,
     marginHorizontal: 20,
-    zIndex: 1,
     borderWidth: 2,
   },
   pointerBorder: {
-    zIndex: 1,
+    zIndex: 1001,
     width: 0,
     height: 0,
     backgroundColor: 'transparent',
@@ -324,7 +344,7 @@ const styles = StyleSheet.create({
     top: BOX_HEIGHT,
   },
   pointerFill: {
-    zIndex: 2,
+    zIndex: 1002,
     width: 0,
     height: 0,
     backgroundColor: 'transparent',
@@ -337,5 +357,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: BOX_HEIGHT + 3, // Position it slightly below the border triangle to fit inside it
     alignSelf: 'center',
+  },
+  modalHeader: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
+    fontFamily: 'Noto Sans',
+    textAlign: 'center',
   },
 });
