@@ -12,7 +12,7 @@ const AssistantMessage = ({ message }) => {
         marginRight: 30,
         alignSelf: 'flex-end',
       }}>
-      <Text style={{ color: '#ffffff', fontWeight: '500', fontSize: 18 }}>{message}</Text>
+      <Text style={{ color: '#ffffff', fontWeight: '500', fontSize: 18, fontFamily: 'Noto Sans' }}>{message}</Text>
     </View>
   );
 };

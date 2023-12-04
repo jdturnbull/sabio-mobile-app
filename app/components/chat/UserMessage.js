@@ -12,7 +12,7 @@ const UserMessage = ({ message }) => {
         marginLeft: 30,
         alignSelf: 'flex-end',
       }}>
-      <Text style={{ color: '#fff', fontWeight: '500', fontSize: 18 }}>{message}</Text>
+      <Text style={{ color: '#fff', fontWeight: '500', fontSize: 18, fontFamily: 'Noto Sans' }}>{message}</Text>
     </View>
   );
 };
