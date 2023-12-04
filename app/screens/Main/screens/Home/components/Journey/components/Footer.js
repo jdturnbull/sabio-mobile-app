@@ -9,7 +9,7 @@ import Animated, {
   useAnimatedGestureHandler,
 } from 'react-native-reanimated';
 
-const Footer = ({ data }) => {
+const Footer = ({ data, setModalData }) => {
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [renderFooter, setRenderFooter] = useState(data !== null);
   const [expanded, setExpanded] = useState(false);
@@ -47,6 +47,9 @@ const Footer = ({ data }) => {
       heightAnim.value = withTiming(0, { duration: 300 }, () => {
         runOnJS(setRenderFooter)(false);
         runOnJS(setExpanded)(false);
+
+        // Reset the modal data
+        runOnJS(setModalData)(null);
       });
     } else {
       heightAnim.value = withTiming(screenHeight / 2, { duration: 300 }, () => {

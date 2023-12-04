@@ -10,7 +10,7 @@ const ITEM_HEIGHT = 95;
 
 const ListItem = forwardRef(
   ({ item, setModalData, modalData, index, visibleIndexs, scrollPosition, setIsAutoScrolling }, ref) => {
-    const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+    const { width: screenWidth } = Dimensions.get('window');
     const center = screenWidth / 2 - BOX_WIDTH / 2;
 
     let isSelected = modalData?.id === item.id;
@@ -30,6 +30,11 @@ const ListItem = forwardRef(
 
     const handlePress = () => {
       if (item.type === 'unplanned') {
+        return;
+      }
+
+      if (isSelected) {
+        setModalData(null);
         return;
       }
 
@@ -56,8 +61,14 @@ const ListItem = forwardRef(
       }, 1000);
     };
 
+    const handleOverlayPress = () => {
+      if (modalData) {
+        setModalData(null);
+      }
+    };
+
     return (
-      <View>
+      <Pressable onPress={handleOverlayPress}>
         <Pressable onPress={handlePress} style={{ ...styles.pressable, left: item.x + center }}>
           <View style={{ ...styles.box }}>
             <View style={styles.boxBase}>
@@ -108,7 +119,7 @@ const ListItem = forwardRef(
             </View>
           </View>
         </Pressable>
-      </View>
+      </Pressable>
     );
   },
 );

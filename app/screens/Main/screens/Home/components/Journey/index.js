@@ -71,7 +71,6 @@ const Journey = () => {
     <ImageBackground source={background} resizeMode="cover" style={{ flex: 1 }}>
       <Top viewableItems={viewableItems} setShowPlan={setShowPlan} />
       <FlatList
-        onTouchStart={() => setModalData(null)}
         ref={flatListRef}
         style={{ marginTop: 4 }}
         contentContainerStyle={{ paddingTop: 35 }}
@@ -90,13 +89,13 @@ const Journey = () => {
             ref={flatListRef}
           />
         )}
-        windowSize={10}
+        windowSize={4}
         ItemSeparatorComponent={(item) => <Separator startOfWeekDates={startOfWeekDates} item={item} />}
         keyExtractor={(item) => item.id}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
       />
-      <Footer data={modalData} />
+      <Footer data={modalData} setModalData={setModalData} />
       <Modal visible={showPlan} animationType="slide" transparent>
         <ModalContent setShowPlan={setShowPlan} />
       </Modal>
