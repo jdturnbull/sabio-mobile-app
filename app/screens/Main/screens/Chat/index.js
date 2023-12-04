@@ -279,12 +279,12 @@ const Chat = () => {
   // Handles animating the width of the input container (can't use native driver when animating layout props)
   useEffect(() => {
     Animated.timing(animatedMargin, {
-      toValue: keyboard.keyboardShown ? 10 : 30,
+      toValue: keyboard.keyboardShown ? 20 : 10,
       duration: 200,
       useNativeDriver: false,
     }).start();
     Animated.timing(animatedWidth, {
-      toValue: keyboard.keyboardShown ? width * 0.98 : width * 0.9,
+      toValue: keyboard.keyboardShown ? width * 0.98 : width * 0.95,
       duration: 200,
       useNativeDriver: false,
     }).start();
@@ -364,28 +364,22 @@ const Chat = () => {
     'Send your feedback to the Sabio team',
   ];
 
+  //   <View style={{ ...styles.headerContainer, width }}>
+  //   <Pressable onPress={handleHelp} style={{ marginBottom: 5 }}>
+  //     <HelpIcon />
+  //   </Pressable>
+  // </View>
   return (
     <View style={styles.container}>
-      <View style={{ ...styles.headerContainer, width }}>
-        <View style={styles.logoContainer}>
-          <LogoSmall />
-        </View>
-        <View style={{ marginBottom: 2, flex: 1 }}>
-          <Text style={styles.headerText}>Sabio</Text>
-          <Text style={styles.headerSubtext}>Online</Text>
-        </View>
-        <Pressable onPress={handleHelp} style={{ marginBottom: 5 }}>
-          <HelpIcon />
-        </Pressable>
-      </View>
       <ImageBackground source={background} resizeMode="cover" style={styles.background}>
         <KeyboardAvoidingView behavior="padding">
-          <GestureHandlerRootView style={{ flex: 1, paddingTop: 130 }}>
+          <GestureHandlerRootView style={{ flex: 1 }}>
             <Animated.ScrollView
               ref={scrollRef}
               showsVerticalScrollIndicator={false}
               style={{
                 ...styles.scrollable,
+                paddingTop: 60,
                 marginHorizontal: 20,
               }}>
               {state.messages.map((message, index) => {
@@ -413,8 +407,9 @@ const Chat = () => {
           </GestureHandlerRootView>
           <Animated.View
             style={{
-              alignItems: 'center',
-              justifyContent: 'flex-end',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
               minHeight: 63,
               paddingTop: 10,
               width,
@@ -480,55 +475,6 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
-  headerContainer: {
-    zIndex: 1,
-    position: 'absolute',
-    display: 'flex',
-    height: 130,
-    paddingHorizontal: 15,
-    paddingBottom: 20,
-    backgroundColor: '#0f1013',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 11,
-    elevation: 10,
-  },
-  logoContainer: {
-    width: 50,
-    height: 50,
-    marginRight: 5,
-    backgroundColor: '#1F2025',
-    borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 22,
-    marginHorizontal: 10,
-  },
-  headerSubtext: {
-    color: '#A4D714',
-    fontWeight: '400',
-    fontSize: 12,
-    marginHorizontal: 10,
-    marginLeft: 11,
-  },
-  header: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 25,
-    marginHorizontal: 10,
-    paddingBottom: 25,
-  },
   scrollable: {
     paddingTop: 18,
   },
@@ -536,7 +482,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1F2025',
+    backgroundColor: '#16171B',
     borderRadius: 20,
     padding: 7,
     paddingLeft: 15,
@@ -581,7 +527,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     height: '100%',
-    backgroundColor: '#16171B',
+    backgroundColor: '#1F2025',
     borderTopRightRadius: 35,
     borderTopLeftRadius: 35,
     zIndex: 100,
