@@ -22,8 +22,8 @@ const Top = ({ viewableItems, setShowPlan }) => {
     <Animated.View
       style={{
         ...styles.container,
-        backgroundColor: '#E66642',
-        shadowColor: '#E66642',
+        backgroundColor: '#748A99',
+        shadowColor: '#748A99',
       }}>
       <View style={styles.left}>
         <Text style={styles.bottomHeader}>{`${month}, MONTH ${monthIndex}`}</Text>

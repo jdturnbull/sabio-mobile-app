@@ -95,7 +95,7 @@ const Footer = ({ data, setModalData }) => {
         <View style={styles.container}>
           <Text style={styles.title}>{data?.item.title}</Text>
           <Text numberOfLines={1} style={styles.body}>
-            {data?.item.guidance}
+            {data?.item.analysis ? data?.item.analysis : data?.item.guidance}
           </Text>
           <Pressable style={styles.pressable} onPress={handlePress}>
             <Text style={styles.pressableText}>{expanded ? 'Close' : 'Open'}</Text>
@@ -103,13 +103,15 @@ const Footer = ({ data, setModalData }) => {
           {expanded && (
             <View style={styles.content}>
               <View>
-                <Text style={styles.title}>Guidance</Text>
-                <Text style={styles.body}>{data?.item.guidance}</Text>
+                <Text style={styles.title}>{data?.item.analysis ? 'Analysis' : 'Guidance'}</Text>
+                <Text style={styles.body}>{data?.item.analysis ? data?.item.analysis : data?.item.guidance}</Text>
               </View>
-              <View>
-                <Text style={styles.title}>Reasoning</Text>
-                <Text style={styles.body}>{data?.item.reasoning}</Text>
-              </View>
+              {!data?.item.analysis && (
+                <View>
+                  <Text style={styles.title}>Reasoning</Text>
+                  <Text style={styles.body}>{data?.item.reasoning}</Text>
+                </View>
+              )}
             </View>
           )}
         </View>

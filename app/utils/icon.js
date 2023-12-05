@@ -23,12 +23,12 @@ import Default from '../components/icons/cards/Default';
 import Unknown from '../components/icons/cards/Unknown';
 import Yoga from '../components/icons/cards/Yoga';
 import Completed from '../components/icons/cards/Completed';
+import Missed from '../components/icons/cards/Missed';
 
 import FloatingButton from '../components/icons/home/FloatingButton';
 import Analytics from '../components/icons/tabs/Analytics';
 import Runner from '../components/icons/general/Runner';
 import Bolt from '../components/icons/general/Bolt';
-
 import Next from '../components/icons/general/Next';
 import Create from '../components/icons/actions/Create';
 import Delete from '../components/icons/actions/Delete';
@@ -79,6 +79,7 @@ export const ICONS = [
   { label: 'confidence', icon: Confidence },
   { label: 'read', icon: Read },
   { label: 'unplanned', icon: Unknown },
+  { label: 'missed', icon: Missed },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

@@ -89,7 +89,7 @@ const Journey = () => {
             ref={flatListRef}
           />
         )}
-        windowSize={4}
+        windowSize={6}
         ItemSeparatorComponent={(item) => <Separator startOfWeekDates={startOfWeekDates} item={item} />}
         keyExtractor={(item) => item.id}
         onViewableItemsChanged={onViewableItemsChanged}

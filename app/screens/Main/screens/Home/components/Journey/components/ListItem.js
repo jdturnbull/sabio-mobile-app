@@ -23,6 +23,7 @@ const ListItem = forwardRef(
         : getIconFromLabel(item.type) || getIconFromLabel('default');
 
     const TickIcon = getIconFromLabel('completed');
+    const CrossIcon = getIconFromLabel('missed');
 
     const arr = date.format('Do').split('');
     const num = arr.length === 3 ? arr[0] : `${arr[0]}${arr[1]}`;
@@ -67,6 +68,20 @@ const ListItem = forwardRef(
       }
     };
 
+    const baseColor =
+      isSelected && item.score === 0 ? '#8AA1B1' : item.type === 'unplanned' ? '#394048' : 'transparent';
+
+    const color =
+      item.type === 'unplanned'
+        ? '#8AA1B130'
+        : item.score > 0 && item.score <= 25
+        ? '#953636'
+        : item.score > 25 && item.score <= 80
+        ? '#C9763A'
+        : item.score > 80
+        ? '#33674E'
+        : '#394048';
+
     return (
       <Pressable onPress={handleOverlayPress}>
         <Pressable onPress={handlePress} style={{ ...styles.pressable, left: item.x + center }}>
@@ -75,20 +90,42 @@ const ListItem = forwardRef(
               <View
                 style={{
                   ...styles.boxBase,
-                  backgroundColor: item.completed ? '#E66642' : isSelected ? '#8AA1B1' : '#8AA1B130',
-                  shadowOffset: {
-                    width: 3,
-                    height: 4,
-                  },
-                  shadowRadius: 0,
-                  shadowOpacity: 1,
-                  shadowColor: item.completed ? `#E6664250` : isSelected ? '8AA1B150' : '#8AA1B110',
+                  backgroundColor: baseColor,
+                  zIndex: isSelected ? 2 : 0,
+                  shadowColor:
+                    item.status === 'MISSED'
+                      ? '#95363650'
+                      : isSelected
+                      ? `${baseColor}50`
+                      : item.type === 'unplanned'
+                      ? `${baseColor}10`
+                      : 'transparent',
                 }}>
-                <View style={styles.boxLeft}>
+                <View
+                  style={{
+                    ...styles.completedSection,
+                    width: `${item.score}%`,
+                    backgroundColor: color,
+                    shadowColor: `${color}50`,
+                    borderTopRightRadius: item.score === 100 ? 12 : 0,
+                    borderBottomRightRadius: item.score === 100 ? 12 : 0,
+                  }}
+                />
+                <View
+                  style={{
+                    ...styles.uncompleteSection,
+                    width: `${100 - item.score}%`,
+                    left: `${item.score}%`,
+                    shadowColor: `${color}50`,
+                    borderTopLeftRadius: item.score > 0 ? null : 12,
+                    borderBottomLeftRadius: item.score > 0 ? null : 12,
+                  }}
+                />
+                <View style={{ ...styles.boxLeft, zIndex: 3 }}>
                   <Icon color={item.completed ? null : isSelected ? '#fff' : '#8AA1B190'} />
                 </View>
-                <View style={styles.boxRight}>
-                  {item.completed ? (
+                <View style={{ ...styles.boxRight, zIndex: 3 }}>
+                  {item.score === 100 ? (
                     <View
                       style={{
                         width: '100%',
@@ -96,18 +133,24 @@ const ListItem = forwardRef(
                         alignItems: 'center',
                         justifyContent: 'space-evenly',
                       }}>
-                      <Text style={{ fontFamily: 'Noto Sans', fontWeight: 700, color: '#fff', fontSize: 16 }}>
+                      <Text
+                        style={{
+                          fontFamily: 'Noto Sans',
+                          fontWeight: 700,
+                          color: item.score === 100 ? '#fff' : '#8AA1B190',
+                          fontSize: 16,
+                        }}>
                         {num}
                         <Text style={{ fontSize: 12 }}>{label}</Text>
                       </Text>
-                      <TickIcon />
+                      {item.score === 100 ? <TickIcon /> : <CrossIcon />}
                     </View>
                   ) : (
                     <Text
                       style={{
                         fontFamily: 'Noto Sans',
                         fontWeight: 700,
-                        color: isSelected ? '#fff' : '#8AA1B190',
+                        color: isSelected ? '#fff' : item.score > 0 ? '#fff' : '#8AA1B190',
                         fontSize: 16,
                       }}>
                       {`${date.format('ddd')} ${num}`}
@@ -136,6 +179,33 @@ const styles = StyleSheet.create({
     width: BOX_WIDTH,
     height: BOX_HEIGHT,
   },
+  completedSection: {
+    position: 'absolute',
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+    zIndex: 1,
+    height: '100%',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowRadius: 0,
+    shadowOpacity: 1,
+  },
+  uncompleteSection: {
+    position: 'absolute',
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+    zIndex: 1,
+    height: '100%',
+    backgroundColor: '#394048',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowRadius: 0,
+    shadowOpacity: 1,
+  },
   boxBase: {
     width: '100%',
     height: '100%',
@@ -144,7 +214,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#16171B',
     borderRadius: 12,
     shadowOffset: {
-      width: 3,
+      width: 0,
       height: 4,
     },
     shadowRadius: 0,
