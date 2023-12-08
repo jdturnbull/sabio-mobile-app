@@ -19,7 +19,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getIconFromLabel } from '../../../../utils/icon';
 import AssistantMessage from '../../../../components/chat/AssistantMessage';
 import UserMessage from '../../../../components/chat/UserMessage';
-import { useNavigation } from '@react-navigation/native';
 import { updateState } from '../../../../stores/chat/chatSlice';
 import { useKeyboard } from '@react-native-community/hooks';
 import background from '../../../../assets/background-chat.png';
@@ -66,15 +65,20 @@ const Chat = () => {
       let messages = state.messages;
 
       if (!state.assistant) {
-        assistant = await openai.retrieveAssistant('main');
+        assistant = await openai.retrieveAssistant('main', session.user.id);
       }
 
       if (!state.thread) {
-        thread = await openai.createThread('main', state.activity);
+        // Does the user have an existing threadId?
+        if (session.user.threadId) {
+          thread = await openai.retrieveThread(session.user.threadId, session.user.id);
+        } else {
+          thread = await openai.createThread('main', state.activity, session.user.id);
+        }
       }
 
       // Get the messages from the thread
-      messages = await openai.retrieveMessages(thread.id);
+      messages = await openai.retrieveMessages(thread.id, session.user.id);
 
       // Update the state with the assistant, thread and messages
       dispatch(updateState({ ...state, assistant, thread, messages }));
@@ -126,7 +130,7 @@ const Chat = () => {
       if (!responsePending) return;
 
       // Retrieve the response from the AI
-      const response = await openai.retrieveRun(state.thread.id, state.runId);
+      const response = await openai.retrieveRun(state.thread.id, state.runId, session.user.id);
       console.log('Retrieved response, status is:' + response.status);
 
       if (response.status === 'in_progress' || response.status === 'queued') {
@@ -134,7 +138,7 @@ const Chat = () => {
         timeoutId = setTimeout(_captureResponse, 2000);
       } else if (response.status === 'completed') {
         // Get the new messages from the message thread and save them
-        const messages = await openai.retrieveMessages(state.thread.id);
+        const messages = await openai.retrieveMessages(state.thread.id, session.user.id);
 
         // Set loading to false to remove the loading indicator
         setLoading(false);
@@ -154,7 +158,7 @@ const Chat = () => {
         setResponsePending(false);
       } else if (response.status === 'requires_action') {
         // Extract the function data from the response
-        const { args, name, id } = openai.extractFunctionData(response);
+        const { args, name, id } = openai.extractFunctionData(response, session.user.id);
 
         // Save the tool id so we can use it when getting the tool completion
         setToolId(id);
@@ -235,7 +239,7 @@ const Chat = () => {
       if (!shouldCompleteTool) return;
 
       // Complete the tool
-      await openai.submitToolResponse(state.thread.id, state.runId, toolId, toolOutput);
+      await openai.submitToolResponse(state.thread.id, state.runId, toolId, toolOutput, session.user.id);
 
       // Tell the component that the tool no longer needs to be completed
       setShouldCompleteTool(false);
@@ -256,13 +260,13 @@ const Chat = () => {
     setCanSend(false);
 
     // Add the user message to the message thread
-    await openai.addUserMessage(state.thread.id, userMessage);
+    await openai.addUserMessage(state.thread.id, userMessage, session.user.id);
 
     // Clear the user message
     setUserMessage('');
 
     // Retrieve the messages from the message thread
-    const messages = await openai.retrieveMessages(state.thread.id);
+    const messages = await openai.retrieveMessages(state.thread.id, session.user.id);
 
     // Update the state with the new messages
     dispatch(updateState({ messages }));
