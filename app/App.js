@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { StatusBar } from 'react-native';
+import styled, { ThemeProvider } from 'styled-components';
+import { Appearance, StatusBar, useColorScheme } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider, useDispatch } from 'react-redux';
 import { PostHogProvider } from 'posthog-react-native';
@@ -13,6 +13,7 @@ import { OverlayPortal } from './components/Overlay';
 import { createDatabase } from './data/database';
 import Root from './screens/Root';
 import { setup } from './stores/user/userSlice';
+import { theme } from './utils/theme';
 
 createDatabase();
 
@@ -23,6 +24,7 @@ const AppContainer = styled.View`
 
 const App = () => {
   const dispatch = useDispatch();
+  const colorScheme = Appearance.getColorScheme();
   const loaded = useSelector((state) => state.user.loaded);
 
   useEffect(() => {
@@ -33,7 +35,11 @@ const App = () => {
 
   return (
     <AppContainer>
-      <StatusBar barStyle="light-content" hidden={false} translucent={false} />
+      <StatusBar
+        barStyle={colorScheme === 'light' ? 'dark-content' : 'light-content'}
+        hidden={false}
+        translucent={false}
+      />
       <UIStateProvider>
         <Root />
         <OverlayPortal />
@@ -53,6 +59,9 @@ const getActiveRouteName = (state) => {
 };
 
 const ConnectedApp = () => {
+  const colorScheme = useColorScheme();
+
+  const [themeData, setThemeData] = useState(theme(colorScheme));
   const [activeRouteName, setActiveRouteName] = useState();
 
   const handleNavStateChange = (state) => {
@@ -61,12 +70,18 @@ const ConnectedApp = () => {
     }
   };
 
+  useEffect(() => {
+    setThemeData(theme(colorScheme));
+  }, [colorScheme]);
+
   return (
     <NavigationContainer ref={navigationRef} onStateChange={handleNavStateChange}>
       <PostHogProvider apiKey={REACT_APP_POSTHOG_API_KEY} options={{ host: 'https://eu.posthog.com' }}>
-        <Provider store={store}>
-          <App />
-        </Provider>
+        <ThemeProvider theme={themeData}>
+          <Provider store={store}>
+            <App />
+          </Provider>
+        </ThemeProvider>
       </PostHogProvider>
     </NavigationContainer>
   );

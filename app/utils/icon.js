@@ -1,6 +1,6 @@
-import LogoLarge from '../components/icons/company/logoLarge';
-import LogoSmall from '../components/icons/company/logoSmall';
-import LogoMedium from '../components/icons/company/logoMedium';
+import LogoLarge from '../components/icons/company/LogoLarge';
+import LogoSmall from '../components/icons/company/LogoSmall';
+import LogoMedium from '../components/icons/company/LogoMedium';
 import Apple from '../components/icons/brands/Apple';
 import Garmin from '../components/icons/brands/Garmin';
 import Fitbit from '../components/icons/brands/Fitbit';
@@ -38,6 +38,9 @@ import Help from '../components/icons/general/Help';
 import Confidence from '../components/icons/general/Confidence';
 import Read from '../components/icons/general/Read';
 import Streak from '../components/icons/general/Streak';
+import LandingRunner from '../components/icons/general/LandingRunner';
+import LandingMidGraphic from '../components/icons/general/LandingMidGraphic';
+import LandingMidGraphicDark from '../components/icons/general/LandingMidGraphicDark';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -55,7 +58,6 @@ export const ICONS = [
   { label: 'feed', icon: Feed },
   { label: 'chat', icon: Chat },
   { label: 'settings', icon: Settings },
-
   { label: 'run', icon: Run },
   { label: 'swim', icon: Swim },
   { label: 'ride', icon: Bike },
@@ -64,7 +66,6 @@ export const ICONS = [
   { label: 'default', icon: Default },
   { label: 'yoga', icon: Yoga },
   { label: 'completed', icon: Completed },
-
   { label: 'floatingButton', icon: FloatingButton },
   { label: 'analytics', icon: Analytics },
   { label: 'runner', icon: Runner },
@@ -80,6 +81,9 @@ export const ICONS = [
   { label: 'read', icon: Read },
   { label: 'unplanned', icon: Unknown },
   { label: 'missed', icon: Missed },
+  { label: 'landingRunner', icon: LandingRunner },
+  { label: 'landingMidGraphic', icon: LandingMidGraphic },
+  { label: 'landingMidGraphicDark', icon: LandingMidGraphicDark },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

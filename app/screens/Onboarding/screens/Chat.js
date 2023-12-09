@@ -12,8 +12,10 @@ import {
   Modal,
   FlatList,
   Alert,
-  ActivityIndicator,
+  Appearance,
 } from 'react-native';
+import styled from 'styled-components';
+import { useTheme } from 'styled-components';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useKeyboard } from '@react-native-community/hooks';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,10 +26,18 @@ import { getIconFromLabel } from '../../../utils/icon';
 import AssistantMessage from '../../../components/chat/AssistantMessage';
 import UserMessage from '../../../components/chat/UserMessage';
 import TypingAnimation from '../../../components/chat/TypingAnimation';
-import background from '../../../assets/background-chat.png';
+import backgroundDark from '../../../assets/background-chat-dark.png';
+import backgroundLight from '../../../assets/background-chat-light.png';
+
 import call from '../../../utils/call';
 
+const StyledGestureHandlerRootView = styled(GestureHandlerRootView)`
+  flex: 1;
+  padding-top: ${(props) => props.theme.spacing.safeAreaView};
+`;
+
 const Chat = () => {
+  const colorScheme = Appearance.getColorScheme();
   const scrollRef = useRef();
   const dispatch = useDispatch();
   const keyboard = useKeyboard();
@@ -56,6 +66,8 @@ const Chat = () => {
   const [animatedMargin] = useState(new Animated.Value(120));
   const translateY = useRef(new Animated.Value(0)).current;
   const [opacity] = useState(new Animated.Value(userMessage.split('').length > 0 ? 1 : 0.2));
+
+  const theme = useTheme();
 
   const LogoSmall = getIconFromLabel('logoSmall');
   const Send = getIconFromLabel('send');
@@ -434,28 +446,18 @@ const Chat = () => {
   ];
 
   return (
-    <View style={styles.container}>
-      <View style={{ ...styles.headerContainer, width }}>
-        <View style={styles.logoContainer}>
-          <LogoSmall />
-        </View>
-        <View style={{ marginBottom: 2, flex: 1 }}>
-          <Text style={styles.headerText}>Sabio</Text>
-          <Text style={styles.headerSubtext}>Online</Text>
-        </View>
-        <Pressable onPress={handleHelp} style={{ marginBottom: 5 }}>
-          <HelpIcon />
-        </Pressable>
-      </View>
-      <ImageBackground source={background} resizeMode="cover" style={styles.background}>
+    <View style={{ ...styles.container, backgroundColor: theme.colors.chatBackground }}>
+      <ImageBackground
+        source={colorScheme === 'light' ? backgroundLight : backgroundDark}
+        resizeMode="cover"
+        style={styles.background}>
         <KeyboardAvoidingView behavior="padding">
-          <GestureHandlerRootView style={{ flex: 1, paddingTop: 130 }}>
+          <StyledGestureHandlerRootView>
             <Animated.ScrollView
               ref={scrollRef}
               showsVerticalScrollIndicator={false}
               style={{
                 ...styles.scrollable,
-                marginHorizontal: 20,
               }}>
               {state.messages.map((message, index) => {
                 if (message?.role === 'assistant') {
@@ -479,7 +481,7 @@ const Chat = () => {
                 </View>
               )}
             </Animated.ScrollView>
-          </GestureHandlerRootView>
+          </StyledGestureHandlerRootView>
           <Animated.View
             style={{
               alignItems: 'center',
@@ -488,10 +490,16 @@ const Chat = () => {
               paddingTop: 10,
               width,
             }}>
-            <Animated.View style={{ ...styles.inputContainer, width: animatedWidth, marginBottom: animatedMargin }}>
+            <Animated.View
+              style={{
+                ...styles.inputContainer,
+                width: animatedWidth,
+                marginBottom: animatedMargin,
+                backgroundColor: theme.text.chatMessage.inputBackground,
+              }}>
               <TextInput
                 multiline
-                style={styles.input}
+                style={{ ...styles.input, color: theme.text.colors.secondary }}
                 value={userMessage}
                 onChangeText={(text) => setUserMessage(text)}
               />
@@ -547,60 +555,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#0f1013',
   },
   background: {
     flex: 1,
   },
-  headerContainer: {
-    zIndex: 1,
-    position: 'absolute',
-    display: 'flex',
-    height: 130,
-    paddingHorizontal: 15,
-    paddingBottom: 20,
-    backgroundColor: '#16171B',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 11,
-    elevation: 10,
-  },
-  logoContainer: {
-    width: 50,
-    height: 50,
-    marginRight: 5,
-    backgroundColor: '#1F2025',
-    borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 22,
-    marginHorizontal: 10,
-  },
-  headerSubtext: {
-    color: '#A4D714',
-    fontWeight: '400',
-    fontSize: 12,
-    marginHorizontal: 10,
-    marginLeft: 11,
-  },
-  header: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 25,
-    marginHorizontal: 10,
-    paddingBottom: 20,
-  },
+
   scrollable: {
     paddingTop: 18,
   },

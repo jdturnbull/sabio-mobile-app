@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Easing, View } from 'react-native';
+import { Appearance, Easing, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LottieView from 'lottie-react-native';
@@ -83,6 +83,8 @@ const RootApp = () => {
   const user = useSelector((state) => state.user.session?.user);
   const _onboarded = useSelector((state) => state.user.session?.user.onboarded);
   const onboarded = useSelector((state) => state.onboarding.onboarded);
+
+  Appearance.setColorScheme('light');
 
   useEffect(() => {
     if (user) {
