@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: 'grey',
+    backgroundColor: '#00000090',
     marginHorizontal: 3,
   },
 });

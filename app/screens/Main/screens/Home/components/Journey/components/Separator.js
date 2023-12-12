@@ -1,7 +1,52 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import styled from 'styled-components';
 import moment from 'moment';
 import { useSelector } from 'react-redux';
+
+const SeparatorContainer = styled.View`
+  width: 100%;
+  z-index: -1;
+`;
+
+const SeparatorTop = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-horizontal: 10px;
+`;
+
+const SeparatorDiv = styled.View`
+  width: 30%;
+  height: 1px;
+  background-color: ${(props) => props.theme.home.separatorColor};
+`;
+
+const SeparatorTitle = styled.Text`
+  font-weight: ${(props) => props.theme.text.weight.semibold};
+  font-size: ${(props) => props.theme.text.size.md};
+  font-family: ${(props) => props.theme.text.family};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  text-align: center;
+  color: ${(props) => props.theme.home.separatorColor};
+`;
+
+const SeparatorBody = styled.View`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-horizontal: 20px;
+  margin-top: 8px;
+  margin-bottom: 35px;
+`;
+
+const SeparatorBodyText = styled.Text`
+  font-weight: ${(props) => props.theme.text.weight.regular};
+  font-size: ${(props) => props.theme.text.size.sm};
+  font-family: ${(props) => props.theme.text.family};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  text-align: center;
+  color: ${(props) => props.theme.home.separatorColor};
+`;
 
 const Separator = ({ item, startOfWeekDates }) => {
   const user = useSelector((state) => state.user.session.user);
@@ -14,57 +59,18 @@ const Separator = ({ item, startOfWeekDates }) => {
     const focus = user.weeklyFocuses[`week ${weekNumber}`];
 
     return (
-      <View style={styles.separatorContainer}>
-        <View style={styles.separatorTop}>
-          <View style={styles.separatorDiv} />
-          <Text style={styles.separatorTitle}>{`Week ${weekNumber}`}</Text>
-          <View style={styles.separatorDiv} />
-        </View>
-        <View style={styles.separatorBody}>
-          <Text style={styles.separatorBodyText}>{focus || ''}</Text>
-        </View>
-      </View>
+      <SeparatorContainer>
+        <SeparatorTop>
+          <SeparatorDiv />
+          <SeparatorTitle>{`Week ${weekNumber}`}</SeparatorTitle>
+          <SeparatorDiv />
+        </SeparatorTop>
+        <SeparatorBody>
+          <SeparatorBodyText>{focus || ''}</SeparatorBodyText>
+        </SeparatorBody>
+      </SeparatorContainer>
     );
   }
 };
 
 export default Separator;
-
-const styles = StyleSheet.create({
-  separatorContainer: {
-    width: '100%',
-    zIndex: -1,
-  },
-  separatorTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-  },
-  separatorDiv: {
-    width: '30%',
-    height: 1,
-    backgroundColor: '#8AA1B190',
-  },
-  separatorTitle: {
-    color: '#8AA1B190',
-    fontWeight: '700',
-    fontSize: 16,
-    fontFamily: 'Noto Sans',
-  },
-  separatorBody: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    marginTop: 8,
-    marginBottom: 35,
-  },
-  separatorBodyText: {
-    color: '#8AA1B170',
-    fontWeight: '700',
-    fontSize: 12,
-    fontFamily: 'Noto Sans',
-    textAlign: 'center',
-  },
-});

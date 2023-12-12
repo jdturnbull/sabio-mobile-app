@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { getIconFromLabel } from '../../utils/icon';
+import { useTheme } from 'styled-components';
 
 const TabBar = ({ state, navigation, width }) => {
+  const theme = useTheme();
   const Home = getIconFromLabel('home');
   const Settings = getIconFromLabel('settings');
-  const Feed = getIconFromLabel('feed');
   const Analytics = getIconFromLabel('analytics');
   const Chat = getIconFromLabel('chat');
 
@@ -16,7 +17,20 @@ const TabBar = ({ state, navigation, width }) => {
   };
 
   return (
-    <View style={{ height: 80, backgroundColor: '#0f1013', flexDirection: 'row' }}>
+    <View
+      style={{
+        height: 80,
+        backgroundColor: theme.tabBar.backgroundColor,
+        flexDirection: 'row',
+        shadowColor: theme.tabBar.shadowColor,
+        shadowOffset: {
+          width: 0,
+          height: -4,
+        },
+        shadowOpacity: activeRoute === 'chat' ? 0 : 1,
+        shadowSpread: 0,
+        shadowRadius: 30,
+      }}>
       <Pressable
         onPress={() => handlePress('home')}
         style={{
@@ -27,7 +41,7 @@ const TabBar = ({ state, navigation, width }) => {
           alignItems: 'center',
           paddingBottom: 20,
         }}>
-        <Home active={activeRoute === 'home'} />
+        <Home color={activeRoute === 'home' ? theme.tabBar.iconSelectedColor : theme.tabBar.iconColor} />
       </Pressable>
       <Pressable
         onPress={() => handlePress('chat')}
@@ -39,7 +53,7 @@ const TabBar = ({ state, navigation, width }) => {
           alignItems: 'center',
           paddingBottom: 20,
         }}>
-        <Chat active={activeRoute === 'chat'} />
+        <Chat color={activeRoute === 'chat' ? theme.tabBar.iconSelectedColor : theme.tabBar.iconColor} />
       </Pressable>
 
       <Pressable
@@ -52,7 +66,7 @@ const TabBar = ({ state, navigation, width }) => {
           alignItems: 'center',
           paddingBottom: 20,
         }}>
-        <Analytics active={activeRoute === 'data'} />
+        <Analytics color={activeRoute === 'data' ? theme.tabBar.iconSelectedColor : theme.tabBar.iconColor} />
       </Pressable>
       <Pressable
         onPress={() => handlePress('settings')}
@@ -64,7 +78,7 @@ const TabBar = ({ state, navigation, width }) => {
           alignItems: 'center',
           paddingBottom: 20,
         }}>
-        <Settings active={activeRoute === 'settings'} />
+        <Settings color={activeRoute === 'settings' ? theme.tabBar.iconSelectedColor : theme.tabBar.iconColor} />
       </Pressable>
     </View>
   );

@@ -24,6 +24,8 @@ import Unknown from '../components/icons/cards/Unknown';
 import Yoga from '../components/icons/cards/Yoga';
 import Completed from '../components/icons/cards/Completed';
 import Missed from '../components/icons/cards/Missed';
+import Stretch from '../components/icons/cards/Stretch';
+import Brick from '../components/icons/cards/Brick';
 
 import FloatingButton from '../components/icons/home/FloatingButton';
 import Analytics from '../components/icons/tabs/Analytics';
@@ -60,7 +62,9 @@ export const ICONS = [
   { label: 'settings', icon: Settings },
   { label: 'run', icon: Run },
   { label: 'swim', icon: Swim },
+  { label: 'bike', icon: Bike },
   { label: 'ride', icon: Bike },
+  { label: 'brick', icon: Brick },
   { label: 'rest', icon: Rest },
   { label: 'strength', icon: Strength },
   { label: 'default', icon: Default },
@@ -81,6 +85,7 @@ export const ICONS = [
   { label: 'read', icon: Read },
   { label: 'unplanned', icon: Unknown },
   { label: 'missed', icon: Missed },
+  { label: 'stretch', icon: Stretch },
   { label: 'landingRunner', icon: LandingRunner },
   { label: 'landingMidGraphic', icon: LandingMidGraphic },
   { label: 'landingMidGraphicDark', icon: LandingMidGraphicDark },

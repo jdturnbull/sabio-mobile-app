@@ -59,9 +59,7 @@ const getActiveRouteName = (state) => {
 };
 
 const ConnectedApp = () => {
-  const colorScheme = useColorScheme();
-
-  const [themeData, setThemeData] = useState(theme(colorScheme));
+  const [themeData, setThemeData] = useState(theme('light'));
   const [activeRouteName, setActiveRouteName] = useState();
 
   const handleNavStateChange = (state) => {
@@ -69,10 +67,6 @@ const ConnectedApp = () => {
       setActiveRouteName(getActiveRouteName(state));
     }
   };
-
-  useEffect(() => {
-    setThemeData(theme(colorScheme));
-  }, [colorScheme]);
 
   return (
     <NavigationContainer ref={navigationRef} onStateChange={handleNavStateChange}>

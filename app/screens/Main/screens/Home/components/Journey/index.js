@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, ImageBackground, Modal } from 'react-native';
+import { StyleSheet, View, Modal } from 'react-native';
 import moment from 'moment';
 import { debounce } from 'lodash';
 import Top from './components/Top';
 import { FlatList } from 'react-native-gesture-handler';
-import background from '../../../../../../assets/background-chat.png';
 import { useSelector } from 'react-redux';
 import ListItem from './components/ListItem';
 import Separator from './components/Separator';
@@ -68,7 +67,7 @@ const Journey = () => {
   };
 
   return (
-    <ImageBackground source={background} resizeMode="cover" style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <Top viewableItems={viewableItems} setShowPlan={setShowPlan} />
       <FlatList
         ref={flatListRef}
@@ -99,7 +98,7 @@ const Journey = () => {
       <Modal visible={showPlan} animationType="slide" transparent>
         <ModalContent setShowPlan={setShowPlan} />
       </Modal>
-    </ImageBackground>
+    </View>
   );
 };
 

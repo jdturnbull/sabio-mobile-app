@@ -84,8 +84,6 @@ const RootApp = () => {
   const _onboarded = useSelector((state) => state.user.session?.user.onboarded);
   const onboarded = useSelector((state) => state.onboarding.onboarded);
 
-  Appearance.setColorScheme('light');
-
   useEffect(() => {
     if (user) {
       posthog.identify(user.id, {

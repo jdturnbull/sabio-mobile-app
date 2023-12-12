@@ -469,13 +469,14 @@ const Chat = () => {
               {loading && (
                 <View
                   style={{
-                    backgroundColor: '#1F2025',
-                    borderRadius: 10,
+                    backgroundColor: theme.text.chatMessage.backgroundAssistant,
+                    borderRadius: 18,
+                    borderTopLeftRadius: 0,
                     padding: 15,
                     marginBottom: 20,
-                    marginRight: 30,
+                    marginLeft: 28,
+                    marginRight: 45,
                     alignSelf: 'flex-start',
-                    width: 65,
                   }}>
                   <TypingAnimation />
                 </View>

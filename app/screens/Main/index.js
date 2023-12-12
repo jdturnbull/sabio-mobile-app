@@ -13,12 +13,7 @@ import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/
 
 const Tab = createBottomTabNavigator();
 
-const style = {
-  backgroundColor: '#0f1013',
-  borderTopColor: '#0f1013',
-  paddingBottom: 10,
-  paddingTop: 10,
-};
+const style = {};
 
 const TabScreenOpts = {
   tabBarShowLabel: false,

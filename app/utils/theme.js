@@ -10,6 +10,8 @@ export const theme = (colorTheme) => {
         black: '#000000',
         background1: '#FFF6D4',
         chatBackground: '#FFF6D4',
+        homeHeaderBackground: '#FFF6D4',
+        darkBrown: '#272620',
       },
       text: {
         colors: {
@@ -45,6 +47,29 @@ export const theme = (colorTheme) => {
           xxl: '3px',
         },
       },
+      home: {
+        cards: {
+          borderColorCompleted: '#8F8667',
+          borderColorPending: '#FFF6D4',
+          borderColorMissed: '#EADDAF',
+          rightBackground: '#EADDAF',
+          leftBackgroundFull: '#D4D72B',
+          leftBackgroundPartial: '#FFAC0A',
+          leftBackgroundSmall: '#EE6E12',
+          iconMissedColor: '#F0E5BD',
+          iconCompletedColor: '#fff',
+          iconPendingColor: '#A79B70',
+          missedTextColor: '#F0E5BD',
+          inCompleteTextColor: '#A79B70',
+        },
+        separatorColor: '#A79B70',
+      },
+      tabBar: {
+        backgroundColor: '#fff',
+        shadowColor: '#EDE0AF',
+        iconColor: '#EDE0AF',
+        iconSelectedColor: '#EE6E12',
+      },
     };
   } else {
     return {
@@ -57,6 +82,8 @@ export const theme = (colorTheme) => {
         black: '#000000',
         background1: '#272620',
         chatBackground: '#5A4F31',
+        homeHeaderBackground: '#5A4F31',
+        darkBrown: '#272620',
       },
       text: {
         colors: {
@@ -91,6 +118,29 @@ export const theme = (colorTheme) => {
           xl: '2px',
           xxl: '3px',
         },
+      },
+      home: {
+        cards: {
+          borderColorCompleted: '#EDE0AF',
+          borderColorPending: '#5A4F31',
+          borderColorMissed: '#5A4F31',
+          rightBackground: '#5A4F31',
+          leftBackgroundFull: '#D4D72B',
+          leftBackgroundPartial: '#FFAC0A',
+          leftBackgroundSmall: '#EE6E12',
+          iconMissedColor: '#584D30',
+          iconCompletedColor: '#000000',
+          iconPendingColor: '#A79B70',
+          missedTextColor: '#584D30',
+          inCompleteTextColor: '#A79B70',
+        },
+        separatorColor: '#A79B70',
+      },
+      tabBar: {
+        backgroundColor: '#fff',
+        shadowColor: '#EDE0AF',
+        iconColor: '#EDE0AF',
+        iconSelectedColor: '#EE6E12',
       },
     };
   }
