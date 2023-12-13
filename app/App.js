@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
-import { Appearance, StatusBar, useColorScheme } from 'react-native';
+import { Appearance, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider, useDispatch } from 'react-redux';
+import { initStripe } from '@stripe/stripe-react-native';
 import { PostHogProvider } from 'posthog-react-native';
 import { REACT_APP_POSTHOG_API_KEY } from '@env';
 import store from './stores/store';
@@ -32,6 +33,14 @@ const App = () => {
       dispatch(setup());
     }
   }, [loaded]);
+
+  useEffect(() => {
+    initStripe({
+      publishableKey:
+        '***REMOVED***',
+      merchantIdentifier: 'merchant.com.{{YOUR_APP_NAME}}',
+    });
+  }, []);
 
   return (
     <AppContainer>

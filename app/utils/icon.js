@@ -43,6 +43,10 @@ import Streak from '../components/icons/general/Streak';
 import LandingRunner from '../components/icons/general/LandingRunner';
 import LandingMidGraphic from '../components/icons/general/LandingMidGraphic';
 import LandingMidGraphicDark from '../components/icons/general/LandingMidGraphicDark';
+import New from '../components/icons/general/New';
+import Subscribe from '../components/icons/general/Subscribe';
+import Support from '../components/icons/general/Support';
+import Connection from '../components/icons/general/Connection';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -89,6 +93,10 @@ export const ICONS = [
   { label: 'landingRunner', icon: LandingRunner },
   { label: 'landingMidGraphic', icon: LandingMidGraphic },
   { label: 'landingMidGraphicDark', icon: LandingMidGraphicDark },
+  { label: 'new', icon: New },
+  { label: 'support', icon: Support },
+  { label: 'subscribe', icon: Subscribe },
+  { label: 'connection', icon: Connection },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

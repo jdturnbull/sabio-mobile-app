@@ -11,6 +11,8 @@ export const theme = (colorTheme) => {
         background1: '#FFF6D4',
         chatBackground: '#FFF6D4',
         homeHeaderBackground: '#FFF6D4',
+        settingsBackground: '#fff',
+        settingsHeader: '#FFF6D4',
         darkBrown: '#272620',
       },
       text: {
@@ -83,6 +85,8 @@ export const theme = (colorTheme) => {
         background1: '#272620',
         chatBackground: '#5A4F31',
         homeHeaderBackground: '#5A4F31',
+        settingsBackground: '#272620',
+        settingsHeader: '#5A4F31',
         darkBrown: '#272620',
       },
       text: {

@@ -548,6 +548,42 @@ PODS:
     - React-Core
   - simdjson (3.1.0-wmelon1)
   - SocketRocket (0.6.1)
+  - Stripe (23.18.1):
+    - StripeApplePay (= 23.18.1)
+    - StripeCore (= 23.18.1)
+    - StripePayments (= 23.18.1)
+    - StripePaymentsUI (= 23.18.1)
+    - StripeUICore (= 23.18.1)
+  - stripe-react-native (0.35.0):
+    - React-Core
+    - Stripe (~> 23.18.0)
+    - StripeApplePay (~> 23.18.0)
+    - StripeFinancialConnections (~> 23.18.0)
+    - StripePayments (~> 23.18.0)
+    - StripePaymentSheet (~> 23.18.0)
+    - StripePaymentsUI (~> 23.18.0)
+  - StripeApplePay (23.18.1):
+    - StripeCore (= 23.18.1)
+  - StripeCore (23.18.1)
+  - StripeFinancialConnections (23.18.1):
+    - StripeCore (= 23.18.1)
+    - StripeUICore (= 23.18.1)
+  - StripePayments (23.18.1):
+    - StripeCore (= 23.18.1)
+    - StripePayments/Stripe3DS2 (= 23.18.1)
+  - StripePayments/Stripe3DS2 (23.18.1):
+    - StripeCore (= 23.18.1)
+  - StripePaymentSheet (23.18.1):
+    - StripeApplePay (= 23.18.1)
+    - StripeCore (= 23.18.1)
+    - StripePayments (= 23.18.1)
+    - StripePaymentsUI (= 23.18.1)
+  - StripePaymentsUI (23.18.1):
+    - StripeCore (= 23.18.1)
+    - StripePayments (= 23.18.1)
+    - StripeUICore (= 23.18.1)
+  - StripeUICore (23.18.1):
+    - StripeCore (= 23.18.1)
   - WatermelonDB (0.27.1):
     - React
     - simdjson
@@ -634,6 +670,7 @@ DEPENDENCIES:
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - "simdjson (from `../node_modules/@nozbe/simdjson`)"
+  - "stripe-react-native (from `../node_modules/@stripe/stripe-react-native`)"
   - "WatermelonDB (from `../node_modules/@nozbe/watermelondb`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -653,6 +690,14 @@ SPEC REPOS:
     - lottie-ios
     - OpenSSL-Universal
     - SocketRocket
+    - Stripe
+    - StripeApplePay
+    - StripeCore
+    - StripeFinancialConnections
+    - StripePayments
+    - StripePaymentSheet
+    - StripePaymentsUI
+    - StripeUICore
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -765,6 +810,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   simdjson:
     :path: "../node_modules/@nozbe/simdjson"
+  stripe-react-native:
+    :path: "../node_modules/@stripe/stripe-react-native"
   WatermelonDB:
     :path: "../node_modules/@nozbe/watermelondb"
   Yoga:
@@ -839,10 +886,19 @@ SPEC CHECKSUMS:
   RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
   simdjson: e6bfae9ce4bcdc80452d388d593816f1ca2106f3
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
+  Stripe: 9cb86aa9331b97a55d443d4fe91203d49144c596
+  stripe-react-native: 2e2dad1734c1c2b71564b66bae4395bfd8419af4
+  StripeApplePay: b58f8e79fd49936a5248520f13f120d027cc69a4
+  StripeCore: 761d716a8780c9ae0ab27353dd91e3dfa529b581
+  StripeFinancialConnections: 26273bb24e6a6ff1255d2bafe86481826ce05158
+  StripePayments: e428005bcd818e2a84dbf5e8916d4c15e0d8a5bc
+  StripePaymentSheet: c94033d73fe36be5f7df8e02aa2e2e81413d3852
+  StripePaymentsUI: d058f0d2f92a622586c21a616980f0becb7e5599
+  StripeUICore: 936959f91c27add2e8d5f740bd839cb61ac466ad
   WatermelonDB: 842d22ba555425aa9f3ce551239a001200c539bc
   Yoga: b76f1acfda8212aa16b7e26bcce3983230c82603
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: c4aa05262b14d4056868160cd44f7b25543632e3
+PODFILE CHECKSUM: d40dd0e3de692d2a69451bfd5226ddfe078b0adc
 
 COCOAPODS: 1.12.1

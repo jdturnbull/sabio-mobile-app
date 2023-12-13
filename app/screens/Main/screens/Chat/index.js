@@ -9,11 +9,10 @@ import {
   Animated,
   KeyboardAvoidingView,
   ImageBackground,
-  Modal,
-  FlatList,
   Alert,
+  useColorScheme,
 } from 'react-native';
-import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, State } from 'react-native-gesture-handler';
 import * as openai from '../../../../utils/openai';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIconFromLabel } from '../../../../utils/icon';
@@ -24,8 +23,14 @@ import { useKeyboard } from '@react-native-community/hooks';
 import background from '../../../../assets/background-chat.png';
 import call from '../../../../utils/call';
 import TypingAnimation from '../../../../components/chat/TypingAnimation';
+import { useTheme } from 'styled-components';
+import BackgroundLight from '../../../../assets/background-chat-light.png';
+import BackgroundDark from '../../../../assets/background-chat-dark.png';
 
 const Chat = () => {
+  const theme = useTheme();
+  const colorScheme = useColorScheme();
+
   const threshold = 100;
 
   const scrollRef = useRef();
@@ -308,74 +313,12 @@ const Chat = () => {
     scrollRef.current.scrollToEnd({ animated: true });
   }, [keyboard.keyboardShown]);
 
-  const handleContactSupport = async () => {
-    Alert.alert('Contact Support', 'Please email help@heysabio.com', [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-    ]);
-  };
-
-  const handleHelp = () => {
-    setModalOpen(true);
-  };
-
-  const onHandlerStateChange = (event) => {
-    if (event.nativeEvent.oldState === State.ACTIVE) {
-      let { translationY } = event.nativeEvent;
-
-      if (translationY > threshold) {
-        setModalOpen(false);
-        translateY.setValue(0);
-      } else {
-        Animated.spring(translateY, {
-          toValue: 0,
-          speed: 14,
-          bounciness: 12,
-          useNativeDriver: true,
-        }).start();
-      }
-    }
-  };
-
-  const handleGestureEvent = useCallback(
-    Animated.event(
-      [
-        {
-          nativeEvent: {
-            translationY: translateY,
-          },
-        },
-      ],
-      { useNativeDriver: true },
-    ),
-    [],
-  );
-
-  const renderItem = ({ item }) => (
-    <View style={{ display: 'flex', flexDirection: 'row', width: '100%', alignItems: 'center', marginVertical: 2 }}>
-      <View style={{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#737476', marginRight: 4 }} />
-      <Text style={{ color: '#737476', fontSize: 15, fontWeight: '600', marginLeft: 5 }}>{item}</Text>
-    </View>
-  );
-
-  const ABILITIES = [
-    'Replan your week',
-    'Provide guidance on workouts',
-    'Provide guidance on nutrition',
-    'Change plans based on your feedback',
-    'Send your feedback to the Sabio team',
-  ];
-
-  //   <View style={{ ...styles.headerContainer, width }}>
-  //   <Pressable onPress={handleHelp} style={{ marginBottom: 5 }}>
-  //     <HelpIcon />
-  //   </Pressable>
-  // </View>
   return (
-    <View style={styles.container}>
-      <ImageBackground source={background} resizeMode="cover" style={styles.background}>
+    <View style={{ ...styles.container, backgroundColor: theme.colors.chatBackground }}>
+      <ImageBackground
+        source={colorScheme === 'light' ? BackgroundLight : BackgroundDark}
+        resizeMode="cover"
+        style={styles.background}>
         <KeyboardAvoidingView behavior="padding">
           <GestureHandlerRootView style={{ flex: 1 }}>
             <Animated.ScrollView
@@ -383,8 +326,6 @@ const Chat = () => {
               showsVerticalScrollIndicator={false}
               style={{
                 ...styles.scrollable,
-                paddingTop: 60,
-                marginHorizontal: 20,
               }}>
               {state.messages.map((message, index) => {
                 if (message?.role === 'assistant') {
@@ -418,10 +359,16 @@ const Chat = () => {
               paddingTop: 10,
               width,
             }}>
-            <Animated.View style={{ ...styles.inputContainer, width: animatedWidth, marginBottom: animatedMargin }}>
+            <Animated.View
+              style={{
+                ...styles.inputContainer,
+                width: animatedWidth,
+                marginBottom: animatedMargin,
+                backgroundColor: theme.text.chatMessage.inputBackground,
+              }}>
               <TextInput
                 multiline
-                style={styles.input}
+                style={{ ...styles.input, color: theme.text.colors.secondary }}
                 value={userMessage}
                 onChangeText={(text) => setUserMessage(text)}
               />
@@ -435,34 +382,6 @@ const Chat = () => {
             </Animated.View>
           </Animated.View>
         </KeyboardAvoidingView>
-        <Modal style={styles.modal} animationType="slide" transparent={true} visible={modalOpen}>
-          <View style={styles.modal}>
-            <View style={{ height: 250 }} />
-            <PanGestureHandler onGestureEvent={handleGestureEvent} onHandlerStateChange={onHandlerStateChange}>
-              <Animated.View style={{ ...styles.modalContent, transform: [{ translateY }] }}>
-                <View style={styles.modalTop}>
-                  <View style={styles.line} />
-                </View>
-                <View style={styles.modalBody}>
-                  <View>
-                    <Text style={styles.modalTitle}>Chatting with Sabio</Text>
-                    <Text style={styles.modalText}>
-                      Sabio can perform a number of tasks to help you in your journey.
-                    </Text>
-                    <Text style={styles.modalText}>Here's what Sabio can do for you, just ask!</Text>
-                    <FlatList style={{ marginTop: 20 }} data={ABILITIES} renderItem={renderItem} />
-                    <Text style={styles.modalText}>
-                      Sabio is always learning and improving, so if you have any feedback please let us know!
-                    </Text>
-                    <Pressable onPress={handleContactSupport} style={styles.pressable}>
-                      <Text style={styles.pressableText}>Contact Support</Text>
-                    </Pressable>
-                  </View>
-                </View>
-              </Animated.View>
-            </PanGestureHandler>
-          </View>
-        </Modal>
       </ImageBackground>
     </View>
   );
