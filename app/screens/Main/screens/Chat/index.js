@@ -26,12 +26,15 @@ import TypingAnimation from '../../../../components/chat/TypingAnimation';
 import { useTheme } from 'styled-components';
 import BackgroundLight from '../../../../assets/background-chat-light.png';
 import BackgroundDark from '../../../../assets/background-chat-dark.png';
+import { useIsFocused } from '@react-navigation/native';
 
 const Chat = () => {
   const theme = useTheme();
   const colorScheme = useColorScheme();
 
   const threshold = 100;
+
+  const isFocused = useIsFocused();
 
   const scrollRef = useRef();
   const dispatch = useDispatch();
@@ -101,6 +104,13 @@ const Chat = () => {
 
     setup();
   }, []);
+
+  useEffect(() => {
+    if (isFocused) {
+      // Scroll to bottom
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }
+  }, [isFocused]);
 
   // Handles initialising the response from the AI to a new user message
   useEffect(() => {

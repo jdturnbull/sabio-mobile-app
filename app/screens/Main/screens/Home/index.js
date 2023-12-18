@@ -8,6 +8,7 @@ import Header from './components/Header';
 import Journey from './components/Journey';
 import BackgroundLight from '../../../../assets/home-background-light.png';
 import BackgroundDark from '../../../../assets/home-background-dark.png';
+import { useIsFocused } from '@react-navigation/native';
 
 const HelloContainer = styled.View`
   margin-top: 5px;
@@ -25,6 +26,7 @@ const HelloText = styled.Text`
 
 const Home = () => {
   const dispatch = useDispatch();
+  const isFocused = useIsFocused();
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
   const user = useSelector((state) => state.user.session.user);
 
@@ -52,7 +54,7 @@ const Home = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, []);
+  }, [isFocused]);
 
   useEffect(() => {
     if (plannedActivities?.length > 0 && intervalRef.current) {
