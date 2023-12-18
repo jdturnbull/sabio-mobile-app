@@ -13,6 +13,7 @@ export const theme = (colorTheme) => {
         homeHeaderBackground: '#FFF6D4',
         settingsBackground: '#fff',
         settingsHeader: '#FFF6D4',
+        progressLabelText: '#3E4B88',
         progressDropDownBackground: '#FFF6D4',
         progressDropDownOptionText: '#3E4B88',
         progressReportTopText: '#3E4B88',
@@ -23,14 +24,17 @@ export const theme = (colorTheme) => {
         run: '#EE6E12',
         swim: '#FFAC0A',
         ride: '#D4D72B',
-        rest: '#D4D72B',
+        rest: '#EADDAF',
         default: '#D4D72B',
+        weighttraining: '#EADDAF',
+        walk: '#EE6E12',
       },
       text: {
         colors: {
           secondary: '#000000',
           primary: '#FF912D',
           secondaryInverse: '#ffffff',
+          highlight: '#A2935B',
         },
         chatMessage: {
           backgroundAssistant: '#EADDAF',
@@ -98,6 +102,7 @@ export const theme = (colorTheme) => {
         homeHeaderBackground: '#5A4F31',
         settingsBackground: '#272620',
         settingsHeader: '#5A4F31',
+        progressLabelText: '#A1AAD3',
         progressDropDownBackground: '#5A4F31',
         progressDropDownOptionText: '#A1AAD3',
         chartDash: '#EADDAF',
@@ -116,6 +121,7 @@ export const theme = (colorTheme) => {
           secondary: '#ffffff',
           secondaryInverse: '#000000',
           primary: '#FF912D',
+          highlight: '#CBBA7F',
         },
         weight: {
           regular: '400',

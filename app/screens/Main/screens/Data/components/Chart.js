@@ -14,13 +14,13 @@ const TopBox = Styled.View`
   background-color: ${(props) => props.theme.colors.progressDropDownBackground};
   align-self: flex-start;
   border-radius: 18px;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 `;
 
 const TopBoxText = Styled.Text`
-  font-size: 10px;
+  font-size: 12px;
   font-weight: ${(props) => props.theme.text.weight.regular};
-  color: ${(props) => props.theme.colors.primary};  
+  color: ${(props) => props.theme.colors.progressLabelText};  
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
 `;
 
@@ -91,7 +91,7 @@ const XAxisText = Styled.Text`
   font-family: ${(props) => props.theme.text.family};
 `;
 
-const ChartComponent = ({ data, maxVal, label, YAxisLabel }) => {
+const ChartComponent = ({ data, maxVal, label, YAxisLabel, fromDate, toDate }) => {
   const theme = useTheme();
   const { width: screenWidth } = useWindowDimensions();
 
@@ -102,6 +102,17 @@ const ChartComponent = ({ data, maxVal, label, YAxisLabel }) => {
   YAxisMax = Math.ceil(YAxisMax / 10) * 10;
   const YAxisLabelInterval = (YAxisMax - YAxisMin) / 3;
 
+  // Get dates between from and to date
+  const dates = [];
+
+  const startDate = moment(fromDate, 'YYYY-MM-DD');
+  const endDate = moment(toDate, 'YYYY-MM-DD');
+
+  while (startDate <= endDate) {
+    dates.push(startDate.format('YYYY-MM-DD'));
+    startDate.add(1, 'days');
+  }
+
   return (
     <Container>
       <TopBox>
@@ -109,7 +120,7 @@ const ChartComponent = ({ data, maxVal, label, YAxisLabel }) => {
       </TopBox>
       <Chart style={{ width: CHART_WIDTH }}>
         <XAxis style={{ width: CHART_WIDTH - 30 }}>
-          {data.map((item, index) => {
+          {dates.map((date, index) => {
             return (
               <View
                 style={{
@@ -118,7 +129,7 @@ const ChartComponent = ({ data, maxVal, label, YAxisLabel }) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <XAxisText>{moment(item.date, 'YYYY-MM-DD').format('ddd')}</XAxisText>
+                <XAxisText>{moment(date, 'YYYY-MM-DD').format('ddd')}</XAxisText>
               </View>
             );
           })}
@@ -154,23 +165,25 @@ const ChartComponent = ({ data, maxVal, label, YAxisLabel }) => {
           </RowContainer>
         </Overlay>
         <BarContainer style={{ width: CHART_WIDTH - 30 }}>
-          {data.map((item, index) => {
-            const barWidth = (CHART_WIDTH - 30) / data.length;
-            const barHeight = (item.value / YAxisMax) * (CHART_HEIGHT - 45);
+          {dates.map((date, index) => {
+            const activity = data.find((item) => item.date === date);
+
+            if (!activity || activity.value === 0) {
+              return (
+                <View style={{ width: (CHART_WIDTH - 30) / 7, paddingHorizontal: 5, alignSelf: 'flex-end' }}></View>
+              );
+            }
+
+            const barWidth = (CHART_WIDTH - 30) / dates.length;
+            const barHeight = (activity.value / YAxisMax) * (CHART_HEIGHT - 45);
             const barMargin = 10;
 
-            const Icon = getIconFromLabel(item.type);
+            const Icon = getIconFromLabel(activity.type) || getIconFromLabel('default');
 
             return (
               <View style={{ width: (CHART_WIDTH - 30) / 7, paddingHorizontal: 5, alignSelf: 'flex-end' }}>
-                <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 5 }}>
-                  <Icon color={theme.barColors[item.type] || theme.barColors.default} />
-                  <BarDistanceText
-                    numberOfLines={1}
-                    style={{ color: theme.barColors[item.type] || theme.barColors.default }}>
-                    {item.value}
-                    {YAxisLabel}
-                  </BarDistanceText>
+                <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 5, marginRight: 5 }}>
+                  <Icon color={theme.barColors[activity.type] || theme.barColors.default} />
                 </View>
                 <View
                   style={{
@@ -178,7 +191,7 @@ const ChartComponent = ({ data, maxVal, label, YAxisLabel }) => {
                     height: barHeight,
                     borderTopRightRadius: 5,
                     borderTopLeftRadius: 5,
-                    backgroundColor: theme.barColors[item.type] || theme.barColors.default,
+                    backgroundColor: theme.barColors[activity.type] || theme.barColors.default,
                   }}
                 />
               </View>

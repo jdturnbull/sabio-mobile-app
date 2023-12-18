@@ -1,12 +1,23 @@
 import React from 'react';
 import { View } from 'react-native';
-import Styled from 'styled-components';
+import styled from 'styled-components';
 import ChartComponent from './Chart';
 
-const Container = Styled.View`
-    flex: 1;
-    width: 100%;
-    height: 100%;
+const Container = styled.View`
+  flex: 1;
+  justify-content: space-evenly;
+  margin-bottom: 50px;
+`;
+
+const Header = styled.View`
+  margin-bottom: 50px;
+`;
+
+const HeaderText = styled.Text`
+  font-size: 16px;
+  font-weight: ${(props) => props.theme.text.weight.bold};
+  color: ${(props) => props.theme.colors.progressReportTopText};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
 `;
 
 const ProgressReport = ({ report }) => {
@@ -28,11 +39,34 @@ const ProgressReport = ({ report }) => {
     }
   });
 
+  distanceMax = Math.ceil(distanceMax);
+  durationMax = Math.ceil(durationMax);
+
+  durationMax = durationMax >= 2 ? durationMax : 2;
+  distanceMax = distanceMax >= 10 ? distanceMax : 10;
+
   return (
     <Container>
-      <ChartComponent data={report.analysis.distances} maxVal={distanceMax} label={distanceLabel} YAxisLabel={'km'} />
+      <Header>
+        <HeaderText>{report.title}</HeaderText>
+      </Header>
+      <ChartComponent
+        data={report.analysis.distances}
+        maxVal={distanceMax}
+        label={distanceLabel}
+        YAxisLabel={'km'}
+        fromDate={report.fromDate}
+        toDate={report.toDate}
+      />
       <View style={{ height: 40 }} />
-      <ChartComponent data={report.analysis.durations} maxVal={durationMax} label={durationLabel} YAxisLabel={'hrs'} />
+      <ChartComponent
+        data={report.analysis.durations}
+        maxVal={durationMax}
+        label={durationLabel}
+        YAxisLabel={'hrs'}
+        fromDate={report.fromDate}
+        toDate={report.toDate}
+      />
     </Container>
   );
 };
