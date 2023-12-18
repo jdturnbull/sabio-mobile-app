@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Pressable, Alert, useWindowDimensions, ImageBackground, useColorScheme } from 'react-native';
+import React, { useState } from 'react';
+import { View, Pressable, Alert, useWindowDimensions, ImageBackground, useColorScheme, Modal } from 'react-native';
 import styled, { useTheme } from 'styled-components';
 import moment from 'moment';
 import call from '../../../../utils/call';
@@ -135,19 +135,22 @@ const Settings = () => {
   const user = useSelector((state) => state.user.session?.user);
   const activities = useSelector((state) => state.user?.plannedActivities);
 
+  const [modalOpen, setModalOpen] = useState(false);
+
   const { width: screenWidth } = useWindowDimensions();
 
   const handleResetConfirm = async () => {
-    const resp = await call('GET', `users/delete/${user.id}`);
-
-    if (resp) {
+    try {
+      await call('GET', `users/reset/${user.id}`);
       Alert.alert('Plan reset', '', [{ text: 'OK' }]);
+    } catch (error) {
+      Alert.alert('Failed to reset plan, please contact support', '', [{ text: 'OK' }]);
     }
   };
 
   const handleOptionPress = (opt) => {
     if (opt === 'support') {
-      Alert.alert('support@heysabio.com', '', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
+      Alert.alert('support@heysabio.com', '', [{ text: 'OK' }]);
     }
 
     if (opt === 'newPlan') {
@@ -158,6 +161,11 @@ const Settings = () => {
     }
 
     if (opt === 'subscription') {
+      // Open apple pay
+    }
+
+    if (opt === 'connection') {
+      Alert.alert('Manage connections', 'Please chat with Sabio to change your connection', [{ text: 'OK' }]);
     }
   };
 
@@ -165,6 +173,8 @@ const Settings = () => {
 
   const totalNum = activities.length;
   const numCompleted = activities.filter((a) => a.status === 'COMPLETED' || a.status === 'PART_COMPLETED').length;
+
+  // Should skipping rest days mean the rest day is no longer considered in your application.
 
   const Opt = ({ opt, onPress, icon, label, first, last }) => {
     const Icon = getIconFromLabel(icon);

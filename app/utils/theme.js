@@ -13,7 +13,18 @@ export const theme = (colorTheme) => {
         homeHeaderBackground: '#FFF6D4',
         settingsBackground: '#fff',
         settingsHeader: '#FFF6D4',
+        progressDropDownBackground: '#FFF6D4',
+        progressDropDownOptionText: '#3E4B88',
+        progressReportTopText: '#3E4B88',
         darkBrown: '#272620',
+        chartDash: '#EADDAF',
+      },
+      barColors: {
+        run: '#EE6E12',
+        swim: '#FFAC0A',
+        ride: '#D4D72B',
+        rest: '#D4D72B',
+        default: '#D4D72B',
       },
       text: {
         colors: {
@@ -87,7 +98,18 @@ export const theme = (colorTheme) => {
         homeHeaderBackground: '#5A4F31',
         settingsBackground: '#272620',
         settingsHeader: '#5A4F31',
+        progressDropDownBackground: '#5A4F31',
+        progressDropDownOptionText: '#A1AAD3',
+        chartDash: '#EADDAF',
         darkBrown: '#272620',
+        progressReportTopText: '#A1AAD3',
+      },
+      barColors: {
+        run: '#EE6E12',
+        swim: '#FFAC0A',
+        ride: '#D4D72B',
+        rest: '#D4D72B',
+        default: '#D4D72B',
       },
       text: {
         colors: {

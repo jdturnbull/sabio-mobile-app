@@ -27,7 +27,7 @@ const TabBar = ({ state, navigation, width }) => {
           width: 0,
           height: -4,
         },
-        shadowOpacity: activeRoute === 'chat' ? 0 : 1,
+        shadowOpacity: activeRoute === 'chat' ? 0 : 0.5,
         shadowSpread: 0,
         shadowRadius: 30,
       }}>

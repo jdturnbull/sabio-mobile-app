@@ -47,6 +47,8 @@ import New from '../components/icons/general/New';
 import Subscribe from '../components/icons/general/Subscribe';
 import Support from '../components/icons/general/Support';
 import Connection from '../components/icons/general/Connection';
+import Down from '../components/icons/general/Down';
+import Up from '../components/icons/general/Up';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -97,6 +99,8 @@ export const ICONS = [
   { label: 'support', icon: Support },
   { label: 'subscribe', icon: Subscribe },
   { label: 'connection', icon: Connection },
+  { label: 'down', icon: Down },
+  { label: 'up', icon: Up },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

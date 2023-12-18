@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useColorScheme } from 'react-native';
 import { getIconFromLabel } from '../../../../../../utils/icon';
+import { useSelector } from 'react-redux';
 
 const Container = styled.View`
   margin-top: 50px;
@@ -33,18 +34,20 @@ const Header = () => {
   const theme = useTheme();
   const colorScheme = useColorScheme();
 
+  const user = useSelector((state) => state.user?.session?.user);
+
   const StreakIcon = getIconFromLabel('streak');
   const ConfidenceIcon = getIconFromLabel('confidence');
 
   return (
     <Container>
       <ItemContainer>
-        <ConfidenceIcon color={colorScheme === 'dark' ? theme.colors.white : null} />
-        <ItemText>80%</ItemText>
+        {/* <ConfidenceIcon color={colorScheme === 'dark' ? theme.colors.white : null} />
+        <ItemText>80%</ItemText> */}
       </ItemContainer>
       <ItemContainer style={{ justifyContent: 'flex-end' }}>
         <StreakIcon color={colorScheme === 'dark' ? theme.colors.white : null} />
-        <ItemText>2</ItemText>
+        <ItemText>{user?.streak || 0}</ItemText>
       </ItemContainer>
     </Container>
   );

@@ -84,6 +84,8 @@ const RootApp = () => {
   const _onboarded = useSelector((state) => state.user.session?.user.onboarded);
   const onboarded = useSelector((state) => state.onboarding.onboarded);
 
+  console.disableYellowBox = true;
+
   useEffect(() => {
     if (user) {
       posthog.identify(user.id, {
