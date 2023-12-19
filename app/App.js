@@ -4,8 +4,6 @@ import { Appearance, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider, useDispatch } from 'react-redux';
 import { initStripe } from '@stripe/stripe-react-native';
-import { PostHogProvider } from 'posthog-react-native';
-import { REACT_APP_POSTHOG_API_KEY } from '@env';
 import store from './stores/store';
 import { useSelector } from 'react-redux';
 import { navigationRef } from './utils/navigation';
@@ -79,13 +77,11 @@ const ConnectedApp = () => {
 
   return (
     <NavigationContainer ref={navigationRef} onStateChange={handleNavStateChange}>
-      <PostHogProvider apiKey={REACT_APP_POSTHOG_API_KEY} options={{ host: 'https://eu.posthog.com' }}>
-        <ThemeProvider theme={themeData}>
-          <Provider store={store}>
-            <App />
-          </Provider>
-        </ThemeProvider>
-      </PostHogProvider>
+      <ThemeProvider theme={themeData}>
+        <Provider store={store}>
+          <App />
+        </Provider>
+      </ThemeProvider>
     </NavigationContainer>
   );
 };

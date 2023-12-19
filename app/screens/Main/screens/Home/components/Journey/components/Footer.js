@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Pressable, Dimensions } from 'react-native';
+import styled, { useTheme } from 'styled-components';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
@@ -9,7 +10,35 @@ import Animated, {
   useAnimatedGestureHandler,
 } from 'react-native-reanimated';
 
+const Title = styled.Text`
+  font-family: ${(props) => props.theme.text.family};
+  font-size: 13px;
+  color: ${(props) => props.theme.text.colors.secondary};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-weight: ${(props) => props.theme.text.weight.semibold};
+`;
+
+const Body = styled.Text`
+  font-family: ${(props) => props.theme.text.family};
+  font-size: 13px;
+  color: ${(props) => props.theme.text.colors.highlight};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-weight: ${(props) => props.theme.text.weight.regular};
+  margin-top: 5px;
+`;
+
+const StyledPressable = styled.Pressable`
+  margin-top: 20px;
+  background-color: ${(props) => props.theme.text.colors.primary};
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const Footer = ({ data, setModalData }) => {
+  const theme = useTheme();
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [renderFooter, setRenderFooter] = useState(data !== null);
   const [expanded, setExpanded] = useState(false);
@@ -92,23 +121,23 @@ const Footer = ({ data, setModalData }) => {
   return (
     <PanGestureHandler onGestureEvent={gestureHandler}>
       <Animated.View style={[styles.overlay, animatedStyle]}>
-        <View style={styles.container}>
-          <Text style={styles.title}>{data?.item.title}</Text>
-          <Text numberOfLines={1} style={styles.body}>
-            {data?.item.analysis ? data?.item.analysis : data?.item.guidance}
-          </Text>
-          <Pressable style={styles.pressable} onPress={handlePress}>
+        <View style={[styles.container, { backgroundColor: theme.text.colors.secondaryInverse }]}>
+          <Title>{data?.item.title.toUpperCase()}</Title>
+          {!expanded && (
+            <Body numberOfLines={1}>{data?.item.analysis ? data?.item.analysis : data?.item.guidance}</Body>
+          )}
+          <StyledPressable onPress={handlePress}>
             <Text style={styles.pressableText}>{expanded ? 'Close' : 'Open'}</Text>
-          </Pressable>
+          </StyledPressable>
           {expanded && (
             <View style={styles.content}>
               <View>
-                <Text style={styles.title}>{data?.item.analysis ? 'Analysis' : 'Guidance'}</Text>
+                <Title style={{ marginBottom: 20 }}>{data?.item.analysis ? 'ANALYSIS' : 'GUIDANCE'}</Title>
                 <Text style={styles.body}>{data?.item.analysis ? data?.item.analysis : data?.item.guidance}</Text>
               </View>
               {!data?.item.analysis && (
                 <View>
-                  <Text style={styles.title}>Reasoning</Text>
+                  <Title style={{ marginBottom: 20 }}>REASONING</Title>
                   <Text style={styles.body}>{data?.item.reasoning}</Text>
                 </View>
               )}
@@ -128,7 +157,6 @@ const styles = StyleSheet.create({
     bottom: -10,
     left: 0,
     right: 0,
-    backgroundColor: '#16171B',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
   },
@@ -137,23 +165,14 @@ const styles = StyleSheet.create({
     height: '100%',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
-    borderWidth: 2,
-    borderBottomWidth: 0,
-    borderColor: '#8AA1B130',
     padding: 20,
-  },
-  title: {
-    fontFamily: 'Noto Sans',
-    fontWeight: '700',
-    color: '#8AA1B190',
-    fontSize: 16,
-  },
-  body: {
-    fontFamily: 'Noto Sans',
-    fontWeight: '400',
-    color: '#8AA1B190',
-    fontSize: 14,
-    marginTop: 5,
+    shadowColor: '#988232',
+    shadowOffset: {
+      width: 0,
+      height: -110,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 180,
   },
   pressable: {
     marginTop: 20,
@@ -171,7 +190,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   content: {
-    marginTop: 20,
     flex: 1,
     display: 'flex',
     flexDirection: 'column',

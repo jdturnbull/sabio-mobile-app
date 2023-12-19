@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LottieView from 'lottie-react-native';
 import { useNetInfo } from '@react-native-community/netinfo';
-import { usePostHog } from 'posthog-react-native';
 import { useSelector } from 'react-redux';
 import Onboarding from './Onboarding';
 import Main from './Main';
@@ -79,22 +78,9 @@ const AuthedApp = () => {
 };
 
 const RootApp = () => {
-  const posthog = usePostHog();
   const user = useSelector((state) => state.user.session?.user);
   const _onboarded = useSelector((state) => state.user.session?.user.onboarded);
   const onboarded = useSelector((state) => state.onboarding.onboarded);
-
-  console.disableYellowBox = true;
-
-  useEffect(() => {
-    if (user) {
-      posthog.identify(user.id, {
-        email: user.email,
-        name: user.name,
-        isDev: user.email === 'jdturnbull98@gmail.com',
-      });
-    }
-  }, [user]);
 
   return (
     <AppStack.Navigator
