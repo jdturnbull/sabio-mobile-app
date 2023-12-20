@@ -50,6 +50,9 @@ import Connection from '../components/icons/general/Connection';
 import Down from '../components/icons/general/Down';
 import Up from '../components/icons/general/Up';
 
+import SabioGreyed from '../components/icons/company/SabioGreyed';
+import SabioSmall from '../components/icons/company/SabioSmall';
+
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
   { label: 'apple', icon: Apple },
@@ -103,6 +106,8 @@ export const ICONS = [
   { label: 'connection', icon: Connection },
   { label: 'down', icon: Down },
   { label: 'up', icon: Up },
+  { label: 'sabioGreyed', icon: SabioGreyed },
+  { label: 'sabioSmall', icon: SabioSmall },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

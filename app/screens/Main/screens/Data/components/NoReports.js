@@ -1,6 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import styled from 'styled-components';
+import { getIconFromLabel } from '../../../../../utils/icon';
 
 const Container = styled.View`
   flex: 1;
@@ -17,9 +18,13 @@ const StyledText = styled.Text`
 `;
 
 const NoReports = () => {
+  const Icon = getIconFromLabel('sabioGreyed');
+
   return (
     <Container>
-      <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+      <Icon />
+      <View
+        style={{ width: '100%', marginTop: 30, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
         <StyledText>Sabio hasn't made a report for you yet</StyledText>
       </View>
     </Container>

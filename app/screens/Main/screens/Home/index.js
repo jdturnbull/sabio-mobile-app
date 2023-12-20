@@ -9,11 +9,16 @@ import Journey from './components/Journey';
 import BackgroundLight from '../../../../assets/home-background-light.png';
 import BackgroundDark from '../../../../assets/home-background-dark.png';
 import { useIsFocused } from '@react-navigation/native';
+import { getIconFromLabel } from '../../../../utils/icon';
 
 const HelloContainer = styled.View`
   margin-top: 5px;
   margin-bottom: 10px;
   padding-horizontal: 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
 `;
 
 const HelloText = styled.Text`
@@ -24,6 +29,21 @@ const HelloText = styled.Text`
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
 `;
 
+const ItemContainer = styled.View`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+`;
+
+const ItemText = styled.Text`
+  font-size: ${(props) => props.theme.text.size.md};
+  color: ${(props) => props.theme.text.colors.secondary};
+  font-family: ${(props) => props.theme.text.family};
+  font-weight: ${(props) => props.theme.text.weight.semibold};
+  margin-left: 5px;
+`;
+
 const Home = () => {
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
@@ -32,6 +52,8 @@ const Home = () => {
 
   const theme = useTheme();
   const colorScheme = useColorScheme();
+
+  const StreakIcon = getIconFromLabel('streak');
 
   const intervalRef = useRef(null);
 
@@ -73,12 +95,20 @@ const Home = () => {
       <ImageBackground
         source={colorScheme === 'light' ? BackgroundLight : BackgroundDark}
         resizeMode="cover"
-        style={{ flex: 1, backgroundColor: colorScheme === 'light' ? theme.colors.white : theme.colors.darkBrown }}>
-        <Header />
+        style={{
+          flex: 1,
+          backgroundColor: colorScheme === 'light' ? theme.colors.white : theme.colors.darkBrown,
+          paddingTop: 50,
+        }}>
+        {/* <Header /> */}
         <HelloContainer>
           <HelloText>
             Hi, <HelloText style={{ color: theme.text.colors.primary }}>{user.name.split(' ')[0]}!</HelloText>
           </HelloText>
+          <ItemContainer>
+            <StreakIcon color={colorScheme === 'dark' ? theme.colors.white : null} />
+            <ItemText>{user?.streak || 0}</ItemText>
+          </ItemContainer>
         </HelloContainer>
         <Journey />
       </ImageBackground>

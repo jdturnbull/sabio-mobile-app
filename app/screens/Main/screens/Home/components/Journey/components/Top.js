@@ -43,7 +43,7 @@ const Top = ({ viewableItems, setShowPlan }) => {
   const user = useSelector((state) => state.user.session.user);
   const monthlyFocuses = user.monthlyFocuses;
   const plannedMonths = useSelector((state) => state.user.plannedMonths);
-  const ReadIcon = getIconFromLabel('read');
+  const ReadIcon = getIconFromLabel('sabioSmall');
 
   const month = moment(viewableItems[0]?.item.date, 'YYYY-MM-DD').format('MMMM YYYY').toUpperCase();
 
@@ -60,7 +60,7 @@ const Top = ({ viewableItems, setShowPlan }) => {
         <StyledTextBottom>{monthlyFocuses[month]}</StyledTextBottom>
       </Left>
       <Pressable
-        onPress={handlePress}
+        // onPress={handlePress}
         style={{
           ...styles.pressable,
           borderColor: colorScheme === 'light' ? theme.text.colors.secondaryInverse : theme.colors.darkBrown,

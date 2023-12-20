@@ -20,7 +20,6 @@ import AssistantMessage from '../../../../components/chat/AssistantMessage';
 import UserMessage from '../../../../components/chat/UserMessage';
 import { updateState } from '../../../../stores/chat/chatSlice';
 import { useKeyboard } from '@react-native-community/hooks';
-import background from '../../../../assets/background-chat.png';
 import call from '../../../../utils/call';
 import TypingAnimation from '../../../../components/chat/TypingAnimation';
 import { useTheme } from 'styled-components';
@@ -31,8 +30,6 @@ import { useIsFocused } from '@react-navigation/native';
 const Chat = () => {
   const theme = useTheme();
   const colorScheme = useColorScheme();
-
-  const threshold = 100;
 
   const isFocused = useIsFocused();
 
@@ -57,11 +54,8 @@ const Chat = () => {
   const [animatedWidth] = useState(new Animated.Value(width * 0.9));
   const [animatedMargin] = useState(new Animated.Value(120));
   const [opacity] = useState(new Animated.Value(userMessage.split('').length > 0 ? 1 : 0.2));
-  const translateY = useRef(new Animated.Value(0)).current;
 
   const Send = getIconFromLabel('send');
-  const LogoSmall = getIconFromLabel('logoSmall');
-  const HelpIcon = getIconFromLabel('help');
 
   // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
@@ -97,18 +91,16 @@ const Chat = () => {
       // If the most recent message is from the user trigger an AI response
       if (latestMessage?.role === 'user') {
         setRequiresResponse(true);
+      } else {
+        // If the most recent message is from the AI, then set canSend to true
+        setCanSend(true);
       }
 
       setIsSetup(true);
     };
 
-    setup();
-  }, []);
-
-  useEffect(() => {
     if (isFocused) {
-      // Scroll to bottom
-      scrollRef.current?.scrollToEnd({ animated: true });
+      setup();
     }
   }, [isFocused]);
 
@@ -189,7 +181,7 @@ const Chat = () => {
           setShouldCompleteTool(true);
         }
 
-        if (name === 'provide_feedback') {
+        if (name === 'feedback') {
           // Send the data to the backend to provide feedback
           const response = await call('POST', 'users/feedback', { data: args, userId: session.user.id });
 
@@ -200,31 +192,20 @@ const Chat = () => {
           setShouldCompleteTool(true);
         }
 
-        if (name === 'add_activity') {
-          // Send the data to the backend to add an activity
-          const response = await call('POST', 'users/addActivity', { data: args, userId: session.user.id });
-
-          // Save the response to the tool output so it can be used when completing the tool
-          setToolOutput(response);
-
-          // Trigger the tool completion
-          setShouldCompleteTool(true);
-        }
-
-        if (name === 'delete_activity') {
-          // Send the data to the backend to delete an activity
-          const response = await call('POST', 'users/deleteActivity', { data: args, userId: session.user.id });
-
-          // Save the response to the tool output so it can be used when completing the tool
-          setToolOutput(response);
-
-          // Trigger the tool completion
-          setShouldCompleteTool(true);
-        }
-
-        if (name === 'learn') {
+        if (name === 'store_info') {
           // Send the data to the backend to learn
-          const response = await call('POST', 'users/learn', { data: args, userId: session.user.id });
+          const response = await call('POST', 'users/remember', { data: args, userId: session.user.id });
+
+          // Save the response to the tool output so it can be used when completing the tool
+          setToolOutput(response);
+
+          // Trigger the tool completion
+          setShouldCompleteTool(true);
+        }
+
+        if (name === 'alter_activity') {
+          // Send the data to the backend to alter the activity
+          const response = await call('POST', 'users/alterActivity', { data: args, userId: session.user.id });
 
           // Save the response to the tool output so it can be used when completing the tool
           setToolOutput(response);
@@ -347,11 +328,12 @@ const Chat = () => {
               {loading && (
                 <View
                   style={{
-                    backgroundColor: '#1F2025',
+                    backgroundColor: theme.text.chatMessage.backgroundAssistant,
                     borderRadius: 10,
                     padding: 15,
                     marginBottom: 20,
                     marginRight: 30,
+                    marginLeft: 30,
                     alignSelf: 'flex-start',
                     width: 65,
                   }}>
