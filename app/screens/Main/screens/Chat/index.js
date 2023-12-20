@@ -60,8 +60,6 @@ const Chat = () => {
   // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
     const setup = async () => {
-      if (isSetup) return;
-
       let assistant = state.assistant;
       let thread = state.thread;
       let messages = state.messages;
@@ -97,6 +95,7 @@ const Chat = () => {
       }
 
       setIsSetup(true);
+      scrollRef.current?.scrollToEnd({ animated: true });
     };
 
     if (isFocused) {
@@ -279,7 +278,7 @@ const Chat = () => {
   // Handles animating the width of the input container (can't use native driver when animating layout props)
   useEffect(() => {
     Animated.timing(animatedMargin, {
-      toValue: keyboard.keyboardShown ? 20 : 10,
+      toValue: keyboard.keyboardShown ? 5 : 10,
       duration: 200,
       useNativeDriver: false,
     }).start();
@@ -316,7 +315,7 @@ const Chat = () => {
               ref={scrollRef}
               showsVerticalScrollIndicator={false}
               style={{
-                ...styles.scrollable,
+                paddingTop: 75,
               }}>
               {state.messages.map((message, index) => {
                 if (message?.role === 'assistant') {
@@ -390,9 +389,6 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
-  scrollable: {
-    paddingTop: 18,
-  },
   inputContainer: {
     display: 'flex',
     flexDirection: 'row',
@@ -405,20 +401,12 @@ const styles = StyleSheet.create({
     paddingBottom: 7,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 11,
-    elevation: 10,
   },
   input: {
     flex: 1,
     color: '#fff',
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '400',
     padding: 0,
     margin: 0,
     marginBottom: 3,

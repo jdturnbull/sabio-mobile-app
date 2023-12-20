@@ -30,7 +30,9 @@ const HelloText = styled.Text`
 const Top = styled.View`
   padding: 20px;
   border-radius: 10px;
-  background-color: ${(props) => props.theme.colors.settingsHeader};
+  background-color: ${(props) => props.theme.settings.topBarColor};
+  flex-direction: row;
+  align-items: center;
 `;
 
 const HeaderText = styled.Text`
@@ -55,13 +57,13 @@ const Option = styled.View`
   border: 1px solid ${(props) => props.theme.home.cards.borderColorMissed};
   background-color: 'transparent';
   border-bottom-width: 0;
-  background-color: ${(props) => props.theme.colors.settingsBackground};
+  background-color: ${(props) => props.theme.settings.optionBoxColor};
 `;
 
 const OptionText = styled.Text`
   font-size: ${(props) => props.theme.text.size.sm};
   font-weight: ${(props) => props.theme.text.weight.semibold};
-  color: ${(props) => props.theme.text.colors.secondary};
+  color: ${(props) => props.theme.settings.optionTextColor};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
   font-family: ${(props) => props.theme.text.family};
 `;
@@ -69,7 +71,7 @@ const OptionText = styled.Text`
 const StyledText = styled.Text`
   font-size: ${(props) => props.theme.text.size.lg};
   font-weight: ${(props) => props.theme.text.weight.bold};
-  color: ${(props) => props.theme.text.colors.secondary};
+  color: ${(props) => props.theme.settings.labelColor};
 `;
 
 const ProgressContainer = styled.View`
@@ -89,7 +91,8 @@ const Progress = styled.View`
 const PercentageText = styled.Text`
   margin-top: 5px;
   font-size: ${(props) => props.theme.text.size.sm};
-  font-weight: ${(props) => props.theme.text.weight.semibold};
+  font-weight: ${(props) => props.theme.text.weight.regular};
+  color: ${(props) => props.theme.text.colors.secondary};
 `;
 
 const InformationContainer = styled.Pressable`
@@ -97,15 +100,14 @@ const InformationContainer = styled.Pressable`
   padding: 15px;
   flex-direction: row;
   align-items: center;
-  border: 1px solid ${(props) => props.theme.home.cards.borderColorMissed};
   border-bottom-width: 0;
-  background-color: ${(props) => props.theme.colors.settingsBackground};
+  background-color: ${(props) => props.theme.settings.optionBoxColor};
 `;
 
 const InformationText = styled.Text`
   line-height: 20px;
   font-size: ${(props) => props.theme.text.size.sm};
-  color: ${(props) => props.theme.text.colors.secondary};
+  color: ${(props) => props.theme.settings.optionTextColor};
   font-family: ${(props) => props.theme.text.family};
 `;
 
@@ -116,10 +118,10 @@ const InformationBox = ({ title, value, onPress, id, last, first }) => {
     <InformationContainer
       style={
         last
-          ? { marginBottom: 50, borderBottomLeftRadius: 10, borderBottomRightRadius: 10 }
+          ? { marginBottom: 50, borderBottomLeftRadius: 18, borderBottomRightRadius: 18 }
           : first
-          ? { borderTopLeftRadius: 10, borderTopRightRadius: 10 }
-          : {}
+          ? { borderTopLeftRadius: 18, borderTopRightRadius: 18, marginBottom: 3 }
+          : { marginBottom: 3 }
       }
       onPress={handlePress}>
       <InformationText>
@@ -188,13 +190,13 @@ const Settings = () => {
         <Option
           style={
             last
-              ? { borderBottomWidth: 1, borderBottomRightRadius: 10, borderBottomLeftRadius: 10 }
+              ? { borderBottomWidth: 1, borderBottomRightRadius: 18, borderBottomLeftRadius: 18 }
               : first
-              ? { borderTopRightRadius: 10, borderTopLeftRadius: 10 }
-              : {}
+              ? { borderTopRightRadius: 18, borderTopLeftRadius: 18, marginBottom: 3 }
+              : { marginBottom: 3 }
           }>
           <OptionText>{label}</OptionText>
-          <Icon color={theme.home.cards.iconPendingColor} />
+          <Icon color={theme.settings.iconColor} />
         </Option>
       </Pressable>
     );
@@ -206,8 +208,12 @@ const Settings = () => {
 
   const handleInfoBoxPress = () => {};
 
+  const ProfileIcon = getIconFromLabel('profile');
+
   return (
-    <ImageBackground source={colorScheme === 'light' ? LightBackground : DarkBackground} style={{ flex: 1 }}>
+    <ImageBackground
+      style={colorScheme === 'light' ? { flex: 1, backgroundColor: '#fff' } : { flex: 1, backgroundColor: '#272620' }}
+      source={colorScheme === 'light' ? LightBackground : DarkBackground}>
       <Container>
         <HelloContainer>
           <HelloText>
@@ -215,11 +221,14 @@ const Settings = () => {
           </HelloText>
         </HelloContainer>
         <Top>
-          <HeaderText>{user.name}</HeaderText>
-          <HeaderSubText>{user.email}</HeaderSubText>
+          <ProfileIcon />
+          <View style={{ marginLeft: 18 }}>
+            <HeaderText>{user.name}</HeaderText>
+            <HeaderSubText>{user.email}</HeaderSubText>
+          </View>
         </Top>
         <View style={{ marginBottom: 30 }}>
-          <StyledText style={{ marginVertical: 30 }}>Plan Completion</StyledText>
+          <StyledText style={{ marginVertical: 30 }}>Account Options</StyledText>
           <Opt onPress={handleOptionPress} label={'Start a new plan'} icon={'new'} opt={'newPlan'} first={true} />
           <Opt onPress={handleOptionPress} label={'Manage connections'} icon={'connection'} opt={'connection'} />
           <Opt onPress={handleOptionPress} label={subscriptionText} icon={'subscribe'} opt={'subscription'} />
@@ -233,7 +242,7 @@ const Settings = () => {
           <View style={{ width: '100%', alignItems: 'flex-end' }}>
             <PercentageText>{`${Math.round(progressPercentage * 100) / 100}%`}</PercentageText>
           </View>
-          <StyledText style={{ marginVertical: 20 }}>Your information</StyledText>
+          <StyledText style={{ marginVertical: 20 }}>Your Information</StyledText>
           <InformationBox
             title={'Goal:'}
             value={user.onboardingData.fitnessGoal}
@@ -249,7 +258,7 @@ const Settings = () => {
           />
           <InformationBox title={'Age:'} value={user.onboardingData.age} onPress={handleInfoBoxPress} id={'age'} />
           <InformationBox
-            title={'Past Experience:'}
+            title={'Past experience:'}
             value={user.onboardingData.pastExperienceWithFitnessAndExercise}
             onPress={handleInfoBoxPress}
             id={'experience'}

@@ -2,7 +2,6 @@ import React from 'react';
 import { useWindowDimensions } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './screens/Home';
-import Feed from './screens/Feed';
 import Chat from './screens/Chat';
 import Data from './screens/Data';
 import Settings from './screens/Settings';
@@ -29,7 +28,6 @@ const TabStackScreen = () => {
       screenOptions={TabScreenOpts}
       tabBar={(props) => <TabBar {...props} width={width} />}>
       <Tab.Screen name="home" component={HomeScreen} />
-      <Tab.Screen name="feed" component={Feed} />
       <Tab.Screen name="chat" component={Chat} />
       <Tab.Screen name="data" component={Data} />
       <Tab.Screen name="settings" component={Settings} />

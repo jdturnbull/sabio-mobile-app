@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Pressable, Dimensions } from 'react-native';
+import { View, StyleSheet, Text, Pressable, Dimensions, useColorScheme } from 'react-native';
 import styled, { useTheme } from 'styled-components';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import Animated, {
@@ -39,6 +39,7 @@ const StyledPressable = styled.Pressable`
 
 const Footer = ({ data, setModalData }) => {
   const theme = useTheme();
+  const colorScheme = useColorScheme();
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [renderFooter, setRenderFooter] = useState(data !== null);
   const [expanded, setExpanded] = useState(false);
@@ -121,7 +122,11 @@ const Footer = ({ data, setModalData }) => {
   return (
     <PanGestureHandler onGestureEvent={gestureHandler}>
       <Animated.View style={[styles.overlay, animatedStyle]}>
-        <View style={[styles.container, { backgroundColor: theme.text.colors.secondaryInverse }]}>
+        <View
+          style={[
+            styles.container,
+            { backgroundColor: theme.text.colors.secondaryInverse, shadowOpacity: colorScheme === 'light' ? 0.5 : 0.1 },
+          ]}>
           <Title>{data?.item.title.toUpperCase()}</Title>
           {!expanded && (
             <Body numberOfLines={1}>{data?.item.analysis ? data?.item.analysis : data?.item.guidance}</Body>
@@ -133,12 +138,12 @@ const Footer = ({ data, setModalData }) => {
             <View style={styles.content}>
               <View>
                 <Title style={{ marginBottom: 20 }}>{data?.item.analysis ? 'ANALYSIS' : 'GUIDANCE'}</Title>
-                <Text style={styles.body}>{data?.item.analysis ? data?.item.analysis : data?.item.guidance}</Text>
+                <Body>{data?.item.analysis ? data?.item.analysis : data?.item.guidance}</Body>
               </View>
               {!data?.item.analysis && (
                 <View>
                   <Title style={{ marginBottom: 20 }}>REASONING</Title>
-                  <Text style={styles.body}>{data?.item.reasoning}</Text>
+                  <Body>{data?.item.reasoning}</Body>
                 </View>
               )}
             </View>
@@ -171,7 +176,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: -110,
     },
-    shadowOpacity: 1,
+
     shadowRadius: 180,
   },
   pressable: {

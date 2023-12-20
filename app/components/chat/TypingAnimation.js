@@ -60,6 +60,9 @@ const TypingIndicator = () => {
           style={[
             styles.dot,
             {
+              backgroundColor: theme.chat.typingIndicatorColor,
+            },
+            {
               opacity: value,
               transform: [
                 {

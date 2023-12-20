@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, useColorScheme } from 'react-native';
 import styled from 'styled-components';
 import { getIconFromLabel } from '../../../../../utils/icon';
 
@@ -18,7 +18,9 @@ const StyledText = styled.Text`
 `;
 
 const NoReports = () => {
-  const Icon = getIconFromLabel('sabioGreyed');
+  const colorScheme = useColorScheme();
+
+  const Icon = getIconFromLabel(colorScheme === 'light' ? 'sabioGreyedLight' : 'sabioGreyedDark');
 
   return (
     <Container>

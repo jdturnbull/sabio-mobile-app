@@ -4,6 +4,12 @@ export const theme = (colorTheme) => {
       spacing: {
         safeAreaView: '75px',
       },
+      splash: {
+        background: '#FFF6D4',
+      },
+      chat: {
+        typingIndicatorColor: '#00000090',
+      },
       colors: {
         primary: '#EE6E12',
         white: '#ffffff',
@@ -19,6 +25,11 @@ export const theme = (colorTheme) => {
         progressReportTopText: '#3E4B88',
         darkBrown: '#272620',
         chartDash: '#EADDAF',
+        tabBarIcon: '#EDE0AF',
+      },
+      waitingScreen: {
+        background: '#FFF6D4',
+        smallText: '#584D30',
       },
       barColors: {
         run: '#EE6E12',
@@ -87,11 +98,24 @@ export const theme = (colorTheme) => {
         iconColor: '#EDE0AF',
         iconSelectedColor: '#EE6E12',
       },
+      settings: {
+        topBarColor: '#FFF6D4',
+        optionBoxColor: '#EADDAF',
+        iconColor: '#5A4F31',
+        optionTextColor: '#000000',
+        labelColor: '#49548A',
+      },
     };
   } else {
     return {
       spacing: {
         safeAreaView: '75px',
+      },
+      splash: {
+        background: '#272620',
+      },
+      chat: {
+        typingIndicatorColor: '#ffffff90',
       },
       colors: {
         primary: '#EE6E12',
@@ -115,6 +139,10 @@ export const theme = (colorTheme) => {
         ride: '#D4D72B',
         rest: '#D4D72B',
         default: '#D4D72B',
+      },
+      waitingScreen: {
+        background: '#272620',
+        smallText: '#CDBD9E',
       },
       text: {
         colors: {
@@ -169,10 +197,17 @@ export const theme = (colorTheme) => {
         separatorColor: '#A79B70',
       },
       tabBar: {
-        backgroundColor: '#fff',
+        backgroundColor: '#000',
         shadowColor: '#EDE0AF',
-        iconColor: '#EDE0AF',
+        iconColor: '#584D30',
         iconSelectedColor: '#EE6E12',
+      },
+      settings: {
+        topBarColor: '#000000',
+        optionBoxColor: '#5A4F31',
+        iconColor: '#EADDAF',
+        optionTextColor: '#FFFFFF',
+        labelColor: '#A1AAD3',
       },
     };
   }

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, useWindowDimensions, View, Pressable, Appearance } from 'react-native';
+import { Animated, useWindowDimensions, View, Pressable, Appearance, StatusBar } from 'react-native';
 import styled, { useTheme } from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { continueWithApple } from '../../../stores/user/userSlice';
@@ -103,6 +103,7 @@ const Landing = () => {
 
   return (
     <Container>
+      <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} />
       <Content>
         <Logo />
         <Headline>
@@ -119,7 +120,7 @@ const Landing = () => {
         </Pressable>
         <Pressable onPress={handlePress}>
           <AlreadyHaveAccountButton>
-            <AlreadyHaveAccountText>
+            <AlreadyHaveAccountText style={colorScheme === 'dark' ? { color: '#fff' } : {}}>
               Already have an account?{' '}
               <AlreadyHaveAccountText style={{ color: theme.colors.primary, fontWeight: theme.text.weight.bold }}>
                 Sign in

@@ -49,9 +49,15 @@ import Support from '../components/icons/general/Support';
 import Connection from '../components/icons/general/Connection';
 import Down from '../components/icons/general/Down';
 import Up from '../components/icons/general/Up';
+import Profile from '../components/icons/general/Profile';
 
-import SabioGreyed from '../components/icons/company/SabioGreyed';
+import SabioGreyedLight from '../components/icons/company/SabioGreyedLight';
+import SabioGreyedDark from '../components/icons/company/SabioGreyedDark';
 import SabioSmall from '../components/icons/company/SabioSmall';
+import WaitingLight from '../components/icons/company/WaitingLight';
+import WaitingDark from '../components/icons/company/WaitingDark';
+import SplashWhite from '../components/icons/company/SplashLight';
+import SplashDark from '../components/icons/company/SplashDark';
 
 export const ICONS = [
   { label: 'logoLarge', icon: LogoLarge },
@@ -106,8 +112,14 @@ export const ICONS = [
   { label: 'connection', icon: Connection },
   { label: 'down', icon: Down },
   { label: 'up', icon: Up },
-  { label: 'sabioGreyed', icon: SabioGreyed },
+  { label: 'sabioGreyedLight', icon: SabioGreyedLight },
+  { label: 'sabioGreyedDark', icon: SabioGreyedDark },
   { label: 'sabioSmall', icon: SabioSmall },
+  { label: 'profile', icon: Profile },
+  { label: 'waitingLight', icon: WaitingLight },
+  { label: 'waitingDark', icon: WaitingDark },
+  { label: 'splashWhite', icon: SplashWhite },
+  { label: 'splashDark', icon: SplashDark },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

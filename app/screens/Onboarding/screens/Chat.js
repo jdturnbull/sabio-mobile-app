@@ -30,6 +30,7 @@ import backgroundDark from '../../../assets/background-chat-dark.png';
 import backgroundLight from '../../../assets/background-chat-light.png';
 
 import call from '../../../utils/call';
+import { hapticImpact } from '../../../utils/haptics';
 
 const StyledGestureHandlerRootView = styled(GestureHandlerRootView)`
   flex: 1;
@@ -69,15 +70,11 @@ const Chat = () => {
 
   const theme = useTheme();
 
-  const LogoSmall = getIconFromLabel('logoSmall');
   const Send = getIconFromLabel('send');
-  const HelpIcon = getIconFromLabel('help');
 
   // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
     const setup = async () => {
-      if (isSetup) return;
-
       let assistant = state.assistant;
       let thread = state.thread;
       let messages = state.messages;
@@ -197,8 +194,13 @@ const Chat = () => {
               threadId: state.thread.id,
             });
 
+            setToolOutput('User has completed the onboarding successfully, wish them farewell for now.');
+            setShouldCompleteTool(true);
+
             // Update the state to move the user into the app
-            dispatch(updateState({ onboarded: true }));
+            setTimeout(() => {
+              dispatch(updateState({ onboarded: true }));
+            }, 2000);
           } catch (error) {
             console.log('Error completing onboarding: ' + error.message);
 
@@ -341,6 +343,8 @@ const Chat = () => {
     // Stop the user from sending a message while the AI is responding
     setCanSend(false);
 
+    hapticImpact();
+
     // Add the user message to the message thread
     await openai.addUserMessage(state.thread.id, userMessage, session.user.id);
 
@@ -365,7 +369,7 @@ const Chat = () => {
   // Handles animating the width of the input container (can't use native driver when animating layout props)
   useEffect(() => {
     Animated.timing(animatedMargin, {
-      toValue: keyboard.keyboardShown ? 10 : 30,
+      toValue: keyboard.keyboardShown ? 5 : 30,
       duration: 200,
       useNativeDriver: false,
     }).start();
@@ -453,12 +457,7 @@ const Chat = () => {
         style={styles.background}>
         <KeyboardAvoidingView behavior="padding">
           <StyledGestureHandlerRootView>
-            <Animated.ScrollView
-              ref={scrollRef}
-              showsVerticalScrollIndicator={false}
-              style={{
-                ...styles.scrollable,
-              }}>
+            <Animated.ScrollView ref={scrollRef} showsVerticalScrollIndicator={false}>
               {state.messages.map((message, index) => {
                 if (message?.role === 'assistant') {
                   return <AssistantMessage key={index} message={message.content[0].text.value} />;
@@ -487,7 +486,7 @@ const Chat = () => {
             style={{
               alignItems: 'center',
               justifyContent: 'flex-end',
-              minHeight: 63,
+              minHeight: 50,
               paddingTop: 10,
               width,
             }}>
@@ -561,9 +560,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  scrollable: {
-    paddingTop: 18,
-  },
   inputContainer: {
     display: 'flex',
     flexDirection: 'row',
@@ -576,20 +572,12 @@ const styles = StyleSheet.create({
     paddingBottom: 7,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 11,
-    elevation: 10,
   },
   input: {
     flex: 1,
     color: '#fff',
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '400',
     padding: 0,
     margin: 0,
     marginBottom: 3,

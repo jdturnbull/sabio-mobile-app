@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
-import { Appearance, StatusBar } from 'react-native';
+import { Appearance, StatusBar, useColorScheme } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider, useDispatch } from 'react-redux';
 import { initStripe } from '@stripe/stripe-react-native';
@@ -66,7 +66,8 @@ const getActiveRouteName = (state) => {
 };
 
 const ConnectedApp = () => {
-  const [themeData, setThemeData] = useState(theme('light'));
+  const colorScheme = useColorScheme();
+  const [themeData, setThemeData] = useState(theme(colorScheme));
   const [activeRouteName, setActiveRouteName] = useState();
 
   const handleNavStateChange = (state) => {

@@ -1,16 +1,19 @@
 import React from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { View, Pressable, useColorScheme } from 'react-native';
 import { getIconFromLabel } from '../../utils/icon';
 import { useTheme } from 'styled-components';
+import { useSelector } from 'react-redux';
 
 const TabBar = ({ state, navigation, width }) => {
   const theme = useTheme();
+  const colorScheme = useColorScheme();
   const Home = getIconFromLabel('home');
   const Settings = getIconFromLabel('settings');
   const Analytics = getIconFromLabel('analytics');
   const Chat = getIconFromLabel('chat');
 
   const activeRoute = state.routes[state.index].name;
+  const plannedActivities = useSelector((state) => state.user?.plannedActivities);
 
   const handlePress = (v) => {
     navigation.navigate(v);
@@ -19,7 +22,8 @@ const TabBar = ({ state, navigation, width }) => {
   return (
     <View
       style={{
-        height: 80,
+        height: plannedActivities.length === 0 ? 0 : 80,
+        opacity: plannedActivities.length === 0 ? 0 : 1,
         backgroundColor: theme.tabBar.backgroundColor,
         flexDirection: 'row',
         shadowColor: theme.tabBar.shadowColor,
@@ -27,7 +31,7 @@ const TabBar = ({ state, navigation, width }) => {
           width: 0,
           height: -4,
         },
-        shadowOpacity: activeRoute === 'chat' ? 0 : 0.5,
+        shadowOpacity: activeRoute === 'chat' ? 0 : colorScheme === 'light' ? 0.5 : 0.1,
         shadowSpread: 0,
         shadowRadius: 30,
       }}>
@@ -85,23 +89,3 @@ const TabBar = ({ state, navigation, width }) => {
 };
 
 export default TabBar;
-
-const styles = StyleSheet.create({
-  container: {
-    height: 90,
-    backgroundColor: '#16171B',
-    alignItems: 'center',
-    justifyContent: 'center',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingTop: 20,
-  },
-  tab: {
-    flex: 1,
-    height: '100%',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-  },
-});

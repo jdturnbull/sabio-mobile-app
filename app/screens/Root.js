@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import Onboarding from './Onboarding';
 import Main from './Main';
 import LostConnectionScreen from './LostConnection';
+import Splash from './Splash';
 
 const fadeTransition = {
   animation: 'timing',
@@ -32,33 +33,6 @@ const CustomTransition = {
   },
 };
 
-const Splash = () => {
-  const { replace } = useNavigation();
-  const lottieRef = useRef();
-
-  const { loaded } = useSelector((state) => state.user);
-  const { current: loadedDT } = useRef(Date.now());
-
-  useEffect(() => {
-    if (!loaded) {
-      lottieRef.current.play();
-    } else {
-      setTimeout(() => replace('App'), Math.max(1100 - Date.now() + loadedDT, 0));
-    }
-  }, [loaded]);
-
-  return (
-    <View style={{ backgroundColor: '#0f1013', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <LottieView
-        ref={lottieRef}
-        source={require('../assets/lf20_muaaisyt.json')}
-        loop={true}
-        duration={1300}
-        style={{ backgroundColor: '#0f1013', width: '25%', height: '25%' }}
-      />
-    </View>
-  );
-};
 const TopStack = createStackNavigator();
 const AppStack = createStackNavigator();
 const AuthedStack = createStackNavigator();
@@ -78,7 +52,6 @@ const AuthedApp = () => {
 };
 
 const RootApp = () => {
-  const user = useSelector((state) => state.user.session?.user);
   const _onboarded = useSelector((state) => state.user.session?.user.onboarded);
   const onboarded = useSelector((state) => state.onboarding.onboarded);
 
