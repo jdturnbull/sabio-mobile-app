@@ -9,7 +9,6 @@ import {
   Animated,
   KeyboardAvoidingView,
   ImageBackground,
-  Alert,
   useColorScheme,
 } from 'react-native';
 import { GestureHandlerRootView, State } from 'react-native-gesture-handler';
@@ -310,13 +309,8 @@ const Chat = () => {
         resizeMode="cover"
         style={styles.background}>
         <KeyboardAvoidingView behavior="padding">
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <Animated.ScrollView
-              ref={scrollRef}
-              showsVerticalScrollIndicator={false}
-              style={{
-                paddingTop: 75,
-              }}>
+          <GestureHandlerRootView style={{ flex: 1, paddingTop: 60 }}>
+            <Animated.ScrollView ref={scrollRef} showsVerticalScrollIndicator={false}>
               {state.messages.map((message, index) => {
                 if (message?.role === 'assistant') {
                   return <AssistantMessage key={index} message={message.content[0].text.value} />;

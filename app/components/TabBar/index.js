@@ -22,8 +22,8 @@ const TabBar = ({ state, navigation, width }) => {
   return (
     <View
       style={{
-        height: plannedActivities.length === 0 ? 0 : 80,
-        opacity: plannedActivities.length === 0 ? 0 : 1,
+        height: plannedActivities?.length !== 0 ? 80 : 0,
+        opacity: plannedActivities?.length !== 0 ? 1 : 0,
         backgroundColor: theme.tabBar.backgroundColor,
         flexDirection: 'row',
         shadowColor: theme.tabBar.shadowColor,

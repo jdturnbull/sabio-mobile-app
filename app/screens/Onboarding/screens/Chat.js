@@ -34,7 +34,7 @@ import { hapticImpact } from '../../../utils/haptics';
 
 const StyledGestureHandlerRootView = styled(GestureHandlerRootView)`
   flex: 1;
-  padding-top: ${(props) => props.theme.spacing.safeAreaView};
+  padding-top: 60px;
 `;
 
 const Chat = () => {
