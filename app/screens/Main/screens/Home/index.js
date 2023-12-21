@@ -46,9 +46,8 @@ const ItemText = styled.Text`
 
 const Home = () => {
   const dispatch = useDispatch();
-  const isFocused = useIsFocused();
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
-  const user = useSelector((state) => state.user.session.user);
+  const user = useSelector((state) => state.user?.session?.user);
 
   const theme = useTheme();
   const colorScheme = useColorScheme();
@@ -76,7 +75,7 @@ const Home = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isFocused]);
+  }, []);
 
   useEffect(() => {
     if (plannedActivities?.length > 0 && intervalRef.current) {

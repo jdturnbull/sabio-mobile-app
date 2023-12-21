@@ -3,14 +3,16 @@ import { StyleSheet, View, Modal } from 'react-native';
 import moment from 'moment';
 import { debounce } from 'lodash';
 import Top from './components/Top';
-import { FlatList } from 'react-native-gesture-handler';
-import { useSelector } from 'react-redux';
+import { FlatList, RefreshControl } from 'react-native-gesture-handler';
+import { useDispatch, useSelector } from 'react-redux';
 import ListItem from './components/ListItem';
 import Separator from './components/Separator';
 import Footer from './components/Footer';
 import ModalContent from './components/ModalContent';
+import { getPlan } from '../../../../../../stores/user/userSlice';
 
 const Journey = () => {
+  const dispatch = useDispatch();
   const flatListRef = useRef(null);
 
   const user = useSelector((state) => state.user.session.user);
@@ -23,6 +25,16 @@ const Journey = () => {
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
   const [modalData, setModalData] = useState();
   const [showPlan, setShowPlan] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    dispatch(getPlan()).then(() => {
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 1000);
+    });
+  };
 
   // Set the start of the week dates for the separators
   useEffect(() => {
@@ -93,6 +105,7 @@ const Journey = () => {
         keyExtractor={(item) => item.id}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       />
       <Footer data={modalData} setModalData={setModalData} />
       <Modal visible={showPlan} animationType="slide" transparent>
