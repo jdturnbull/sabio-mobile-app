@@ -19,11 +19,14 @@ const TabBar = ({ state, navigation, width }) => {
     navigation.navigate(v);
   };
 
+  if (!plannedActivities || plannedActivities?.length === 0) {
+    return <View />;
+  }
+
   return (
     <View
       style={{
-        height: plannedActivities?.length !== 0 ? 80 : 0,
-        opacity: plannedActivities?.length !== 0 ? 1 : 0,
+        height: 80,
         backgroundColor: theme.tabBar.backgroundColor,
         flexDirection: 'row',
         shadowColor: theme.tabBar.shadowColor,

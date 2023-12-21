@@ -31,18 +31,21 @@ const WaitingScreen = () => {
   const [fadeAnim] = useState(new Animated.Value(1));
   const [widthAnim] = useState(new Animated.Value(0));
 
-  const stage = useSelector((state) => state?.user?.stage);
+  const user = useSelector((state) => state.user.session.user);
+  const stage = user.onboardingData?.stage;
 
-  const label =
-    stage === 0
-      ? 'Analysing your conversation'
-      : stage === 1
-      ? 'Forming holistic strategy'
-      : 'Building your initial plan';
+  let label = '';
+
+  if (!stage) label = 'Analysing your conversation';
+  if (stage === 1) label = 'Forming holistic strategy';
+  if (stage === 2) label = 'Forming monthly focuses';
+  if (stage === 3) label = 'Forming weekly focuses';
+  if (stage === 4) label = 'Planning your first two weeks';
+  if (stage === 5) label = 'Plan creation complete';
 
   useEffect(() => {
     Animated.timing(widthAnim, {
-      toValue: (308 / 3) * stage,
+      toValue: (308 / 5) * stage,
       duration: 1000,
       useNativeDriver: false,
     }).start();

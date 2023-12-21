@@ -60,11 +60,11 @@ export const continueWithApple = createAsyncThunk('user/continueWithApple', asyn
 
 export const getPlan = createAsyncThunk('user/getPlan', async (data, { getState }) => {
   try {
-    const user = getState().user.session?.user;
+    const userId = getState().user.session?.user.id;
 
     // Stage is the stage of loading for the waiting screen
-    const { plan, stage } = await call('GET', `users/retrievePlan/${user.id}`);
-    return { plan, stage };
+    const response = await call('GET', `users/retrievePlan/${userId}`);
+    return response;
   } catch (error) {
     console.log('Error getting plan', error);
   }
@@ -87,7 +87,6 @@ export const userSlice = createSlice({
     error: null,
     loaded: false,
     loading: false,
-    stage: 0,
     plannedActivities: [],
     plannedMonths: [],
     actions: [],
@@ -119,7 +118,7 @@ export const userSlice = createSlice({
     builder.addCase(getPlan.fulfilled, (state, action) => {
       state.plannedActivities = action.payload.plan.data;
       state.plannedMonths = action.payload.plan.months;
-      state.stage = action.payload.stage;
+      state.session = { ...state.session, user: action.payload.user };
     });
     builder.addCase(getActions.fulfilled, (state, action) => {
       state.actions = action.payload;
