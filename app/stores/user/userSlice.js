@@ -5,27 +5,27 @@ import * as RNLocalize from 'react-native-localize';
 import call from '../../utils/call';
 
 export const setup = createAsyncThunk('user/setup', async () => {
-  try {
-    const session = await AsyncStorage.getItem('session');
+  const session = await AsyncStorage.getItem('session');
 
-    if (session) {
-      try {
-        const { id } = JSON.parse(session);
-        const updatedSession = await call('GET', `users/session/${id}`);
+  if (session) {
+    const { id } = JSON.parse(session);
+    try {
+      const updatedSession = await call('POST', `users/session`, { id });
 
-        if (updatedSession) {
-          await AsyncStorage.setItem('session', JSON.stringify(updatedSession));
-          return { session: updatedSession };
-        } else {
-          await AsyncStorage.removeItem('session');
-        }
-      } catch (error) {
-        console.log(error);
+      if (updatedSession) {
+        await AsyncStorage.setItem('session', JSON.stringify(updatedSession));
+        return { session: updatedSession };
+      } else {
+        await AsyncStorage.removeItem('session');
       }
+    } catch (error) {
+      return { session: null };
     }
-
+  } else {
     return { session: null };
-  } catch (error) {}
+  }
+
+  return { session: null };
 });
 
 export const continueWithApple = createAsyncThunk('user/continueWithApple', async (data) => {
@@ -47,6 +47,9 @@ export const continueWithApple = createAsyncThunk('user/continueWithApple', asyn
         name,
         onboardingData: data,
       });
+
+      console.log(session);
+
       await AsyncStorage.setItem('session', JSON.stringify(session));
 
       return session;

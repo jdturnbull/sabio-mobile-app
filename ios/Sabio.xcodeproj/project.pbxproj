@@ -16,6 +16,9 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		155A5B2D67F54603A8DAD08C /* NotoSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2A68963943C443AC8CEEF5FB /* NotoSans-SemiBold.ttf */; };
 		184BECD5AF41843AD45992A3 /* libPods-Sabio-SabioTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27769D1476E0D7F80EA62CD1 /* libPods-Sabio-SabioTests.a */; };
+		1A4021392B46DD62003612C1 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A4021382B46DD62003612C1 /* StoreKit.framework */; };
+		1A4EBB0B2B46ED8A0003229D /* StoreKitTestCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = 1A4EBB0A2B46ED8A0003229D /* StoreKitTestCertificate.cer */; };
+		1A4EBB0F2B4712190003229D /* Sabio.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 1A4EBB0E2B4712190003229D /* Sabio.storekit */; };
 		2035F3E6228E4A92BFDA2336 /* NotoSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 23685B21375C4708A11EB82B /* NotoSans-ExtraBold.ttf */; };
 		453814ED61E4442984C3C334 /* NotoSans-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B25C8561F7DE4BFF98738658 /* NotoSans-SemiBoldItalic.ttf */; };
 		4BA2CA1B8E4F4570AA4DE7FF /* NotoSans-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 16A30DA12F234135A93067C1 /* NotoSans-ThinItalic.ttf */; };
@@ -63,6 +66,9 @@
 		18C7CC257426F363B32C8294 /* Pods-Sabio.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sabio.release.xcconfig"; path = "Target Support Files/Pods-Sabio/Pods-Sabio.release.xcconfig"; sourceTree = "<group>"; };
 		19B497BDCD7C46DAAD249043 /* NotoSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-Regular.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-Regular.ttf"; sourceTree = "<group>"; };
 		1A2A12702B2A038D00DA1657 /* SabioRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = SabioRelease.entitlements; path = Sabio/SabioRelease.entitlements; sourceTree = "<group>"; };
+		1A4021382B46DD62003612C1 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		1A4EBB0A2B46ED8A0003229D /* StoreKitTestCertificate.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = StoreKitTestCertificate.cer; sourceTree = "<group>"; };
+		1A4EBB0E2B4712190003229D /* Sabio.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Sabio.storekit; sourceTree = "<group>"; };
 		1A5941242AF6F65000F3CE01 /* Sabio.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Sabio.entitlements; path = Sabio/Sabio.entitlements; sourceTree = "<group>"; };
 		23685B21375C4708A11EB82B /* NotoSans-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-ExtraBold.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-ExtraBold.ttf"; sourceTree = "<group>"; };
 		27769D1476E0D7F80EA62CD1 /* libPods-Sabio-SabioTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Sabio-SabioTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,6 +106,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7DC030F06C17D999CBC0AD24 /* libPods-Sabio.a in Frameworks */,
+				1A4021392B46DD62003612C1 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,13 +141,24 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				1A4EBB072B46ED1E0003229D /* Store */,
 			);
 			name = Sabio;
+			sourceTree = "<group>";
+		};
+		1A4EBB072B46ED1E0003229D /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				1A4EBB0A2B46ED8A0003229D /* StoreKitTestCertificate.cer */,
+				1A4EBB0E2B4712190003229D /* Sabio.storekit */,
+			);
+			path = Store;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1A4021382B46DD62003612C1 /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				CB33E1BAC73676E942024B1E /* libPods-Sabio.a */,
 				27769D1476E0D7F80EA62CD1 /* libPods-Sabio-SabioTests.a */,
@@ -312,9 +330,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				1A4EBB0B2B46ED8A0003229D /* StoreKitTestCertificate.cer in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				79B7ACB338A34DE384296C7D /* NotoSans-Black.ttf in Resources */,
 				62F11C70A877485AB9BA27D8 /* NotoSans-BlackItalic.ttf in Resources */,
+				1A4EBB0F2B4712190003229D /* Sabio.storekit in Resources */,
 				E462CA66CF3B4146A5C94249 /* NotoSans-Bold.ttf in Resources */,
 				9335B6317F644AC9B3CDA95B /* NotoSans-BoldItalic.ttf in Resources */,
 				2035F3E6228E4A92BFDA2336 /* NotoSans-ExtraBold.ttf in Resources */,
@@ -582,6 +602,8 @@
 				DEVELOPMENT_TEAM = 8KTQM8MJ2H;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Sabio/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Sabio;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -596,8 +618,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.heysabio.sabio;
 				PRODUCT_NAME = Sabio;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -616,6 +642,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8KTQM8MJ2H;
 				INFOPLIST_FILE = Sabio/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Sabio;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -630,7 +658,11 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.heysabio.sabio;
 				PRODUCT_NAME = Sabio;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

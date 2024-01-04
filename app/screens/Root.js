@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Appearance, Easing, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { withIAPContext } from 'react-native-iap';
 import { createStackNavigator } from '@react-navigation/stack';
 import LottieView from 'lottie-react-native';
 import { useNetInfo } from '@react-native-community/netinfo';
@@ -78,4 +79,4 @@ const Root = () => {
   );
 };
 
-export default Root;
+export default withIAPContext(Root);

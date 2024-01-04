@@ -156,10 +156,11 @@ const Settings = () => {
     }
 
     if (opt === 'newPlan') {
-      Alert.alert('Reset your plan', 'This will remove all existing data & progress reports', [
-        { text: 'Cancel' },
-        { text: 'Confirm', onPress: handleResetConfirm },
-      ]);
+      // Alert.alert('Reset your plan', 'This will remove all existing data & progress reports', [
+      //   { text: 'Cancel' },
+      //   { text: 'Confirm', onPress: handleResetConfirm },
+      // ]);
+      Alert.alert("This option isn't available yet", '', [{ text: 'Cancel' }]);
     }
 
     if (opt === 'subscription') {

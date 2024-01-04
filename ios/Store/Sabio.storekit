@@ -1,0 +1,59 @@
+{
+  "identifier" : "CE416EED",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6474304071",
+    "_developerTeamID" : "8KTQM8MJ2H",
+    "_lastSynchronizedDate" : 726077980.74735606
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21430278",
+      "localizations" : [
+
+      ],
+      "name" : "Init",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6475424137",
+          "introductoryOffer" : {
+            "internalID" : "68C362A7",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1W"
+          },
+          "localizations" : [
+            {
+              "description" : "Intelligent Fitness Coach",
+              "displayName" : "Sabio",
+              "locale" : "en_GB"
+            }
+          ],
+          "productID" : "com.heysabio.sabio.product.base",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Base",
+          "subscriptionGroupID" : "21430278",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 2,
+    "minor" : 0
+  }
+}
