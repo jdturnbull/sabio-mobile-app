@@ -9,13 +9,8 @@ export default async (method, path, data) => {
 
     const data_with_key = { ...data, sabio_secret: REACT_APP_SECRET_KEY };
 
-    console.log(url, data_with_key);
-
-    console.log('Making the axios request');
-
     try {
       const response = await axios({ method, url, data: data_with_key });
-      console.log('Completed the axios request');
       return response.data;
     } catch (error) {
       console.log(error.code);

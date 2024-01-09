@@ -61,7 +61,7 @@
          </BuildableReference>
       </BuildableProductRunnable>
       <StoreKitConfigurationFileReference
-         identifier = "../../../../Sabio.storekit">
+         identifier = "../Store/Sabio.storekit">
       </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction

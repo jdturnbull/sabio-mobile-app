@@ -37,6 +37,7 @@ import Delete from '../components/icons/actions/Delete';
 import Update from '../components/icons/actions/Update';
 import ViewAnalysis from '../components/icons/cards/View';
 import Help from '../components/icons/general/Help';
+import Tick from '../components/icons/general/Tick';
 import Confidence from '../components/icons/general/Confidence';
 import Read from '../components/icons/general/Read';
 import Streak from '../components/icons/general/Streak';
@@ -120,6 +121,7 @@ export const ICONS = [
   { label: 'waitingDark', icon: WaitingDark },
   { label: 'splashWhite', icon: SplashWhite },
   { label: 'splashDark', icon: SplashDark },
+  { label: 'tick', icon: Tick },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;
