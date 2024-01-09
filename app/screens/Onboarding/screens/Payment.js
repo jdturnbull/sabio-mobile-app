@@ -5,6 +5,7 @@ import {
   requestSubscription,
   purchaseErrorListener,
   purchaseUpdatedListener,
+  validateReceiptIos,
   useIAP,
 } from 'react-native-iap';
 import call from '../../../utils/call';
@@ -95,7 +96,6 @@ const Payment = () => {
   const Tick = getIconFromLabel('tick');
 
   const subscribe = async () => {
-    console.log('here');
     try {
       await initConnection();
 
