@@ -5,7 +5,6 @@ import {
   requestSubscription,
   purchaseErrorListener,
   purchaseUpdatedListener,
-  validateReceiptIos,
   useIAP,
 } from 'react-native-iap';
 import call from '../../../utils/call';
