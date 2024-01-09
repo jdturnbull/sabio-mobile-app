@@ -7,12 +7,11 @@ export default async (method, path, data) => {
   try {
     const url = `${apiBase}/${path}`;
 
-    const data_with_key = { ...data, sabio_secret: REACT_APP_SECRET_KEY };
-
     try {
-      const response = await axios({ method, url, data: data_with_key });
+      const response = await axios({ method, url, data });
       return response.data;
     } catch (error) {
+      console.log('There has been an error');
       console.log(error.code);
     }
   } catch (error) {
