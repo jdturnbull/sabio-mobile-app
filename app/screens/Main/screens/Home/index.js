@@ -102,7 +102,7 @@ const Home = () => {
         {/* <Header /> */}
         <HelloContainer>
           <HelloText>
-            Hi, <HelloText style={{ color: theme.text.colors.primary }}>{user.name.split(' ')[0]}!</HelloText>
+            Hi, <HelloText style={{ color: theme.text.colors.primary }}>{user?.name.split(' ')[0]}!</HelloText>
           </HelloText>
           <ItemContainer>
             <StreakIcon color={colorScheme === 'dark' ? theme.colors.white : null} />

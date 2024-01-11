@@ -230,11 +230,18 @@ const Payment = () => {
             placeholder="Enter your code"
             value={code}
             onChangeText={(text) => setCode(text)}
-            style={{ padding: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 10, width: '100%', color: '#fff' }}
+            style={{
+              padding: 10,
+              borderWidth: 1,
+              borderColor: '#ccc',
+              borderRadius: 10,
+              width: '100%',
+              color: theme.colors.secondary,
+            }}
           />
           <View style={{ flexDirection: 'row' }}>
-            <ModalButton style={{ borderColor: '#fff' }} onPress={() => setShowCode(false)}>
-              <ModalText style={{ color: '#fff' }}>Cancel</ModalText>
+            <ModalButton style={{ borderColor: theme.colors.secondary }} onPress={() => setShowCode(false)}>
+              <ModalText style={{ color: theme.colors.secondary }}>Cancel</ModalText>
             </ModalButton>
             <ModalButton onPress={handleCodeConfirm}>
               <ModalText>Confirm</ModalText>

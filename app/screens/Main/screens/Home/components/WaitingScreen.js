@@ -78,7 +78,7 @@ const WaitingScreen = () => {
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
           <ActivityIndicator style={{ marginRight: 15 }} />
           <Animated.Text style={[styles.pulseText, { opacity: fadeAnim }, { color: theme.text.colors.secondary }]}>
-            {label}
+            {label || ''}
           </Animated.Text>
         </View>
         <View
