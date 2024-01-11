@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
+import { ActivityIndicator, Modal, Pressable, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import {
   initConnection,
   requestSubscription,
@@ -11,7 +12,6 @@ import call from '../../../utils/call';
 import { getIconFromLabel } from '../../../utils/icon';
 import { useDispatch, useSelector } from 'react-redux';
 import { setup } from '../../../stores/user/userSlice';
-import { View } from 'react-native';
 
 const Container = styled.View`
   flex: 1;
@@ -76,6 +76,28 @@ const TickLabel = styled.Text`
   margin-left: 10px;
 `;
 
+const ModalButton = styled.Pressable`
+  background-color: ${(props) => props.theme.colors.background1};
+  margin-top: 20px;
+  height: 50px;
+  width: 100px;
+  margin-right: 10px;
+  border-radius: 18px;
+  padding: 10px;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-color: ${(props) => props.theme.colors.primary};
+`;
+
+const ModalText = styled.Text`
+  color: ${(props) => props.theme.text.colors.primary};
+  font-family: ${(props) => props.theme.text.family};
+  font-size: ${(props) => props.theme.text.size.sm};
+  font-weight: ${(props) => props.theme.text.weight.semibold};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+`;
+
 const TickItem = ({ label, Icon }) => {
   return (
     <TickItemContainer>
@@ -86,16 +108,39 @@ const TickItem = ({ label, Icon }) => {
 };
 
 const Payment = () => {
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const dispatch = useDispatch();
   const theme = useTheme();
+  const [showCode, setShowCode] = useState(false);
+  const [code, setCode] = useState('');
+  const [loading, setLoading] = useState(false);
   const user = useSelector((state) => state.user.session?.user);
   const { getSubscriptions, connected } = useIAP();
 
   const Logo = getIconFromLabel('logoLarge');
   const Tick = getIconFromLabel('tick');
 
+  const handleVIP = () => {
+    setShowCode(true);
+  };
+
+  const handleCodeConfirm = async () => {
+    setLoading(true);
+    const response = await call('POST', 'users/confirmCode', { userId: user.id, code: code.toLowerCase() });
+
+    if (response) {
+      dispatch(setup());
+      setLoading(false);
+      setShowCode(false);
+    } else {
+      setLoading(false);
+      alert('There was a problem with your code, please try again.');
+    }
+  };
+
   const subscribe = async () => {
     try {
+      setLoading(true);
       await initConnection();
 
       if (connected) {
@@ -111,30 +156,32 @@ const Payment = () => {
     }
   };
 
-  // Now for the purchase listeners
-  useEffect(() => {
-    purchaseUpdatedListener(async (purchase) => {
-      purchase.transactionReceipt;
-      if (purchase.transactionReceipt) {
-        const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
+  // useEffect(() => {
+  //   purchaseUpdatedListener(async (purchase) => {
+  //     purchase.transactionReceipt;
+  //     if (purchase.transactionReceipt) {
+  //       const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
 
-        if (response) {
-          dispatch(setup());
-        } else {
-          alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
-        }
-      }
-    });
+  //       if (response) {
+  //         dispatch(setup());
+  //         setLoading(false);
+  //       } else {
+  //         setLoading(false);
+  //         alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
+  //       }
+  //     }
+  //   });
 
-    purchaseErrorListener((error) => {
-      console.log('Purchase Error', error);
-    });
+  //   purchaseErrorListener((error) => {
+  //     console.log('Purchase Error', error);
+  //     setLoading(false);
+  //   });
 
-    return () => {
-      purchaseUpdatedListener();
-      purchaseErrorListener();
-    };
-  }, []);
+  //   return () => {
+  //     purchaseUpdatedListener();
+  //     purchaseErrorListener();
+  //   };
+  // }, []);
 
   return (
     <Container>
@@ -153,6 +200,47 @@ const Payment = () => {
       <GetStartedButton onPress={subscribe}>
         <GetStartedText>Start your free trial</GetStartedText>
       </GetStartedButton>
+      <Pressable onPress={handleVIP}>
+        <Text style={{ marginTop: 20, color: theme.text.colors.secondary, fontFamily: theme.text.family }}>
+          Have a code? <Text style={{ color: theme.text.colors.primary }}>Redeem here</Text>
+        </Text>
+      </Pressable>
+      {loading && (
+        <View
+          style={{
+            position: 'absolute',
+            left: 0,
+            width: screenWidth,
+            height: screenHeight,
+            backgroundColor: '#000',
+            opacity: 0.7,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" color={'#fff'} />
+        </View>
+      )}
+      <Modal visible={showCode} animationType="slide" transparent={true}>
+        <Container>
+          <Headline>Enter your code</Headline>
+          <BodyText>Enter your code here for exclusive access.</BodyText>
+          <TextInput
+            placeholder="Enter your code"
+            value={code}
+            onChangeText={(text) => setCode(text)}
+            style={{ padding: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 10, width: '100%', color: '#fff' }}
+          />
+          <View style={{ flexDirection: 'row' }}>
+            <ModalButton style={{ borderColor: '#fff' }} onPress={() => setShowCode(false)}>
+              <ModalText style={{ color: '#fff' }}>Cancel</ModalText>
+            </ModalButton>
+            <ModalButton onPress={handleCodeConfirm}>
+              <ModalText>Confirm</ModalText>
+            </ModalButton>
+          </View>
+        </Container>
+      </Modal>
     </Container>
   );
 };

@@ -75,7 +75,6 @@ export const retrieveAssistant = async (type, userId) => {
         console.log(`Failed to retrieve assistant after ${maxRetries} attempts.`);
         const msg = error.response?.data?.error?.message || error.message;
         sendToPosthog('retrieve_assistant', msg, userId);
-        return null; // or throw new Error('Failed to retrieve assistant');
       }
     }
   }

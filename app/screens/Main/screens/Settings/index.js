@@ -160,7 +160,7 @@ const Settings = () => {
       //   { text: 'Cancel' },
       //   { text: 'Confirm', onPress: handleResetConfirm },
       // ]);
-      Alert.alert("This option isn't available yet", '', [{ text: 'Cancel' }]);
+      Alert.alert('Contact support to reset your plan', '', [{ text: 'Cancel' }]);
     }
 
     if (opt === 'subscription') {
@@ -231,8 +231,8 @@ const Settings = () => {
         <View style={{ marginBottom: 30 }}>
           <StyledText style={{ marginVertical: 30 }}>Account Options</StyledText>
           <Opt onPress={handleOptionPress} label={'Start a new plan'} icon={'new'} opt={'newPlan'} first={true} />
-          <Opt onPress={handleOptionPress} label={'Manage connections'} icon={'connection'} opt={'connection'} />
-          <Opt onPress={handleOptionPress} label={subscriptionText} icon={'subscribe'} opt={'subscription'} />
+          {/* <Opt onPress={handleOptionPress} label={'Manage connections'} icon={'connection'} opt={'connection'} /> */}
+          {/* <Opt onPress={handleOptionPress} label={subscriptionText} icon={'subscribe'} opt={'subscription'} /> */}
           <Opt onPress={handleOptionPress} label={'Contact support'} icon={'support'} opt={'support'} last={true} />
         </View>
         <View style={{ flex: 1 }}>

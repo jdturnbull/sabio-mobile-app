@@ -173,14 +173,10 @@ const Chat = () => {
         // Save the tool id so we can use it when getting the tool completion
         setToolId(id);
 
-        if (name === 'connectSmartWatch') {
-          if (args.toLowerCase().includes('strava')) {
-            // Get and store the redirect url
-            const redirect = await call('GET', `connect/getUrl/strava/${session.user.id}`);
-            setRedirect(redirect);
-            // Trigger opening the safari view
-            setShowSafari(true);
-          }
+        if (name === 'connectStrava') {
+          const redirect = await call('GET', `connect/getUrl/strava/${session.user.id}`);
+          setRedirect(redirect);
+          setShowSafari(true);
         }
 
         // TODO: The catch seems to fail here, need to investigate

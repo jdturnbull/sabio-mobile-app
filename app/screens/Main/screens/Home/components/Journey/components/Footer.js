@@ -138,14 +138,8 @@ const Footer = ({ data, setModalData }) => {
             <View style={styles.content}>
               <View>
                 <Title style={{ marginBottom: 20 }}>{data?.item.analysis ? 'ANALYSIS' : 'GUIDANCE'}</Title>
-                <Body>{data?.item.analysis ? data?.item.analysis : data?.item.guidance}</Body>
+                <Body>{data?.item.guidance}</Body>
               </View>
-              {!data?.item.analysis && (
-                <View>
-                  <Title style={{ marginBottom: 20 }}>REASONING</Title>
-                  <Body>{data?.item.reasoning}</Body>
-                </View>
-              )}
             </View>
           )}
         </View>
@@ -198,6 +192,6 @@ const styles = StyleSheet.create({
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-evenly',
+    marginTop: 20,
   },
 });

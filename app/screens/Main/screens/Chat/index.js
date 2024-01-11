@@ -70,9 +70,18 @@ const Chat = () => {
       if (!state.thread) {
         // Does the user have an existing threadId?
         if (session.user.threadId) {
-          thread = await openai.retrieveThread(session.user.threadId, session.user.id);
+          try {
+            thread = await openai.retrieveThread(session.user.threadId, session.user.id);
+          } catch (error) {
+            // If the thread is bugged just grab a new one
+            thread = await openai.createThread('main', state.activity, session.user.id);
+            // Now save the new threadId to the user
+            await call('POST', 'users/update', { userId: session.user.id, data: { threadId: thread.id } });
+          }
         } else {
           thread = await openai.createThread('main', state.activity, session.user.id);
+          // Now save the new threadId to the user
+          await call('POST', 'users/update', { userId: session.user.id, data: { threadId: thread.id } });
         }
       }
 
@@ -168,9 +177,9 @@ const Chat = () => {
         // Save the tool id so we can use it when getting the tool completion
         setToolId(id);
 
-        if (name === 'replan') {
-          // Send the data to the backend to replan the week
-          const response = await call('POST', 'users/replan', { data: args, userId: session.user.id });
+        if (name === 'replan_multiple') {
+          // Send the data to the backend to replan
+          const response = await call('POST', 'users/replanMultiple', { data: args, userId: session.user.id });
 
           // Save the response to the tool output so it can be used when completing the tool
           setToolOutput(response);
@@ -192,7 +201,7 @@ const Chat = () => {
 
         if (name === 'store_info') {
           // Send the data to the backend to learn
-          const response = await call('POST', 'users/remember', { data: args, userId: session.user.id });
+          const response = await call('POST', 'users/storeInfo', { data: args, userId: session.user.id });
 
           // Save the response to the tool output so it can be used when completing the tool
           setToolOutput(response);
@@ -201,9 +210,9 @@ const Chat = () => {
           setShouldCompleteTool(true);
         }
 
-        if (name === 'alter_activity') {
+        if (name === 'alter_single_activity') {
           // Send the data to the backend to alter the activity
-          const response = await call('POST', 'users/alterActivity', { data: args, userId: session.user.id });
+          const response = await call('POST', 'users/alterSingleActivity', { data: args, userId: session.user.id });
 
           // Save the response to the tool output so it can be used when completing the tool
           setToolOutput(response);

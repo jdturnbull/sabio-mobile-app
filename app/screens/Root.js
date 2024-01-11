@@ -55,14 +55,19 @@ const AuthedApp = () => {
 const RootApp = () => {
   const _onboarded = useSelector((state) => state.user.session?.user.onboarded);
   const onboarded = useSelector((state) => state.onboarding.onboarded);
+  const subscriptionStatus = useSelector((state) => state.user.session?.user?.subscriptionStatus);
 
   return (
     <AppStack.Navigator
       screenOptions={{ headerShown: false, ...CustomTransition, cardStyle: { backgroundColor: 'transparent' } }}>
       {onboarded || _onboarded ? (
-        <AppStack.Screen name="Authed" component={AuthedApp} />
+        subscriptionStatus === 'SUBSCRIBED' ? (
+          <AppStack.Screen name="Authed" component={AuthedApp} />
+        ) : (
+          <AuthedStack.Screen name="Onboarding" component={Onboarding} />
+        )
       ) : (
-        <AuthedStack.Screen name="Onboarding" component={Onboarding} />
+        <AppStack.Screen name="Onboarding" component={Onboarding} />
       )}
     </AppStack.Navigator>
   );
