@@ -156,32 +156,32 @@ const Payment = () => {
     }
   };
 
-  // useEffect(() => {
-  //   purchaseUpdatedListener(async (purchase) => {
-  //     purchase.transactionReceipt;
-  //     if (purchase.transactionReceipt) {
-  //       const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
+  useEffect(() => {
+    purchaseUpdatedListener(async (purchase) => {
+      purchase.transactionReceipt;
+      if (purchase.transactionReceipt) {
+        const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
 
-  //       if (response) {
-  //         dispatch(setup());
-  //         setLoading(false);
-  //       } else {
-  //         setLoading(false);
-  //         alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
-  //       }
-  //     }
-  //   });
+        if (response) {
+          dispatch(setup());
+          setLoading(false);
+        } else {
+          setLoading(false);
+          alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
+        }
+      }
+    });
 
-  //   purchaseErrorListener((error) => {
-  //     console.log('Purchase Error', error);
-  //     setLoading(false);
-  //   });
+    purchaseErrorListener((error) => {
+      console.log('Purchase Error', error);
+      setLoading(false);
+    });
 
-  //   return () => {
-  //     purchaseUpdatedListener();
-  //     purchaseErrorListener();
-  //   };
-  // }, []);
+    return () => {
+      purchaseUpdatedListener();
+      purchaseErrorListener();
+    };
+  }, []);
 
   return (
     <Container>
