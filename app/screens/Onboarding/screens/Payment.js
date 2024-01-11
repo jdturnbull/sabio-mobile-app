@@ -153,6 +153,7 @@ const Payment = () => {
       });
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
 
