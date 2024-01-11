@@ -104,6 +104,7 @@ const Payment = () => {
 
       await requestSubscription({
         sku: 'com.heysabio.sabio.product.base',
+        appUserNameIOS: user.id,
       });
     } catch (error) {
       console.log(error);
