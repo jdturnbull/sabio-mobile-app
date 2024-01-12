@@ -236,12 +236,12 @@ const Payment = () => {
               borderColor: '#ccc',
               borderRadius: 10,
               width: '100%',
-              color: theme.colors.secondary,
+              color: theme.text.colors.secondary,
             }}
           />
           <View style={{ flexDirection: 'row' }}>
-            <ModalButton style={{ borderColor: theme.colors.secondary }} onPress={() => setShowCode(false)}>
-              <ModalText style={{ color: theme.colors.secondary }}>Cancel</ModalText>
+            <ModalButton style={{ borderColor: theme.text.colors.secondary }} onPress={() => setShowCode(false)}>
+              <ModalText style={{ color: theme.text.colors.secondary }}>Cancel</ModalText>
             </ModalButton>
             <ModalButton onPress={handleCodeConfirm}>
               <ModalText>Confirm</ModalText>

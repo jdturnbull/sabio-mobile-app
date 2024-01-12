@@ -30,7 +30,7 @@ const Data = () => {
   const theme = useTheme();
   const focused = useIsFocused();
 
-  const user = useSelector((state) => state.user.session.user);
+  const user = useSelector((state) => state.user.session?.user);
 
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState([]);
@@ -38,7 +38,7 @@ const Data = () => {
   useEffect(() => {
     const fetchReports = async () => {
       setLoading(true);
-      const response = await call('GET', `users/getProgressReports/${user.id}`);
+      const response = await call('GET', `users/getProgressReports/${user?.id}`);
       setReports(response);
       setLoading(false);
     };

@@ -15,8 +15,8 @@ const Journey = () => {
   const dispatch = useDispatch();
   const flatListRef = useRef(null);
 
-  const user = useSelector((state) => state.user.session.user);
-  const plannedActivities = useSelector((state) => state.user.plannedActivities);
+  const user = useSelector((state) => state.user?.session?.user);
+  const plannedActivities = useSelector((state) => state.user?.plannedActivities);
 
   const [viewableItems, setViewableItems] = useState([]);
   const [startOfWeekDates, setStartOfWeekDates] = useState([]);
@@ -52,7 +52,7 @@ const Journey = () => {
   );
 
   //Get idx of today's date
-  const today = moment.tz(user.timezone).format('YYYY-MM-DD');
+  const today = moment.tz(user?.timezone).format('YYYY-MM-DD');
   const initIdx = plannedActivities.findIndex((activity) => activity.date === today);
 
   // Scroll to the current date

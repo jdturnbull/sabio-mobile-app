@@ -3,10 +3,12 @@ import { View, Pressable, Alert, useWindowDimensions, ImageBackground, useColorS
 import styled, { useTheme } from 'styled-components';
 import moment from 'moment';
 import call from '../../../../utils/call';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getIconFromLabel } from '../../../../utils/icon';
 import LightBackground from '../../../../assets/home-background-light.png';
 import DarkBackground from '../../../../assets/home-background-dark.png';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -132,6 +134,8 @@ const InformationBox = ({ title, value, onPress, id, last, first }) => {
 };
 
 const Settings = () => {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
   const theme = useTheme();
   const colorScheme = useColorScheme();
   const user = useSelector((state) => state.user.session?.user);
@@ -143,7 +147,7 @@ const Settings = () => {
 
   const handleResetConfirm = async () => {
     try {
-      await call('GET', `users/reset/${user.id}`);
+      await call('GET', `users/reset/${user?.id}`);
       Alert.alert('Plan reset', '', [{ text: 'OK' }]);
     } catch (error) {
       Alert.alert('Failed to reset plan, please contact support', '', [{ text: 'OK' }]);
@@ -165,6 +169,33 @@ const Settings = () => {
 
     if (opt === 'subscription') {
       // Open apple pay
+    }
+
+    if (opt === 'logout') {
+      Alert.alert('Logout', 'Are you sure you want to logout?', [
+        { text: 'Cancel' },
+        {
+          text: 'Confirm',
+          onPress: async () => {
+            AsyncStorage.removeItem('session');
+            Alert.alert('Logged out, please reload the app', '', [{ text: 'OK' }]);
+          },
+        },
+      ]);
+    }
+
+    if (opt === 'deleteAccount') {
+      Alert.alert('Delete account', 'Are you sure you want to delete your account? This action is permenent', [
+        { text: 'Cancel' },
+        {
+          text: 'Confirm',
+          onPress: async () => {
+            await call('GET', `users/delete/${user?.id}`);
+            AsyncStorage.removeItem('session');
+            Alert.alert('Account deleted, please reload the app', '', [{ text: 'OK' }]);
+          },
+        },
+      ]);
     }
 
     if (opt === 'connection') {
@@ -224,13 +255,15 @@ const Settings = () => {
         <Top>
           <ProfileIcon />
           <View style={{ marginLeft: 18 }}>
-            <HeaderText>{user.name}</HeaderText>
-            <HeaderSubText>{user.email}</HeaderSubText>
+            <HeaderText>{user?.name}</HeaderText>
+            <HeaderSubText>{user?.email}</HeaderSubText>
           </View>
         </Top>
         <View style={{ marginBottom: 30 }}>
           <StyledText style={{ marginVertical: 30 }}>Account Options</StyledText>
           <Opt onPress={handleOptionPress} label={'Start a new plan'} icon={'new'} opt={'newPlan'} first={true} />
+          <Opt onPress={handleOptionPress} label={'Logout'} icon={'logout'} opt={'logout'} />
+          <Opt onPress={handleOptionPress} label={'Delete Account'} icon={'stop'} opt={'deleteAccount'} />
           {/* <Opt onPress={handleOptionPress} label={'Manage connections'} icon={'connection'} opt={'connection'} /> */}
           {/* <Opt onPress={handleOptionPress} label={subscriptionText} icon={'subscribe'} opt={'subscription'} /> */}
           <Opt onPress={handleOptionPress} label={'Contact support'} icon={'support'} opt={'support'} last={true} />

@@ -4,6 +4,10 @@ import { appleAuth } from '@invertase/react-native-apple-authentication';
 import * as RNLocalize from 'react-native-localize';
 import call from '../../utils/call';
 
+export const signout = createAsyncThunk('user/signout', async () => {
+  await AsyncStorage.removeItem('session');
+});
+
 export const setup = createAsyncThunk('user/setup', async () => {
   const session = await AsyncStorage.getItem('session');
 
@@ -110,6 +114,9 @@ export const userSlice = createSlice({
       state.loaded = true;
       state.session = action.payload.session;
       state.signedIn = !!action.payload.session;
+    });
+    builder.addCase(signout.fulfilled, (state, action) => {
+      state.signedIn = false;
     });
     builder.addCase(continueWithApple.fulfilled, (state, action) => {
       if (action.payload) {

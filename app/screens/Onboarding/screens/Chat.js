@@ -17,6 +17,7 @@ import {
 import styled from 'styled-components';
 import { useTheme } from 'styled-components';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useKeyboard } from '@react-native-community/hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import SafariView from 'react-native-safari-view';
@@ -31,10 +32,10 @@ import backgroundLight from '../../../assets/background-chat-light.png';
 
 import call from '../../../utils/call';
 import { hapticImpact } from '../../../utils/haptics';
+import { setup } from '../../../stores/user/userSlice';
 
 const StyledGestureHandlerRootView = styled(GestureHandlerRootView)`
   flex: 1;
-  padding-top: 60px;
 `;
 
 const Chat = () => {
@@ -80,15 +81,15 @@ const Chat = () => {
       let messages = state.messages;
 
       if (!state.assistant) {
-        assistant = await openai.retrieveAssistant('onboarding', session.user.id);
+        assistant = await openai.retrieveAssistant('onboarding', session.user?.id);
       }
 
       if (!state.thread) {
-        thread = await openai.createThread('onboarding', state.activity, session.user.id);
+        thread = await openai.createThread('onboarding', state.activity, session.user?.id);
       }
 
       // Get the messages from the thread
-      messages = await openai.retrieveMessages(thread.id, session.user.id);
+      messages = await openai.retrieveMessages(thread.id, session.user?.id);
 
       // Update the state with the assistant, thread and messages
       dispatch(updateState({ ...state, assistant, thread, messages }));
@@ -117,7 +118,7 @@ const Chat = () => {
       setLoading(true);
 
       // Initialise a response from the AI
-      const id = await openai.run(state.thread.id, state.assistant.id, session.user.id);
+      const id = await openai.run(state.thread.id, state.assistant.id, session.user?.id);
 
       // Save the id of the response
       dispatch(updateState({ ...state, runId: id }));
@@ -140,7 +141,7 @@ const Chat = () => {
       if (!responsePending) return;
 
       // Retrieve the response from the AI
-      const response = await openai.retrieveRun(state.thread.id, state.runId, session.user.id);
+      const response = await openai.retrieveRun(state.thread.id, state.runId, session.user?.id);
       console.log('Retrieved response, status is:' + response.status);
 
       if (response.status === 'in_progress' || response.status === 'queued') {
@@ -148,7 +149,7 @@ const Chat = () => {
         timeoutId = setTimeout(_captureResponse, 2000);
       } else if (response.status === 'completed') {
         // Get the new messages from the message thread and save them
-        const messages = await openai.retrieveMessages(state.thread.id, session.user.id);
+        const messages = await openai.retrieveMessages(state.thread.id, session.user?.id);
 
         // Set loading to false to remove the loading indicator
         setLoading(false);
@@ -168,13 +169,13 @@ const Chat = () => {
         setResponsePending(false);
       } else if (response.status === 'requires_action') {
         // Extract the function data from the response
-        const { args, name, id } = openai.extractFunctionData(response, session.user.id);
+        const { args, name, id } = openai.extractFunctionData(response, session.user?.id);
 
         // Save the tool id so we can use it when getting the tool completion
         setToolId(id);
 
         if (name === 'connectStrava') {
-          const redirect = await call('GET', `connect/getUrl/strava/${session.user.id}`);
+          const redirect = await call('GET', `connect/getUrl/strava/${session.user?.id}`);
           setRedirect(redirect);
           setShowSafari(true);
         }
@@ -186,7 +187,7 @@ const Chat = () => {
             // Complete the onboarding process
             await call('POST', `users/completeOnboarding`, {
               data: args,
-              id: session.user.id,
+              id: session.user?.id,
               threadId: state.thread.id,
             });
 
@@ -239,7 +240,7 @@ const Chat = () => {
 
       try {
         // Retrieve the connections from the backend
-        const response = await call('GET', `connect/list/${session.user.id}`);
+        const response = await call('GET', `connect/list/${session.user?.id}`);
 
         if (response.length === 0) {
           // If the user hasn't connected their watch, run the function again in 2 seconds
@@ -277,7 +278,7 @@ const Chat = () => {
     // If the dismissal was done by the user
     if (!programmaticDismissal) {
       // Retrieve the connections from the backend
-      const response = await call('GET', `connect/list/${session.user.id}`);
+      const response = await call('GET', `connect/list/${session.user?.id}`);
 
       if (response.length === 0) {
         // If the user hasn't connected their watch, complete the tool
@@ -319,7 +320,7 @@ const Chat = () => {
       if (!shouldCompleteTool) return;
 
       // Complete the tool
-      await openai.submitToolResponse(state.thread.id, state.runId, toolId, toolOutput, session.user.id);
+      await openai.submitToolResponse(state.thread.id, state.runId, toolId, toolOutput, session.user?.id);
 
       // Tell the component that the tool no longer needs to be completed
       setShouldCompleteTool(false);
@@ -342,13 +343,13 @@ const Chat = () => {
     hapticImpact();
 
     // Add the user message to the message thread
-    await openai.addUserMessage(state.thread.id, userMessage, session.user.id);
+    await openai.addUserMessage(state.thread.id, userMessage, session.user?.id);
 
     // Clear the user message
     setUserMessage('');
 
     // Retrieve the messages from the message thread
-    const messages = await openai.retrieveMessages(state.thread.id, session.user.id);
+    const messages = await openai.retrieveMessages(state.thread.id, session.user?.id);
 
     // Update the state with the new messages
     dispatch(updateState({ messages }));
@@ -386,64 +387,29 @@ const Chat = () => {
     }).start();
   }, [userMessage]);
 
-  const handleHelp = () => {
-    setModalOpen(true);
-  };
+  const Logout = getIconFromLabel('logout');
 
-  const handleGestureEvent = useCallback(
-    Animated.event(
+  const logout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
       [
         {
-          nativeEvent: {
-            translationY: translateY,
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          onPress: async () => {
+            // remove token from local storage
+            await AsyncStorage.removeItem('session');
+            dispatch(setup());
           },
         },
       ],
-      { useNativeDriver: true },
-    ),
-    [],
-  );
-
-  const onHandlerStateChange = (event) => {
-    if (event.nativeEvent.oldState === State.ACTIVE) {
-      let { translationY } = event.nativeEvent;
-
-      if (translationY > threshold) {
-        setModalOpen(false);
-        translateY.setValue(0);
-      } else {
-        Animated.spring(translateY, {
-          toValue: 0,
-          speed: 14,
-          bounciness: 12,
-          useNativeDriver: true,
-        }).start();
-      }
-    }
+      { cancelable: false },
+    );
   };
-
-  const handleContactSupport = async () => {
-    Alert.alert('Contact Support', 'Please email help@heysabio.com', [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-    ]);
-  };
-
-  const renderItem = ({ item }) => (
-    <View style={{ display: 'flex', flexDirection: 'row', width: '100%', alignItems: 'center', marginVertical: 2 }}>
-      <View style={{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#737476', marginRight: 4 }} />
-      <Text style={{ color: '#737476', fontSize: 15, fontWeight: '600', marginLeft: 5 }}>{item}</Text>
-    </View>
-  );
-
-  const CONSTRAINTS = [
-    'The goal must be quantifiable',
-    'The plan must be atleast a month long',
-    'The plan must be at most a year long',
-    'Access to a smart tracker is required',
-  ];
 
   return (
     <View style={{ ...styles.container, backgroundColor: theme.colors.chatBackground }}>
@@ -454,6 +420,18 @@ const Chat = () => {
         <KeyboardAvoidingView behavior="padding">
           <StyledGestureHandlerRootView>
             <Animated.ScrollView ref={scrollRef} showsVerticalScrollIndicator={false}>
+              <View
+                style={{
+                  marginTop: 50,
+                  height: 50,
+                  paddingHorizontal: 20,
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}>
+                <Pressable onPress={logout}>
+                  <Logout />
+                </Pressable>
+              </View>
               {state.messages.map((message, index) => {
                 if (message?.role === 'assistant') {
                   return <AssistantMessage key={index} message={message.content[0].text.value} />;
@@ -509,37 +487,6 @@ const Chat = () => {
             </Animated.View>
           </Animated.View>
         </KeyboardAvoidingView>
-        <Modal style={styles.modal} animationType="slide" transparent={true} visible={modalOpen}>
-          <View style={styles.modal}>
-            <View style={{ height: 250 }} />
-            <PanGestureHandler onGestureEvent={handleGestureEvent} onHandlerStateChange={onHandlerStateChange}>
-              <Animated.View style={{ ...styles.modalContent, transform: [{ translateY }] }}>
-                <View style={styles.modalTop}>
-                  <View style={styles.line} />
-                </View>
-                <View style={styles.modalBody}>
-                  <View>
-                    <Text style={styles.modalTitle}>Chatting with Sabio</Text>
-                    <Text style={styles.modalText}>
-                      Sabio's goal for this conversation is to understand a quantifiable and timebound fitness goal that
-                      he can help you work towards.
-                    </Text>
-                    <Text style={styles.modalText}>
-                      There are a few constaints that Sabio has to work within, these are listed below:
-                    </Text>
-                    <FlatList style={{ marginTop: 20 }} data={CONSTRAINTS} renderItem={renderItem} />
-                    <Text style={styles.modalText}>
-                      If this app is behaving unexpectedly, please reload the app to reset the conversation.
-                    </Text>
-                    <Pressable onPress={handleContactSupport} style={styles.pressable}>
-                      <Text style={styles.pressableText}>Contact Support</Text>
-                    </Pressable>
-                  </View>
-                </View>
-              </Animated.View>
-            </PanGestureHandler>
-          </View>
-        </Modal>
       </ImageBackground>
     </View>
   );

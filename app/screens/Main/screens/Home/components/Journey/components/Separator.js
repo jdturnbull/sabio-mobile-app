@@ -49,14 +49,14 @@ const SeparatorBodyText = styled.Text`
 `;
 
 const Separator = ({ item, startOfWeekDates }) => {
-  const user = useSelector((state) => state.user.session.user);
+  const user = useSelector((state) => state.user.session?.user);
 
   let weekNumber = 0;
   const date = moment.utc(item.leadingItem?.date, 'YYYY-MM-DD').format('YYYY-MM-DD');
 
   if (startOfWeekDates.includes(date)) {
     weekNumber = startOfWeekDates.indexOf(date) + 1;
-    const focus = user.weeklyFocuses[`week ${weekNumber}`];
+    const focus = user?.weeklyFocuses[`week ${weekNumber}`];
 
     return (
       <SeparatorContainer>

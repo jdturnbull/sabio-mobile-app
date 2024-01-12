@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 const { height: screenHeight } = Dimensions.get('window');
 
 const ModalContent = ({ setShowPlan }) => {
-  const user = useSelector((state) => state.user.session.user);
+  const user = useSelector((state) => state.user.session?.user);
 
   const translateY = useSharedValue(0);
 
@@ -50,7 +50,7 @@ const ModalContent = ({ setShowPlan }) => {
           </View>
           <Text style={styles.title}>Journey Plan</Text>
           <ScrollView>
-            <Text style={styles.body}>{user.plan}</Text>
+            <Text style={styles.body}>{user?.plan}</Text>
           </ScrollView>
         </View>
       </Animated.View>

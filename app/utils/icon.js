@@ -51,6 +51,7 @@ import Connection from '../components/icons/general/Connection';
 import Down from '../components/icons/general/Down';
 import Up from '../components/icons/general/Up';
 import Profile from '../components/icons/general/Profile';
+import Logout from '../components/icons/general/Logout';
 
 import SabioGreyedLight from '../components/icons/company/SabioGreyedLight';
 import SabioGreyedDark from '../components/icons/company/SabioGreyedDark';
@@ -122,6 +123,7 @@ export const ICONS = [
   { label: 'splashWhite', icon: SplashWhite },
   { label: 'splashDark', icon: SplashDark },
   { label: 'tick', icon: Tick },
+  { label: 'logout', icon: Logout },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

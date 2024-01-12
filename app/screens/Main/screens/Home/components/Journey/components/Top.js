@@ -40,9 +40,9 @@ const StyledTextBottom = styled.Text`
 const Top = ({ viewableItems, setShowPlan }) => {
   const colorScheme = useColorScheme();
   const theme = useTheme();
-  const user = useSelector((state) => state.user.session.user);
-  const monthlyFocuses = user.monthlyFocuses;
-  const plannedMonths = useSelector((state) => state.user.plannedMonths);
+  const user = useSelector((state) => state.user.session?.user);
+  const monthlyFocuses = user?.monthlyFocuses;
+  const plannedMonths = useSelector((state) => state.user?.plannedMonths);
   const ReadIcon = getIconFromLabel('sabioSmall');
 
   const month = moment(viewableItems[0]?.item.date, 'YYYY-MM-DD').format('MMMM YYYY').toUpperCase();
