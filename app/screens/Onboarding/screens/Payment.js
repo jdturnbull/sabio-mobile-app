@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { ActivityIndicator, Modal, Pressable, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import {
+  ActivityIndicator,
+  Modal,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+  useWindowDimensions,
+  Platform,
+} from 'react-native';
 import {
   initConnection,
   requestSubscription,
@@ -190,7 +199,12 @@ const Payment = () => {
       <Headline>
         Hire Sabio & get started <Headline style={{ color: theme.text.colors.primary }}>for free!</Headline>
       </Headline>
-      <View style={{ width: '100%' }}>
+      <View
+        style={
+          Platform.isPad
+            ? { display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }
+            : { width: '100%' }
+        }>
         <TickItem Icon={Tick} label={'Try for free'} />
         <TickItem Icon={Tick} label={'Personalised training plan'} />
         <TickItem Icon={Tick} label={'Data driven AI coach'} />

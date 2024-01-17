@@ -34,7 +34,7 @@ const initial_chat_messages = JSON.stringify({
   messages: [
     {
       role: 'user',
-      content: 'Hey Sabio!',
+      content: "Hey Sabio! I have a fitness goal I'd like to discuss.",
     },
   ],
 });

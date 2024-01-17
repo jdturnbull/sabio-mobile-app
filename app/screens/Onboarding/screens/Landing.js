@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, useWindowDimensions, View, Pressable, Appearance, StatusBar } from 'react-native';
+import { Animated, useWindowDimensions, View, Pressable, Appearance, StatusBar, Platform } from 'react-native';
 import styled, { useTheme } from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { continueWithApple } from '../../../stores/user/userSlice';
@@ -77,6 +77,8 @@ const AlreadyHaveAccountText = styled.Text`
 const Landing = () => {
   const colorScheme = Appearance.getColorScheme();
 
+  console.log(Platform);
+
   const theme = useTheme();
   const dispatch = useDispatch();
   const width = useWindowDimensions().width;
@@ -115,19 +117,18 @@ const Landing = () => {
       <Bottom style={colorScheme === 'dark' && { backgroundColor: theme.colors.black }}>
         <Pressable onPress={handlePress}>
           <GetStartedButton>
-            <GetStartedText>Get started with Sabio</GetStartedText>
+            <GetStartedText>Continue with Apple</GetStartedText>
           </GetStartedButton>
         </Pressable>
-        <Pressable onPress={handlePress}>
+        {/* <Pressable onPress={handlePress}>
           <AlreadyHaveAccountButton>
             <AlreadyHaveAccountText style={colorScheme === 'dark' ? { color: '#fff' } : {}}>
-              Already have an account?{' '}
               <AlreadyHaveAccountText style={{ color: theme.colors.primary, fontWeight: theme.text.weight.bold }}>
-                Sign in
+                Sign in with apple
               </AlreadyHaveAccountText>
             </AlreadyHaveAccountText>
           </AlreadyHaveAccountButton>
-        </Pressable>
+        </Pressable> */}
       </Bottom>
       <View
         style={{
@@ -139,7 +140,7 @@ const Landing = () => {
         <Hero />
       </View>
       <View style={{ position: 'absolute', top: '65%', left: 0, zIndex: 1 }}>
-        <Graphic />
+        {Platform.isPad ? null : <Graphic />}
       </View>
     </Container>
   );
