@@ -9,6 +9,7 @@ import {
   View,
   useWindowDimensions,
   Platform,
+  Linking,
 } from 'react-native';
 import {
   initConnection,
@@ -85,28 +86,6 @@ const TickLabel = styled.Text`
   margin-left: 10px;
 `;
 
-const ModalButton = styled.Pressable`
-  background-color: ${(props) => props.theme.colors.background1};
-  margin-top: 20px;
-  height: 50px;
-  width: 100px;
-  margin-right: 10px;
-  border-radius: 18px;
-  padding: 10px;
-  align-items: center;
-  justify-content: center;
-  border-width: 1px;
-  border-color: ${(props) => props.theme.colors.primary};
-`;
-
-const ModalText = styled.Text`
-  color: ${(props) => props.theme.text.colors.primary};
-  font-family: ${(props) => props.theme.text.family};
-  font-size: ${(props) => props.theme.text.size.sm};
-  font-weight: ${(props) => props.theme.text.weight.semibold};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
-`;
-
 const TickItem = ({ label, Icon }) => {
   return (
     <TickItemContainer>
@@ -129,24 +108,6 @@ const Payment = () => {
   const Logo = getIconFromLabel('logoLarge');
   const Tick = getIconFromLabel('tick');
 
-  const handleVIP = () => {
-    setShowCode(true);
-  };
-
-  const handleCodeConfirm = async () => {
-    setLoading(true);
-    const response = await call('POST', 'users/confirmCode', { userId: user.id, code: code.toLowerCase() });
-
-    if (response) {
-      dispatch(setup());
-      setLoading(false);
-      setShowCode(false);
-    } else {
-      setLoading(false);
-      alert('There was a problem with your code, please try again.');
-    }
-  };
-
   const subscribe = async () => {
     try {
       setLoading(true);
@@ -166,32 +127,32 @@ const Payment = () => {
     }
   };
 
-  useEffect(() => {
-    purchaseUpdatedListener(async (purchase) => {
-      purchase.transactionReceipt;
-      if (purchase.transactionReceipt) {
-        const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
+  // useEffect(() => {
+  //   purchaseUpdatedListener(async (purchase) => {
+  //     purchase.transactionReceipt;
+  //     if (purchase.transactionReceipt) {
+  //       const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
 
-        if (response) {
-          dispatch(setup());
-          setLoading(false);
-        } else {
-          setLoading(false);
-          alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
-        }
-      }
-    });
+  //       if (response) {
+  //         dispatch(setup());
+  //         setLoading(false);
+  //       } else {
+  //         setLoading(false);
+  //         alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
+  //       }
+  //     }
+  //   });
 
-    purchaseErrorListener((error) => {
-      console.log('Purchase Error', error);
-      setLoading(false);
-    });
+  //   purchaseErrorListener((error) => {
+  //     console.log('Purchase Error', error);
+  //     setLoading(false);
+  //   });
 
-    return () => {
-      purchaseUpdatedListener();
-      purchaseErrorListener();
-    };
-  }, []);
+  //   return () => {
+  //     purchaseUpdatedListener();
+  //     purchaseErrorListener();
+  //   };
+  // }, []);
 
   return (
     <Container>
@@ -215,11 +176,23 @@ const Payment = () => {
       <GetStartedButton onPress={subscribe}>
         <GetStartedText>Start your free trial</GetStartedText>
       </GetStartedButton>
-      <Pressable onPress={handleVIP}>
-        <Text style={{ marginTop: 20, color: theme.text.colors.secondary, fontFamily: theme.text.family }}>
-          Have a code? <Text style={{ color: theme.text.colors.primary }}>Redeem here</Text>
+      <View style={{ marginTop: 15 }}>
+        <Text style={{ color: '#fff' }}>
+          Subscription automatically renews at £9.99 / month. By subscribing you agree to the{' '}
+          <Text
+            onPress={() => Linking.openURL('https://heysabio.com/terms')}
+            style={{ textDecorationLine: 'underline' }}>
+            terms
+          </Text>{' '}
+          and{' '}
+          <Text
+            onPress={() => Linking.openURL('https://heysabio.com/privacy-policy')}
+            style={{ textDecorationLine: 'underline' }}>
+            privacy policy
+          </Text>
+          .
         </Text>
-      </Pressable>
+      </View>
       {loading && (
         <View
           style={{
@@ -236,33 +209,6 @@ const Payment = () => {
           <ActivityIndicator size="large" color={'#fff'} />
         </View>
       )}
-      <Modal visible={showCode} animationType="slide" transparent={true}>
-        <Container>
-          <Headline>Enter your code</Headline>
-          <BodyText>Enter your code here for exclusive access.</BodyText>
-          <TextInput
-            placeholder="Enter your code"
-            value={code}
-            onChangeText={(text) => setCode(text)}
-            style={{
-              padding: 10,
-              borderWidth: 1,
-              borderColor: '#ccc',
-              borderRadius: 10,
-              width: '100%',
-              color: theme.text.colors.secondary,
-            }}
-          />
-          <View style={{ flexDirection: 'row' }}>
-            <ModalButton style={{ borderColor: theme.text.colors.secondary }} onPress={() => setShowCode(false)}>
-              <ModalText style={{ color: theme.text.colors.secondary }}>Cancel</ModalText>
-            </ModalButton>
-            <ModalButton onPress={handleCodeConfirm}>
-              <ModalText>Confirm</ModalText>
-            </ModalButton>
-          </View>
-        </Container>
-      </Modal>
     </Container>
   );
 };
