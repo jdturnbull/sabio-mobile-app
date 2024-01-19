@@ -158,7 +158,7 @@ const Payment = () => {
     <Container>
       <Logo />
       <Headline>
-        Hire Sabio & get started <Headline style={{ color: theme.text.colors.primary }}>for free!</Headline>
+        One week <Headline style={{ color: theme.text.colors.primary }}>free trial</Headline> then £9.99 / month
       </Headline>
       <View
         style={
