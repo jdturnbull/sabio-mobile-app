@@ -4,7 +4,6 @@ import LogoMedium from '../components/icons/company/LogoMedium';
 import Apple from '../components/icons/brands/Apple';
 import Garmin from '../components/icons/brands/Garmin';
 import Fitbit from '../components/icons/brands/Fitbit';
-import Strava from '../components/icons/brands/Strava';
 import Stop from '../components/icons/general/Stop';
 import Send from '../components/icons/general/Send';
 import Back from '../components/icons/general/Back';
@@ -52,6 +51,7 @@ import Down from '../components/icons/general/Down';
 import Up from '../components/icons/general/Up';
 import Profile from '../components/icons/general/Profile';
 import Logout from '../components/icons/general/Logout';
+import Strava from '../components/icons/general/Strava';
 
 import SabioGreyedLight from '../components/icons/company/SabioGreyedLight';
 import SabioGreyedDark from '../components/icons/company/SabioGreyedDark';
@@ -66,7 +66,6 @@ export const ICONS = [
   { label: 'apple', icon: Apple },
   { label: 'garmin', icon: Garmin },
   { label: 'fitbit', icon: Fitbit },
-  { label: 'strava', icon: Strava },
   { label: 'stop', icon: Stop },
   { label: 'logoSmall', icon: LogoSmall },
   { label: 'send', icon: Send },
@@ -124,6 +123,7 @@ export const ICONS = [
   { label: 'splashDark', icon: SplashDark },
   { label: 'tick', icon: Tick },
   { label: 'logout', icon: Logout },
+  { label: 'strava', icon: Strava },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

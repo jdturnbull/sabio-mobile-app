@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Pressable, Alert, useWindowDimensions, ImageBackground, useColorScheme, Modal } from 'react-native';
 import styled, { useTheme } from 'styled-components';
 import moment from 'moment';
@@ -8,6 +8,7 @@ import { getIconFromLabel } from '../../../../utils/icon';
 import LightBackground from '../../../../assets/home-background-light.png';
 import DarkBackground from '../../../../assets/home-background-dark.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SafariView from 'react-native-safari-view';
 import { useNavigation } from '@react-navigation/native';
 
 const Container = styled.ScrollView`
@@ -138,12 +139,29 @@ const Settings = () => {
   const navigation = useNavigation();
   const theme = useTheme();
   const colorScheme = useColorScheme();
+  const [hasConnection, setHasConnection] = useState(false);
   const user = useSelector((state) => state.user.session?.user);
   const activities = useSelector((state) => state.user?.plannedActivities);
 
   const [modalOpen, setModalOpen] = useState(false);
 
   const { width: screenWidth } = useWindowDimensions();
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        const res = await call('GET', `connect/list/${user?.id}`);
+
+        if (res.length > 0) {
+          setHasConnection(true);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    checkConnection();
+  }, []);
 
   const handleResetConfirm = async () => {
     try {
@@ -154,7 +172,7 @@ const Settings = () => {
     }
   };
 
-  const handleOptionPress = (opt) => {
+  const handleOptionPress = async (opt) => {
     if (opt === 'support') {
       Alert.alert('support@heysabio.com', '', [{ text: 'OK' }]);
     }
@@ -169,6 +187,11 @@ const Settings = () => {
 
     if (opt === 'subscription') {
       // Open apple pay
+    }
+
+    if (opt === 'connect') {
+      const redirect = await call('GET', `connect/getUrl/strava/${user?.id}`);
+      SafariView.show({ url: redirect });
     }
 
     if (opt === 'logout') {
@@ -262,6 +285,9 @@ const Settings = () => {
         <View style={{ marginBottom: 30 }}>
           <StyledText style={{ marginVertical: 30 }}>Account Options</StyledText>
           <Opt onPress={handleOptionPress} label={'Start a new plan'} icon={'new'} opt={'newPlan'} first={true} />
+          {!hasConnection && (
+            <Opt onPress={handleOptionPress} label={'Connect Strava'} icon={'strava'} opt={'connect'} />
+          )}
           <Opt onPress={handleOptionPress} label={'Logout'} icon={'logout'} opt={'logout'} />
           <Opt onPress={handleOptionPress} label={'Delete Account'} icon={'stop'} opt={'deleteAccount'} />
           {/* <Opt onPress={handleOptionPress} label={'Manage connections'} icon={'connection'} opt={'connection'} /> */}

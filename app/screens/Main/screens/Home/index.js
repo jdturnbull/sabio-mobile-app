@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { ImageBackground, View, useColorScheme } from 'react-native';
+import { ImageBackground, View, useColorScheme, Text } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPlan, setup } from '../../../../stores/user/userSlice';
 import WaitingScreen from './components/WaitingScreen';
