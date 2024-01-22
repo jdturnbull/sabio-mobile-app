@@ -4,10 +4,6 @@ import { appleAuth } from '@invertase/react-native-apple-authentication';
 import * as RNLocalize from 'react-native-localize';
 import call from '../../utils/call';
 
-export const signout = createAsyncThunk('user/signout', async () => {
-  await AsyncStorage.removeItem('session');
-});
-
 export const setup = createAsyncThunk('user/setup', async () => {
   const session = await AsyncStorage.getItem('session');
 
@@ -52,8 +48,6 @@ export const continueWithApple = createAsyncThunk('user/continueWithApple', asyn
         onboardingData: data,
       });
 
-      console.log(session);
-
       await AsyncStorage.setItem('session', JSON.stringify(session));
 
       return session;
@@ -94,6 +88,7 @@ export const userSlice = createSlice({
     error: null,
     loaded: false,
     loading: false,
+    onboarded: false,
     plannedActivities: [],
     plannedMonths: [],
     actions: [],
@@ -105,6 +100,11 @@ export const userSlice = createSlice({
     updateState: (state, action) => {
       state = { ...state, ...action.payload };
     },
+    signout: (state, action) => {
+      state.signedIn = false;
+      state.onboarded = false;
+      state.session = null;
+    },
     setSelectedDate: (state, action) => {
       state.selectedDate = action.payload;
     },
@@ -114,9 +114,7 @@ export const userSlice = createSlice({
       state.loaded = true;
       state.session = action.payload.session;
       state.signedIn = !!action.payload.session;
-    });
-    builder.addCase(signout.fulfilled, (state, action) => {
-      state.signedIn = false;
+      state.onboarded = action.payload.session?.user?.onboarded;
     });
     builder.addCase(continueWithApple.fulfilled, (state, action) => {
       if (action.payload) {
@@ -137,6 +135,6 @@ export const userSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setSelectedDate, updateState } = userSlice.actions;
+export const { setSelectedDate, updateState, signout } = userSlice.actions;
 
 export default userSlice.reducer;

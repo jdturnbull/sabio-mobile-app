@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Pressable, Alert, useWindowDimensions, ImageBackground, useColorScheme, Modal } from 'react-native';
 import styled, { useTheme } from 'styled-components';
-import moment from 'moment';
-import call from '../../../../utils/call';
-import { useDispatch, useSelector } from 'react-redux';
-import { getIconFromLabel } from '../../../../utils/icon';
-import LightBackground from '../../../../assets/home-background-light.png';
-import DarkBackground from '../../../../assets/home-background-dark.png';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import SafariView from 'react-native-safari-view';
+import { View, Pressable, Alert, useWindowDimensions, ImageBackground, useColorScheme } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import SafariView from 'react-native-safari-view';
+import moment from 'moment';
+
+import call from '../../../utils/call';
+import { getIconFromLabel } from '../../../utils/icon';
+import LightBackground from '../../../assets/home-background-light.png';
+import DarkBackground from '../../../assets/home-background-dark.png';
+import { signout } from '../../../stores/user/userSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -200,8 +202,7 @@ const Settings = () => {
         {
           text: 'Confirm',
           onPress: async () => {
-            AsyncStorage.removeItem('session');
-            Alert.alert('Logged out, please reload the app', '', [{ text: 'OK' }]);
+            navigation.navigate('Onboarding', { screen: 'Landing', params: { logout: true } });
           },
         },
       ]);
@@ -213,9 +214,8 @@ const Settings = () => {
         {
           text: 'Confirm',
           onPress: async () => {
-            await call('GET', `users/delete/${user?.id}`);
-            AsyncStorage.removeItem('session');
-            Alert.alert('Account deleted, please reload the app', '', [{ text: 'OK' }]);
+            // await call('GET', `users/delete/${user?.id}`);
+            navigation.navigate('Onboarding', { screen: 'Landing', params: { logout: true } });
           },
         },
       ]);
@@ -226,10 +226,8 @@ const Settings = () => {
     }
   };
 
-  const subscriptionText = user.subscriptionStatus === 'SUBSCRIBED' ? 'Cancel subscription' : 'Subscribe';
-
-  const totalNum = activities.length;
-  const numCompleted = activities.filter((a) => a.status === 'COMPLETED' || a.status === 'PART_COMPLETED').length;
+  const totalNum = activities?.length || 0;
+  const numCompleted = activities?.filter((a) => a.status === 'COMPLETED' || a.status === 'PART_COMPLETED').length || 0;
 
   // Should skipping rest days mean the rest day is no longer considered in your application.
 
@@ -305,33 +303,38 @@ const Settings = () => {
           <StyledText style={{ marginVertical: 20 }}>Your Information</StyledText>
           <InformationBox
             title={'Goal:'}
-            value={user.onboardingData.fitnessGoal}
+            value={user?.onboardingData.fitnessGoal || ''}
             onPress={handleInfoBoxPress}
             id={'goal'}
             first={true}
           />
           <InformationBox
             title={'Goal by:'}
-            value={moment(user.onboardingData.goalByDate, 'YYYY-MM-DD').format('MMMM Do YYYY')}
+            value={moment(user?.onboardingData.goalByDate, 'YYYY-MM-DD').format('MMMM Do YYYY') || ''}
             onPress={handleInfoBoxPress}
             id={'goalByDate'}
           />
-          <InformationBox title={'Age:'} value={user.onboardingData.age} onPress={handleInfoBoxPress} id={'age'} />
+          <InformationBox
+            title={'Age:'}
+            value={user?.onboardingData.age || ''}
+            onPress={handleInfoBoxPress}
+            id={'age'}
+          />
           <InformationBox
             title={'Past experience:'}
-            value={user.onboardingData.pastExperienceWithFitnessAndExercise}
+            value={user?.onboardingData.pastExperienceWithFitnessAndExercise || ''}
             onPress={handleInfoBoxPress}
             id={'experience'}
           />
           <InformationBox
             title={'Availability:'}
-            value={user.onboardingData.availability}
+            value={user?.onboardingData.availability || ''}
             onPress={handleInfoBoxPress}
             id={'availability'}
           />
           <InformationBox
             title={'Health concerns:'}
-            value={user.onboardingData.injuriesOrHealthConcerns}
+            value={user?.onboardingData.injuriesOrHealthConcerns || ''}
             onPress={handleInfoBoxPress}
             id={'health'}
             last={true}

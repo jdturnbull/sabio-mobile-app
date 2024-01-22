@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, useColorScheme } from 'react-native';
 import styled from 'styled-components';
-import { getIconFromLabel } from '../../../../../utils/icon';
+import { getIconFromLabel } from '../../../../utils/icon';
 
 const Container = styled.View`
   flex: 1;

@@ -2,8 +2,8 @@ import React, { forwardRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { Pressable, Dimensions } from 'react-native';
 import moment from 'moment';
-import { hapticSelection } from '../../../../../../../utils/haptics';
-import { getIconFromLabel } from '../../../../../../../utils/icon';
+import { hapticSelection } from '../../../../../../utils/haptics';
+import { getIconFromLabel } from '../../../../../../utils/icon';
 
 const BOX_WIDTH = 164;
 const BOX_HEIGHT = 60;

@@ -2,7 +2,7 @@ import React from 'react';
 const moment = require('moment');
 import { useWindowDimensions, View } from 'react-native';
 import Styled, { useTheme } from 'styled-components';
-import { getIconFromLabel } from '../../../../../utils/icon';
+import { getIconFromLabel } from '../../../../utils/icon';
 
 const CHART_HEIGHT = 199;
 const ROW_HEIGHT = CHART_HEIGHT / 4;

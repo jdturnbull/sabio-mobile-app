@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Animated, View, StyleSheet, ActivityIndicator, Text, useColorScheme } from 'react-native';
-import { getIconFromLabel } from '../../../../../utils/icon';
+import { getIconFromLabel } from '../../../../utils/icon';
 import styled, { useTheme } from 'styled-components';
 import { useSelector } from 'react-redux';
 

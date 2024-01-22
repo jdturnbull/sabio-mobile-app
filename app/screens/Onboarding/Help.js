@@ -1,11 +1,9 @@
 import React, { useRef, useCallback } from 'react';
 import { StyleSheet, View, Animated, Text, Pressable } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { getIconFromLabel } from '../../../../utils/icon';
+import { getIconFromLabel } from '../../utils/icon';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
-import { updateState } from '../../../../stores/chat/chatSlice';
 
 const styles = StyleSheet.create({
   container: {
@@ -106,13 +104,10 @@ const styles = StyleSheet.create({
   },
 });
 
-const Activity = () => {
-  const dispatch = useDispatch();
-  const threshold = 100;
+const Help = () => {
+  const threshold = 200;
   const navigation = useNavigation();
   const translateY = useRef(new Animated.Value(0)).current;
-
-  const { activity } = navigation.getState().routes[0].params;
 
   const RunnerIcon = getIconFromLabel('runner');
   const BoltIcon = getIconFromLabel('bolt');
@@ -148,10 +143,7 @@ const Activity = () => {
     }
   };
 
-  const handlePress = () => {
-    dispatch(updateState({ activity }));
-    navigation.navigate('TabStack', { screen: 'chat' });
-  };
+  const handlePress = () => {};
 
   return (
     <View style={styles.container}>
@@ -165,7 +157,7 @@ const Activity = () => {
           </View>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.title}>{activity.title}</Text>
+              <Text style={styles.title}></Text>
             </View>
             <View style={{ flex: 1, justifyContent: 'space-evenly', marginTop: 20 }}>
               <View style={styles.contentContainer}>
@@ -173,14 +165,14 @@ const Activity = () => {
                   <BoltIcon />
                   <Text style={styles.contentHeader}>Guidance</Text>
                 </View>
-                <Text style={styles.contentBody}>{activity.guidance}</Text>
+                <Text style={styles.contentBody}></Text>
               </View>
               <View style={styles.contentContainer}>
                 <View style={{ display: 'flex', flexDirection: 'row', width: '100%', alignItems: 'center' }}>
                   <BoltIcon />
                   <Text style={styles.contentHeader}>Reasoning</Text>
                 </View>
-                <Text style={styles.contentBody}>{activity.reasoning}</Text>
+                <Text style={styles.contentBody}></Text>
               </View>
             </View>
           </View>
@@ -196,4 +188,4 @@ const Activity = () => {
   );
 };
 
-export default Activity;
+export default Help;

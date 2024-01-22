@@ -2,8 +2,10 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, useWindowDimensions, View, Pressable, Appearance, StatusBar, Platform } from 'react-native';
 import styled, { useTheme } from 'styled-components';
 import { useDispatch } from 'react-redux';
-import { continueWithApple } from '../../../stores/user/userSlice';
-import { getIconFromLabel } from '../../../utils/icon';
+import { continueWithApple, updateState } from '../../stores/user/userSlice';
+import { getIconFromLabel } from '../../utils/icon';
+import { useIsFocused, useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Container = styled.View`
   flex: 1;
@@ -60,24 +62,11 @@ const GetStartedText = styled.Text`
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
 `;
 
-const AlreadyHaveAccountButton = styled.View`
-  margin-top: 15px;
-  align-items: center;
-  justify-content: center;
-`;
-
-const AlreadyHaveAccountText = styled.Text`
-  color: ${(props) => props.theme.text.colors.secondary};
-  font-family: ${(props) => props.theme.text.family};
-  font-size: ${(props) => props.theme.text.size.md};
-  font-weight: ${(props) => props.theme.text.weight.semibold};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
-`;
-
 const Landing = () => {
+  const route = useRoute();
   const colorScheme = Appearance.getColorScheme();
 
-  console.log(Platform);
+  const { params } = route;
 
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -94,6 +83,14 @@ const Landing = () => {
   const handlePress = () => {
     dispatch(continueWithApple());
   };
+
+  useEffect(() => {
+    if (params && params.logout) {
+      console.log('Removing shit');
+      dispatch(updateState({ session: null, signedIn: false }));
+      AsyncStorage.removeItem('session');
+    }
+  }, [params]);
 
   useEffect(() => {
     Animated.timing(opacity, {
@@ -120,15 +117,6 @@ const Landing = () => {
             <GetStartedText>Continue with Apple</GetStartedText>
           </GetStartedButton>
         </Pressable>
-        {/* <Pressable onPress={handlePress}>
-          <AlreadyHaveAccountButton>
-            <AlreadyHaveAccountText style={colorScheme === 'dark' ? { color: '#fff' } : {}}>
-              <AlreadyHaveAccountText style={{ color: theme.colors.primary, fontWeight: theme.text.weight.bold }}>
-                Sign in with apple
-              </AlreadyHaveAccountText>
-            </AlreadyHaveAccountText>
-          </AlreadyHaveAccountButton>
-        </Pressable> */}
       </Bottom>
       <View
         style={{

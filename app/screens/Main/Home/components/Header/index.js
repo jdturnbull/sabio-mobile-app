@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useColorScheme } from 'react-native';
-import { getIconFromLabel } from '../../../../../../utils/icon';
+import { getIconFromLabel } from '../../../../../utils/icon';
 import { useSelector } from 'react-redux';
 
 const Container = styled.View`

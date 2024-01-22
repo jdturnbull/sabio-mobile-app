@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useIsFocused } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
-import call from '../../../../utils/call';
+import call from '../../../utils/call';
 import Loading from './components/Loading';
 import NoReports from './components/NoReports';
 import ReportsList from './components/ReportsList';

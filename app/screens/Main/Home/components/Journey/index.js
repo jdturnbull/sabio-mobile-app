@@ -9,7 +9,7 @@ import ListItem from './components/ListItem';
 import Separator from './components/Separator';
 import Footer from './components/Footer';
 import ModalContent from './components/ModalContent';
-import { getPlan } from '../../../../../../stores/user/userSlice';
+import { getPlan } from '../../../../../stores/user/userSlice';
 
 const Journey = () => {
   const dispatch = useDispatch();

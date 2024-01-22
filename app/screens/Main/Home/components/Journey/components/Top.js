@@ -3,7 +3,7 @@ import styled, { useTheme } from 'styled-components';
 import moment from 'moment';
 import { useSelector } from 'react-redux';
 import { Pressable, StyleSheet, useColorScheme } from 'react-native';
-import { getIconFromLabel } from '../../../../../../../utils/icon';
+import { getIconFromLabel } from '../../../../../../utils/icon';
 
 const Container = styled.View`
   display: flex;

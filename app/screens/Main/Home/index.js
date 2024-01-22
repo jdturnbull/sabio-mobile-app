@@ -1,15 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { ImageBackground, View, useColorScheme, Text } from 'react-native';
+import { ImageBackground, View, useColorScheme } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getPlan, setup } from '../../../../stores/user/userSlice';
-import WaitingScreen from './components/WaitingScreen';
-import Header from './components/Header';
+import { getPlan, setup } from '../../../stores/user/userSlice';
 import Journey from './components/Journey';
-import BackgroundLight from '../../../../assets/home-background-light.png';
-import BackgroundDark from '../../../../assets/home-background-dark.png';
-import { useIsFocused } from '@react-navigation/native';
-import { getIconFromLabel } from '../../../../utils/icon';
+import WaitingScreen from './components/WaitingScreen';
+import { getIconFromLabel } from '../../../utils/icon';
+import BackgroundDark from '../../../assets/home-background-dark.png';
+import BackgroundLight from '../../../assets/home-background-light.png';
 
 const HelloContainer = styled.View`
   margin-top: 5px;

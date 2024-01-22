@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { View, Pressable } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
-import { getIconFromLabel } from '../../../../../utils/icon';
+import { getIconFromLabel } from '../../../../utils/icon';
 
 const ITEM_HEIGHT = 52;
 

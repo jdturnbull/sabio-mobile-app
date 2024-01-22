@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -20,19 +20,21 @@ import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-g
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useKeyboard } from '@react-native-community/hooks';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 import SafariView from 'react-native-safari-view';
-import * as openai from '../../../utils/openai';
-import { updateState } from '../../../stores/onboarding/onboardingSlice';
-import { getIconFromLabel } from '../../../utils/icon';
-import AssistantMessage from '../../../components/chat/AssistantMessage';
-import UserMessage from '../../../components/chat/UserMessage';
-import TypingAnimation from '../../../components/chat/TypingAnimation';
-import backgroundDark from '../../../assets/background-chat-dark.png';
-import backgroundLight from '../../../assets/background-chat-light.png';
+import * as openai from '../../utils/openai';
+import { updateState } from '../../stores/onboarding/onboardingSlice';
+import { updateState as updateUserState } from '../../stores/user/userSlice';
+import { getIconFromLabel } from '../../utils/icon';
+import AssistantMessage from '../../components/chat/AssistantMessage';
+import UserMessage from '../../components/chat/UserMessage';
+import TypingAnimation from '../../components/chat/TypingAnimation';
+import backgroundDark from '../../assets/background-chat-dark.png';
+import backgroundLight from '../../assets/background-chat-light.png';
 
-import call from '../../../utils/call';
-import { hapticImpact } from '../../../utils/haptics';
-import { setup } from '../../../stores/user/userSlice';
+import call from '../../utils/call';
+import { hapticImpact } from '../../utils/haptics';
+import { setup } from '../../stores/user/userSlice';
 
 const StyledGestureHandlerRootView = styled(GestureHandlerRootView)`
   flex: 1;
@@ -44,6 +46,7 @@ const Chat = () => {
   const dispatch = useDispatch();
   const keyboard = useKeyboard();
   const width = useWindowDimensions().width;
+  const navigation = useNavigation();
 
   const threshold = 100;
 
@@ -196,7 +199,8 @@ const Chat = () => {
 
             // Update the state to move the user into the app
             setTimeout(() => {
-              dispatch(updateState({ onboarded: true }));
+              dispatch(updateUserState({ onboarded: true }));
+              navigation.navigate('Authed');
             }, 2000);
           } catch (error) {
             console.log('Error completing onboarding: ' + error.message);

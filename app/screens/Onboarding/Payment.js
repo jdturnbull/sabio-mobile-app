@@ -18,10 +18,10 @@ import {
   purchaseUpdatedListener,
   useIAP,
 } from 'react-native-iap';
-import call from '../../../utils/call';
-import { getIconFromLabel } from '../../../utils/icon';
+import call from '../../utils/call';
+import { getIconFromLabel } from '../../utils/icon';
 import { useDispatch, useSelector } from 'react-redux';
-import { setup } from '../../../stores/user/userSlice';
+import { setup } from '../../stores/user/userSlice';
 
 const Container = styled.View`
   flex: 1;
@@ -177,17 +177,17 @@ const Payment = () => {
         <GetStartedText>Start your free trial</GetStartedText>
       </GetStartedButton>
       <View style={{ marginTop: 15 }}>
-        <Text style={{ color: '#fff' }}>
+        <Text style={{ color: theme.text.colors.secondary }}>
           Subscription automatically renews at £9.99 / month. By subscribing you agree to the{' '}
           <Text
             onPress={() => Linking.openURL('https://heysabio.com/terms')}
-            style={{ textDecorationLine: 'underline' }}>
+            style={{ textDecorationLine: 'underline', color: theme.text.colors.secondary }}>
             terms
           </Text>{' '}
           and{' '}
           <Text
             onPress={() => Linking.openURL('https://heysabio.com/privacy-policy')}
-            style={{ textDecorationLine: 'underline' }}>
+            style={{ textDecorationLine: 'underline', color: theme.text.colors.secondary }}>
             privacy policy
           </Text>
           .

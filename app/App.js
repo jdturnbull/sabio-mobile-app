@@ -3,7 +3,6 @@ import styled, { ThemeProvider } from 'styled-components';
 import { Appearance, StatusBar, useColorScheme } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider, useDispatch } from 'react-redux';
-import { initStripe } from '@stripe/stripe-react-native';
 import store from './stores/store';
 import { useSelector } from 'react-redux';
 import { navigationRef } from './utils/navigation';
@@ -31,14 +30,6 @@ const App = () => {
       dispatch(setup());
     }
   }, [loaded]);
-
-  useEffect(() => {
-    initStripe({
-      publishableKey:
-        '***REMOVED***',
-      merchantIdentifier: 'merchant.com.{{YOUR_APP_NAME}}',
-    });
-  }, []);
 
   return (
     <AppContainer>

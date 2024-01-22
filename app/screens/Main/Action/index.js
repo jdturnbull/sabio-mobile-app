@@ -1,9 +1,11 @@
 import React, { useRef, useCallback } from 'react';
-import { StyleSheet, View, Animated, Text, Pressable } from 'react-native';
+import { StyleSheet, View, Animated, Text, Pressable, ScrollView } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { getIconFromLabel } from '../../../utils/icon';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { getIconFromLabel } from '../../../utils/icon';
+import { updateState } from '../../../stores/chat/chatSlice';
 
 const styles = StyleSheet.create({
   container: {
@@ -55,6 +57,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingBottom: 20,
   },
   title: {
     color: '#fff',
@@ -63,6 +66,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 20,
+    marginTop: 20,
   },
   contentHeader: {
     fontSize: 18,
@@ -104,10 +108,13 @@ const styles = StyleSheet.create({
   },
 });
 
-const Help = () => {
-  const threshold = 200;
+const Action = () => {
+  const dispatch = useDispatch();
+  const threshold = 100;
   const navigation = useNavigation();
   const translateY = useRef(new Animated.Value(0)).current;
+
+  const { action } = navigation.getState().routes[0].params;
 
   const RunnerIcon = getIconFromLabel('runner');
   const BoltIcon = getIconFromLabel('bolt');
@@ -143,7 +150,10 @@ const Help = () => {
     }
   };
 
-  const handlePress = () => {};
+  const handlePress = () => {
+    dispatch(updateState({ action }));
+    navigation.navigate('TabStack', { screen: 'chat' });
+  };
 
   return (
     <View style={styles.container}>
@@ -157,24 +167,24 @@ const Help = () => {
           </View>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.title}></Text>
+              <Text style={styles.title}>{action.title}</Text>
             </View>
-            <View style={{ flex: 1, justifyContent: 'space-evenly', marginTop: 20 }}>
+            <ScrollView style={{ flex: 1, paddingHorizontal: 10 }}>
               <View style={styles.contentContainer}>
                 <View style={{ display: 'flex', flexDirection: 'row', width: '100%', alignItems: 'center' }}>
                   <BoltIcon />
-                  <Text style={styles.contentHeader}>Guidance</Text>
+                  <Text style={styles.contentHeader}>Notes</Text>
                 </View>
-                <Text style={styles.contentBody}></Text>
+                <Text style={styles.contentBody}>{action.notes}</Text>
               </View>
               <View style={styles.contentContainer}>
                 <View style={{ display: 'flex', flexDirection: 'row', width: '100%', alignItems: 'center' }}>
                   <BoltIcon />
                   <Text style={styles.contentHeader}>Reasoning</Text>
                 </View>
-                <Text style={styles.contentBody}></Text>
+                <Text style={styles.contentBody}>{action.reasoning}</Text>
               </View>
-            </View>
+            </ScrollView>
           </View>
           <View style={styles.buttonContainer}>
             <Pressable onPress={handlePress} style={styles.pressable}>
@@ -188,4 +198,4 @@ const Help = () => {
   );
 };
 
-export default Help;
+export default Action;

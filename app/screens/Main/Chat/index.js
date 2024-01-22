@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useTheme } from 'styled-components';
 import {
   View,
   Text,
@@ -11,20 +12,20 @@ import {
   ImageBackground,
   useColorScheme,
 } from 'react-native';
-import { GestureHandlerRootView, State } from 'react-native-gesture-handler';
-import * as openai from '../../../../utils/openai';
 import { useDispatch, useSelector } from 'react-redux';
-import { getIconFromLabel } from '../../../../utils/icon';
-import AssistantMessage from '../../../../components/chat/AssistantMessage';
-import UserMessage from '../../../../components/chat/UserMessage';
-import { updateState } from '../../../../stores/chat/chatSlice';
-import { useKeyboard } from '@react-native-community/hooks';
-import call from '../../../../utils/call';
-import TypingAnimation from '../../../../components/chat/TypingAnimation';
-import { useTheme } from 'styled-components';
-import BackgroundLight from '../../../../assets/background-chat-light.png';
-import BackgroundDark from '../../../../assets/background-chat-dark.png';
 import { useIsFocused } from '@react-navigation/native';
+import { useKeyboard } from '@react-native-community/hooks';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+import call from '../../../utils/call';
+import * as openai from '../../../utils/openai';
+import { getIconFromLabel } from '../../../utils/icon';
+import UserMessage from '../../../components/chat/UserMessage';
+import { updateState } from '../../../stores/chat/chatSlice';
+import AssistantMessage from '../../../components/chat/AssistantMessage';
+import TypingAnimation from '../../../components/chat/TypingAnimation';
+import BackgroundLight from '../../../assets/background-chat-light.png';
+import BackgroundDark from '../../../assets/background-chat-dark.png';
 
 const Chat = () => {
   const theme = useTheme();
@@ -143,86 +144,80 @@ const Chat = () => {
     const _captureResponse = async () => {
       if (!responsePending) return;
 
-      // Retrieve the response from the AI
-      const response = await openai.retrieveRun(state.thread.id, state.runId, session.user?.id);
-      console.log('Retrieved response, status is:' + response.status);
+      try {
+        // Retrieve the response from the AI
+        const response = await openai.retrieveRun(state.thread.id, state.runId, session.user?.id);
+        console.log('Retrieved response, status is:' + response.status);
 
-      if (response.status === 'in_progress' || response.status === 'queued') {
-        // If the response isn't ready yet, run the function again in 2 seconds
-        timeoutId = setTimeout(_captureResponse, 2000);
-      } else if (response.status === 'completed') {
-        // Get the new messages from the message thread and save them
-        const messages = await openai.retrieveMessages(state.thread.id, session.user?.id);
+        if (response.status === 'in_progress' || response.status === 'queued') {
+          // If the response isn't ready yet, run the function again in 2 seconds
+          timeoutId = setTimeout(_captureResponse, 2000);
+        } else if (response.status === 'completed') {
+          // Get the new messages from the message thread and save them
+          const messages = await openai.retrieveMessages(state.thread.id, session.user?.id);
 
-        // Set loading to false to remove the loading indicator
-        setLoading(false);
+          // Set loading to false to remove the loading indicator
+          setLoading(false);
 
-        // Update the state with the new messages
-        dispatch(updateState({ messages }));
+          // Update the state with the new messages
+          dispatch(updateState({ messages }));
 
-        // Scroll to the bottom of the chat so the user can see the new message
-        setTimeout(() => {
-          scrollRef.current?.scrollToEnd({ animated: true });
-        }, 100);
+          // Scroll to the bottom of the chat so the user can see the new message
+          setTimeout(() => {
+            scrollRef.current?.scrollToEnd({ animated: true });
+          }, 100);
 
-        // Set canSend true to enable the user to send a new message
-        setCanSend(true);
+          // Set canSend true to enable the user to send a new message
+          setCanSend(true);
 
-        // Tell the component that a response is no longer pending
-        setResponsePending(false);
-      } else if (response.status === 'requires_action') {
-        // Extract the function data from the response
-        const { args, name, id } = openai.extractFunctionData(response, session.user?.id);
+          // Tell the component that a response is no longer pending
+          setResponsePending(false);
+        } else if (response.status === 'requires_action') {
+          // Extract the function data from the response
+          const { args, name, id } = openai.extractFunctionData(response, session.user?.id);
 
-        // Save the tool id so we can use it when getting the tool completion
-        setToolId(id);
+          // Save the tool id so we can use it when getting the tool completion
+          setToolId(id);
 
-        if (name === 'replan_multiple') {
-          // Send the data to the backend to replan
-          const response = await call('POST', 'users/replanMultiple', { data: args, userId: session.user?.id });
+          if (name === 'replan') {
+            // Send the data to the backend to replan
+            const response = await call('POST', 'users/replan', { data: args, userId: session.user?.id });
 
-          // Save the response to the tool output so it can be used when completing the tool
-          setToolOutput(response);
+            // Save the response to the tool output so it can be used when completing the tool
+            setToolOutput(response);
 
-          // Trigger the tool completion
-          setShouldCompleteTool(true);
+            // Trigger the tool completion
+            setShouldCompleteTool(true);
+          }
+
+          if (name === 'feedback') {
+            // Send the data to the backend to provide feedback
+            const response = await call('POST', 'users/feedback', { data: args, userId: session.user?.id });
+
+            // Save the response to the tool output so it can be used when completing the tool
+            setToolOutput(response);
+
+            // Trigger the tool completion
+            setShouldCompleteTool(true);
+          }
+
+          if (name === 'learn') {
+            // Send the data to the backend to learn
+            const response = await call('POST', 'users/learn', { data: args, userId: session.user?.id });
+
+            // Save the response to the tool output so it can be used when completing the tool
+            setToolOutput(response);
+
+            // Trigger the tool completion
+            setShouldCompleteTool(true);
+          }
+
+          // Tell the component that a response is no longer pending
+          setResponsePending(false);
         }
-
-        if (name === 'feedback') {
-          // Send the data to the backend to provide feedback
-          const response = await call('POST', 'users/feedback', { data: args, userId: session.user?.id });
-
-          // Save the response to the tool output so it can be used when completing the tool
-          setToolOutput(response);
-
-          // Trigger the tool completion
-          setShouldCompleteTool(true);
-        }
-
-        if (name === 'store_info') {
-          // Send the data to the backend to learn
-          const response = await call('POST', 'users/storeInfo', { data: args, userId: session.user?.id });
-
-          // Save the response to the tool output so it can be used when completing the tool
-          setToolOutput(response);
-
-          // Trigger the tool completion
-          setShouldCompleteTool(true);
-        }
-
-        if (name === 'alter_single_activity') {
-          // Send the data to the backend to alter the activity
-          const response = await call('POST', 'users/alterSingleActivity', { data: args, userId: session.user?.id });
-
-          // Save the response to the tool output so it can be used when completing the tool
-          setToolOutput(response);
-
-          // Trigger the tool completion
-          setShouldCompleteTool(true);
-        }
-
-        // Tell the component that a response is no longer pending
-        setResponsePending(false);
+      } catch (error) {
+        // Reset threadId
+        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: null } });
       }
     };
 

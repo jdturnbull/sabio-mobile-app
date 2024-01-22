@@ -1,15 +1,24 @@
-import React, { useEffect, useRef } from 'react';
-import { Appearance, Easing, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { Easing, useWindowDimensions } from 'react-native';
 import { withIAPContext } from 'react-native-iap';
 import { createStackNavigator } from '@react-navigation/stack';
-import LottieView from 'lottie-react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNetInfo } from '@react-native-community/netinfo';
-import { useSelector } from 'react-redux';
-import Onboarding from './Onboarding';
-import Main from './Main';
+
+import HomeScreen from './Main/Home';
+import Chat from './Main/Chat';
+import Data from './Main/Data';
+import Settings from './Main/Settings';
+
+import Landing from './Onboarding/Landing';
+import Payment from './Onboarding/Payment';
+import OnboardingChat from './Onboarding/Chat';
+
+import TabBar from '../components/TabBar';
 import LostConnectionScreen from './LostConnection';
 import Splash from './Splash';
+import { useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 
 const fadeTransition = {
   animation: 'timing',
@@ -35,17 +44,53 @@ const CustomTransition = {
 };
 
 const TopStack = createStackNavigator();
+const OnboardingStack = createStackNavigator();
+const AuthedStack = createBottomTabNavigator();
 const AppStack = createStackNavigator();
-const AuthedStack = createStackNavigator();
+
+const OnboardingApp = () => {
+  const navigation = useNavigation();
+  const subscribed = useSelector((state) => state.user.session?.user?.subscriptionStatus === 'SUBSCRIBED');
+  const signedIn = useSelector((state) => state.user.signedIn);
+
+  const init_route = signedIn && subscribed ? 'Chat' : signedIn && !subscribed ? 'Payment' : 'Landing';
+
+  useEffect(() => {
+    if (signedIn && subscribed) {
+      navigation.navigate('Chat');
+    } else if (signedIn && !subscribed) {
+      navigation.navigate('Payment');
+    } else {
+      navigation.navigate('Landing');
+    }
+  }, [subscribed, signedIn]);
+
+  return (
+    <OnboardingStack.Navigator
+      initialRouteName={init_route}
+      screenOptions={{ headerShown: false, ...CustomTransition, cardStyle: { backgroundColor: 'transparent' } }}>
+      <OnboardingStack.Screen name="Landing" component={Landing} />
+      <OnboardingStack.Screen name="Payment" component={Payment} />
+      <OnboardingStack.Screen name="Chat" component={OnboardingChat} />
+    </OnboardingStack.Navigator>
+  );
+};
 
 const AuthedApp = () => {
   const { isConnected } = useNetInfo();
+  const { width } = useWindowDimensions();
 
   return (
     <React.Fragment>
       <AuthedStack.Navigator
-        screenOptions={{ headerShown: false, ...CustomTransition, cardStyle: { backgroundColor: 'transparent' } }}>
-        <AuthedStack.Screen name="Main" component={Main} />
+        initialRouteName="home"
+        sceneContainerStyle={{}}
+        screenOptions={{ tabBarShowLabel: false, headerShown: false }}
+        tabBar={(props) => <TabBar {...props} width={width} />}>
+        <AuthedStack.Screen name="home" component={HomeScreen} />
+        <AuthedStack.Screen name="chat" component={Chat} />
+        <AuthedStack.Screen name="data" component={Data} />
+        <AuthedStack.Screen name="settings" component={Settings} />
       </AuthedStack.Navigator>
       {isConnected === false && <LostConnectionScreen />}
     </React.Fragment>
@@ -53,22 +98,23 @@ const AuthedApp = () => {
 };
 
 const RootApp = () => {
-  const _onboarded = useSelector((state) => state.user.session?.user.onboarded);
-  const onboarded = useSelector((state) => state.onboarding.onboarded);
-  const subscriptionStatus = useSelector((state) => state.user.session?.user?.subscriptionStatus);
+  const navigation = useNavigation();
+  const onboarded = useSelector((state) => state.user.session?.user?.onboarded);
 
+  // Listen for changes to authed state
+  useEffect(() => {
+    if (onboarded) {
+      navigation.navigate('Authed');
+    } else {
+      navigation.navigate('Onboarding');
+    }
+  }, [onboarded]);
   return (
     <AppStack.Navigator
+      initialRouteName={onboarded ? 'Authed' : 'Onboarding'}
       screenOptions={{ headerShown: false, ...CustomTransition, cardStyle: { backgroundColor: 'transparent' } }}>
-      {onboarded || _onboarded ? (
-        subscriptionStatus === 'SUBSCRIBED' ? (
-          <AppStack.Screen name="Authed" component={AuthedApp} />
-        ) : (
-          <AuthedStack.Screen name="Onboarding" component={Onboarding} />
-        )
-      ) : (
-        <AppStack.Screen name="Onboarding" component={Onboarding} />
-      )}
+      <AppStack.Screen name="Authed" component={AuthedApp} />
+      <AppStack.Screen name="Onboarding" component={OnboardingApp} />
     </AppStack.Navigator>
   );
 };
