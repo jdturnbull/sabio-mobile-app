@@ -22,6 +22,7 @@ import call from '../../utils/call';
 import { getIconFromLabel } from '../../utils/icon';
 import { useDispatch, useSelector } from 'react-redux';
 import { setup } from '../../stores/user/userSlice';
+import { useNavigation } from '@react-navigation/native';
 
 const Container = styled.View`
   flex: 1;
@@ -96,6 +97,7 @@ const TickItem = ({ label, Icon }) => {
 };
 
 const Payment = () => {
+  const navigation = useNavigation();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -136,6 +138,7 @@ const Payment = () => {
         if (response) {
           dispatch(setup());
           setLoading(false);
+          navigation.navigate('Chat');
         } else {
           setLoading(false);
           alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
