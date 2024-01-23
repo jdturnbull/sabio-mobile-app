@@ -100,11 +100,6 @@ export const userSlice = createSlice({
     updateState: (state, action) => {
       state = { ...state, ...action.payload };
     },
-    signout: (state, action) => {
-      state.signedIn = false;
-      state.onboarded = false;
-      state.session = null;
-    },
     setSelectedDate: (state, action) => {
       state.selectedDate = action.payload;
     },

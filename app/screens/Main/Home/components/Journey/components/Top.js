@@ -41,7 +41,7 @@ const Top = ({ viewableItems, setShowPlan }) => {
   const colorScheme = useColorScheme();
   const theme = useTheme();
   const user = useSelector((state) => state.user.session?.user);
-  const monthlyFocuses = user?.monthlyFocuses;
+  const monthlyFocuses = user?.monthlyFocuses || [];
   const plannedMonths = useSelector((state) => state.user?.plannedMonths);
   const ReadIcon = getIconFromLabel('sabioSmall');
 
@@ -57,7 +57,7 @@ const Top = ({ viewableItems, setShowPlan }) => {
     <Container>
       <Left>
         <StyledTextTop>{`${month}, MONTH ${monthIndex}`}</StyledTextTop>
-        <StyledTextBottom>{monthlyFocuses[month]}</StyledTextBottom>
+        <StyledTextBottom>{monthlyFocuses[month] || ''}</StyledTextBottom>
       </Left>
       <Pressable
         // onPress={handlePress}

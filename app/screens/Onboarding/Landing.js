@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, useWindowDimensions, View, Pressable, Appearance, StatusBar, Platform } from 'react-native';
 import styled, { useTheme } from 'styled-components';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { continueWithApple, updateState } from '../../stores/user/userSlice';
 import { getIconFromLabel } from '../../utils/icon';
-import { useIsFocused, useRoute } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Container = styled.View`
@@ -65,6 +65,7 @@ const GetStartedText = styled.Text`
 const Landing = () => {
   const route = useRoute();
   const colorScheme = Appearance.getColorScheme();
+  const signedIn = useSelector((state) => state.user.signedIn);
 
   const { params } = route;
 
@@ -86,7 +87,6 @@ const Landing = () => {
 
   useEffect(() => {
     if (params && params.logout) {
-      console.log('Removing shit');
       dispatch(updateState({ session: null, signedIn: false }));
       AsyncStorage.removeItem('session');
     }

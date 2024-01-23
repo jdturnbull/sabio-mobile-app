@@ -50,24 +50,24 @@ const AppStack = createStackNavigator();
 
 const OnboardingApp = () => {
   const navigation = useNavigation();
-  const subscribed = useSelector((state) => state.user.session?.user?.subscriptionStatus === 'SUBSCRIBED');
   const signedIn = useSelector((state) => state.user.signedIn);
+  const subscribed = useSelector((state) => state.user.session?.user.subscriptionStatus === 'SUBSCRIBED');
 
-  const init_route = signedIn && subscribed ? 'Chat' : signedIn && !subscribed ? 'Payment' : 'Landing';
+  console.log({ signedIn, subscribed });
 
   useEffect(() => {
-    if (signedIn && subscribed) {
-      navigation.navigate('Chat');
-    } else if (signedIn && !subscribed) {
+    if (signedIn && !subscribed) {
       navigation.navigate('Payment');
+    } else if (signedIn && subscribed) {
+      navigation.navigate('Chat');
     } else {
       navigation.navigate('Landing');
     }
-  }, [subscribed, signedIn]);
+  }, [signedIn]);
 
   return (
     <OnboardingStack.Navigator
-      initialRouteName={init_route}
+      initialRouteName={'Landing'}
       screenOptions={{ headerShown: false, ...CustomTransition, cardStyle: { backgroundColor: 'transparent' } }}>
       <OnboardingStack.Screen name="Landing" component={Landing} />
       <OnboardingStack.Screen name="Payment" component={Payment} />

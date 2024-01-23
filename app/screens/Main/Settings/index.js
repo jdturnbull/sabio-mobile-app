@@ -10,7 +10,7 @@ import call from '../../../utils/call';
 import { getIconFromLabel } from '../../../utils/icon';
 import LightBackground from '../../../assets/home-background-light.png';
 import DarkBackground from '../../../assets/home-background-dark.png';
-import { signout } from '../../../stores/user/userSlice';
+import { setup, signout } from '../../../stores/user/userSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Container = styled.ScrollView`
@@ -202,20 +202,22 @@ const Settings = () => {
         {
           text: 'Confirm',
           onPress: async () => {
-            navigation.navigate('Onboarding', { screen: 'Landing', params: { logout: true } });
+            await AsyncStorage.removeItem('session');
+            dispatch(setup());
           },
         },
       ]);
     }
 
     if (opt === 'deleteAccount') {
-      Alert.alert('Delete account', 'Are you sure you want to delete your account? This action is permenent', [
+      Alert.alert('Delete account', 'Are you sure you want to delete your account? This action is permenent.', [
         { text: 'Cancel' },
         {
           text: 'Confirm',
           onPress: async () => {
-            // await call('GET', `users/delete/${user?.id}`);
-            navigation.navigate('Onboarding', { screen: 'Landing', params: { logout: true } });
+            await call('GET', `users/delete/${user?.id}`);
+            await AsyncStorage.removeItem('session');
+            dispatch(setup());
           },
         },
       ]);
