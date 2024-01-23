@@ -103,6 +103,9 @@ const Chat = () => {
       // If the most recent message is from the user trigger an AI response
       if (latestMessage?.role === 'user') {
         setRequiresResponse(true);
+      } else {
+        console.log('setup set can send to true');
+        setCanSend(true);
       }
 
       setIsSetup(true);
