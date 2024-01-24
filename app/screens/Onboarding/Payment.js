@@ -132,77 +132,22 @@ const Payment = () => {
     }
   };
 
-  const sendToPosthog = async (type, message, userId) => {
-    const data = {
-      event: 'purchase_restore_data',
-      properties: {
-        type,
-        message,
-      },
-      api_key: REACT_APP_POSTHOG_API_KEY,
-      distinct_id: userId,
-    };
-
-    try {
-      await axios.post('https://eu.posthog.com/capture/', data);
-      console.log('Error reported to PostHog');
-    } catch (posthogError) {
-      console.error('Failed to report error to PostHog:', posthogError);
-    }
-  };
-
-  async function isSubscriptionActive() {
-    const availablePurchases = await RNIap.getAvailablePurchases();
-
-    await sendToPosthog('available_purchases', JSON.stringify(availablePurchases), user.id);
-    const sortedAvailablePurchases = availablePurchases.sort((a, b) => b.transactionDate - a.transactionDate);
-    await sendToPosthog('sorted_available_purchases', JSON.stringify(sortedAvailablePurchases), user.id);
-    const latestAvailableReceipt = sortedAvailablePurchases[0].transactionReceipt;
-    await sendToPosthog('latest_available_receipt', JSON.stringify(latestAvailableReceipt), user.id);
-
-    const isTestEnvironment = __DEV__;
-
-    await sendToPosthog('is_test_environment', JSON.stringify(isTestEnvironment), user.id);
-
-    const decodedReceipt = await RNIap.validateReceiptIos(
-      {
-        'receipt-data': latestAvailableReceipt,
-        password: REACT_APP_SHARED_SECRET,
-      },
-      isTestEnvironment,
-    );
-
-    await sendToPosthog('decoded_receipt', JSON.stringify(decodedReceipt), user.id);
-
-    const { latest_receipt_info: latestReceiptInfo } = decodedReceipt;
-
-    await sendToPosthog('latest_receipt_info', JSON.stringify(latestReceiptInfo), user.id);
-
-    const isSubValid = !!latestReceiptInfo.find((receipt) => {
-      const expirationInMilliseconds = Number(receipt.expires_date_ms);
-      const nowInMilliseconds = Date.now();
-      return expirationInMilliseconds > nowInMilliseconds;
-    });
-
-    await sendToPosthog('is_sub_valid', JSON.stringify(isSubValid), user.id);
-
-    return { valid: isSubValid, receipt: latestAvailableReceipt };
-  }
-
   const restorePurchases = async () => {
-    const { valid, receipt } = await isSubscriptionActive();
+    setLoading(true);
+
+    const availablePurchases = await RNIap.getAvailablePurchases();
+    const sortedAvailablePurchases = availablePurchases.sort((a, b) => b.transactionDate - a.transactionDate);
+    const latestAvailableReceipt = sortedAvailablePurchases[0].transactionReceipt;
+
+    const valid = await call('POST', 'users/restorePurchase', { receipt: latestAvailableReceipt, userId: user.id });
 
     if (valid) {
-      const response = await call('POST', 'users/confirmSubscription', { userId: user.id, receipt });
-
-      if (response) {
-        dispatch(setup());
-        setLoading(false);
-        navigation.navigate('Chat');
-      } else {
-        setLoading(false);
-        alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
-      }
+      dispatch(setup());
+      setLoading(false);
+      navigation.navigate('Chat');
+    } else {
+      setLoading(false);
+      alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
     }
   };
 
