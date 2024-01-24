@@ -147,7 +147,7 @@ const Payment = () => {
       navigation.navigate('Chat');
     } else {
       setLoading(false);
-      alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
+      alert('No subscription found, if you are having issues please contact support@heysabio.com');
     }
   };
 
