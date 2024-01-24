@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
+import * as RNIap from 'react-native-iap';
+import axios from 'axios';
+import { REACT_APP_SHARED_SECRET, REACT_APP_POSTHOG_API_KEY } from '@env';
 import {
   ActivityIndicator,
   Modal,
@@ -57,7 +60,7 @@ const BodyText = styled.Text`
 
 const GetStartedButton = styled.Pressable`
   background-color: ${(props) => props.theme.colors.primary};
-  margin-top: 65px;
+  margin-top: 30px;
   border-radius: 18px;
   padding: 24px;
   align-items: center;
@@ -129,33 +132,107 @@ const Payment = () => {
     }
   };
 
-  useEffect(() => {
-    purchaseUpdatedListener(async (purchase) => {
-      purchase.transactionReceipt;
-      if (purchase.transactionReceipt) {
-        const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
-
-        if (response) {
-          dispatch(setup());
-          setLoading(false);
-          navigation.navigate('Chat');
-        } else {
-          setLoading(false);
-          alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
-        }
-      }
-    });
-
-    purchaseErrorListener((error) => {
-      console.log('Purchase Error', error);
-      setLoading(false);
-    });
-
-    return () => {
-      purchaseUpdatedListener();
-      purchaseErrorListener();
+  const sendToPosthog = async (type, message, userId) => {
+    const data = {
+      event: 'purchase_restore_data',
+      properties: {
+        type,
+        message,
+      },
+      api_key: REACT_APP_POSTHOG_API_KEY,
+      distinct_id: userId,
     };
-  }, []);
+
+    try {
+      await axios.post('https://eu.posthog.com/capture/', data);
+      console.log('Error reported to PostHog');
+    } catch (posthogError) {
+      console.error('Failed to report error to PostHog:', posthogError);
+    }
+  };
+
+  async function isSubscriptionActive() {
+    const availablePurchases = await RNIap.getAvailablePurchases();
+
+    await sendToPosthog('available_purchases', JSON.stringify(availablePurchases), user.id);
+    const sortedAvailablePurchases = availablePurchases.sort((a, b) => b.transactionDate - a.transactionDate);
+    await sendToPosthog('sorted_available_purchases', JSON.stringify(sortedAvailablePurchases), user.id);
+    const latestAvailableReceipt = sortedAvailablePurchases[0].transactionReceipt;
+    await sendToPosthog('latest_available_receipt', JSON.stringify(latestAvailableReceipt), user.id);
+
+    const isTestEnvironment = __DEV__;
+
+    await sendToPosthog('is_test_environment', JSON.stringify(isTestEnvironment), user.id);
+
+    const decodedReceipt = await RNIap.validateReceiptIos(
+      {
+        'receipt-data': latestAvailableReceipt,
+        password: REACT_APP_SHARED_SECRET,
+      },
+      isTestEnvironment,
+    );
+
+    await sendToPosthog('decoded_receipt', JSON.stringify(decodedReceipt), user.id);
+
+    const { latest_receipt_info: latestReceiptInfo } = decodedReceipt;
+
+    await sendToPosthog('latest_receipt_info', JSON.stringify(latestReceiptInfo), user.id);
+
+    const isSubValid = !!latestReceiptInfo.find((receipt) => {
+      const expirationInMilliseconds = Number(receipt.expires_date_ms);
+      const nowInMilliseconds = Date.now();
+      return expirationInMilliseconds > nowInMilliseconds;
+    });
+
+    await sendToPosthog('is_sub_valid', JSON.stringify(isSubValid), user.id);
+
+    return { valid: isSubValid, receipt: latestAvailableReceipt };
+  }
+
+  const restorePurchases = async () => {
+    const { valid, receipt } = await isSubscriptionActive();
+
+    if (valid) {
+      const response = await call('POST', 'users/confirmSubscription', { userId: user.id, receipt });
+
+      if (response) {
+        dispatch(setup());
+        setLoading(false);
+        navigation.navigate('Chat');
+      } else {
+        setLoading(false);
+        alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
+      }
+    }
+  };
+
+  // useEffect(() => {
+  //   purchaseUpdatedListener(async (purchase) => {
+  //     purchase.transactionReceipt;
+  //     if (purchase.transactionReceipt) {
+  //       const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
+
+  //       if (response) {
+  //         dispatch(setup());
+  //         setLoading(false);
+  //         navigation.navigate('Chat');
+  //       } else {
+  //         setLoading(false);
+  //         alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
+  //       }
+  //     }
+  //   });
+
+  //   purchaseErrorListener((error) => {
+  //     console.log('Purchase Error', error);
+  //     setLoading(false);
+  //   });
+
+  //   return () => {
+  //     purchaseUpdatedListener();
+  //     purchaseErrorListener();
+  //   };
+  // }, []);
 
   return (
     <Container>
@@ -180,6 +257,9 @@ const Payment = () => {
         <GetStartedText>Start your free trial</GetStartedText>
       </GetStartedButton>
       <View style={{ marginTop: 15 }}>
+        <Pressable style={{ display: 'flex', alignItems: 'center', marginBottom: 15 }} onPress={restorePurchases}>
+          <Text style={{ color: theme.text.colors.primary }}>Restore subscription</Text>
+        </Pressable>
         <Text style={{ color: theme.text.colors.secondary }}>
           Subscription automatically renews at £9.99 / month. By subscribing you agree to the{' '}
           <Text
