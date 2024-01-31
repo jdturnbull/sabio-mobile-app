@@ -51,9 +51,7 @@ const AppStack = createStackNavigator();
 const OnboardingApp = () => {
   const navigation = useNavigation();
   const signedIn = useSelector((state) => state.user.signedIn);
-  const subscribed = useSelector((state) => state.user.session?.user.subscriptionStatus === 'SUBSCRIBED');
-
-  console.log({ signedIn, subscribed });
+  const subscribed = useSelector((state) => state.user.session?.user?.subscriptionStatus === 'SUBSCRIBED');
 
   useEffect(() => {
     if (signedIn && !subscribed) {

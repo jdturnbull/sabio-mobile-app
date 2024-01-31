@@ -88,6 +88,21 @@ const Chat = () => {
       }
 
       if (!state.thread) {
+        // Does the user have an existing threadId?
+        if (session.user?.threadId) {
+          try {
+            thread = await openai.retrieveThread(session.user?.threadId, session.user?.id);
+          } catch (error) {
+            // If the thread is bugged just grab a new one
+            thread = await openai.createThread('onboarding', state.activity, session.user?.id);
+            // Now save the new threadId to the user
+            await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: thread.id } });
+          }
+        } else {
+          thread = await openai.createThread('onboarding', state.activity, session.user?.id);
+          // Now save the new threadId to the user
+          await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: thread.id } });
+        }
         thread = await openai.createThread('onboarding', state.activity, session.user?.id);
       }
 

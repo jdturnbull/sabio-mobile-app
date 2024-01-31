@@ -87,6 +87,7 @@ export const userSlice = createSlice({
   initialState: {
     error: null,
     loaded: false,
+    allowChatBeforePayment: false,
     loading: false,
     onboarded: false,
     plannedActivities: [],
@@ -109,12 +110,16 @@ export const userSlice = createSlice({
       state.loaded = true;
       state.session = action.payload.session;
       state.signedIn = !!action.payload.session;
+      state.allowChatBeforePayment = action.payload.session?.allowChatBeforePayment || false;
       state.onboarded = action.payload.session?.user?.onboarded;
     });
     builder.addCase(continueWithApple.fulfilled, (state, action) => {
+      console.log(action.payload);
+
       if (action.payload) {
         state.session = action.payload;
         state.signedIn = true;
+        state.allowChatBeforePayment = action.payload.allowChatBeforePayment;
         state.loaded = true;
       }
     });

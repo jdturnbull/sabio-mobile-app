@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Pressable, Dimensions, useColorScheme } from 'react-native';
 import styled, { useTheme } from 'styled-components';
-import { PanGestureHandler } from 'react-native-gesture-handler';
+import { PanGestureHandler, ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -128,18 +128,18 @@ const Footer = ({ data, setModalData }) => {
             { backgroundColor: theme.text.colors.secondaryInverse, shadowOpacity: colorScheme === 'light' ? 0.5 : 0.1 },
           ]}>
           <Title>{data?.item.title.toUpperCase()}</Title>
-          {!expanded && (
-            <Body numberOfLines={1}>{data?.item.analysis ? data?.item.analysis : data?.item.guidance}</Body>
-          )}
+          {!expanded && <Body numberOfLines={1}>{data?.item.guidance}</Body>}
           <StyledPressable onPress={handlePress}>
             <Text style={styles.pressableText}>{expanded ? 'Close' : 'Open'}</Text>
           </StyledPressable>
           {expanded && (
             <View style={styles.content}>
-              <View>
-                <Title style={{ marginBottom: 20 }}>{data?.item.analysis ? 'ANALYSIS' : 'GUIDANCE'}</Title>
-                <Body>{data?.item.guidance}</Body>
-              </View>
+              <ScrollView style={{ flex: 1, paddingBottom: 20 }}>
+                <View>
+                  <Title style={{ marginBottom: 20 }}>{'GUIDANCE'}</Title>
+                  <Body>{data?.item.guidance}</Body>
+                </View>
+              </ScrollView>
             </View>
           )}
         </View>

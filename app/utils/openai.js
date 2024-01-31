@@ -216,8 +216,11 @@ export const submitToolResponse = async (thread_id, run_id, tool_id, output, use
 
   while (retryCount < maxRetries) {
     try {
+      console.log({ output });
+      let _output = output ? output : 'No tool output provided, assume success';
+
       const body = JSON.stringify({
-        tool_outputs: [{ tool_call_id: tool_id, output }],
+        tool_outputs: [{ tool_call_id: tool_id, output: _output }],
       });
 
       await axios.post(

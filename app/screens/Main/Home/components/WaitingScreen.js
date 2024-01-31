@@ -5,8 +5,8 @@ import styled, { useTheme } from 'styled-components';
 import { useSelector } from 'react-redux';
 
 const Title = styled.Text`
-  font-size: 20px;
-  margin-top: 60px;
+  font-size: 16px;
+  margin-top: 40px;
   color: ${(props) => props.theme.text.colors.secondary};
   font-family: ${(props) => props.theme.text.family};
   font-weight: ${(props) => props.theme.text.weight.semibold};
@@ -69,7 +69,7 @@ const WaitingScreen = () => {
   }, [fadeAnim]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.waitingScreen.background, paddingTop: 120 }}>
+    <View style={{ flex: 1, backgroundColor: theme.waitingScreen.background, paddingTop: 80 }}>
       <View style={{ flex: 1, alignItems: 'center' }}>
         <Logo />
         <Title>Building your initial training plan</Title>
