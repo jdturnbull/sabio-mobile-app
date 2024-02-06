@@ -3,6 +3,7 @@ export const theme = (colorTheme) => {
     return {
       spacing: {
         safeAreaView: '75px',
+        safeAreaViewSmall: '50px',
       },
       splash: {
         background: '#FFF6D4',
@@ -10,9 +11,14 @@ export const theme = (colorTheme) => {
       chat: {
         typingIndicatorColor: '#00000090',
       },
+      finalOnboarding: {
+        dayBorder: '#A2935B',
+        daySelectedBorder: '#FF912D',
+      },
       colors: {
         primary: '#EE6E12',
         white: '#ffffff',
+        labelColor: '#49548A',
         black: '#000000',
         background1: '#FFF6D4',
         chatBackground: '#FFF6D4',
@@ -110,6 +116,7 @@ export const theme = (colorTheme) => {
     return {
       spacing: {
         safeAreaView: '75px',
+        safeAreaViewSmall: '50px',
       },
       splash: {
         background: '#272620',
@@ -117,8 +124,13 @@ export const theme = (colorTheme) => {
       chat: {
         typingIndicatorColor: '#ffffff90',
       },
+      finalOnboarding: {
+        dayBorder: '#EADDAF',
+        daySelectedBorder: '#FF912D',
+      },
       colors: {
         primary: '#EE6E12',
+        labelColor: '#A1AAD3',
         white: '#ffffff',
         black: '#000000',
         background1: '#272620',

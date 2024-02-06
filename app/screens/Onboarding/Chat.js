@@ -21,10 +21,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useKeyboard } from '@react-native-community/hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
-import SafariView from 'react-native-safari-view';
 import * as openai from '../../utils/openai';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
-import { updateState as updateUserState } from '../../stores/user/userSlice';
 import { getIconFromLabel } from '../../utils/icon';
 import AssistantMessage from '../../components/chat/AssistantMessage';
 import UserMessage from '../../components/chat/UserMessage';
@@ -48,19 +46,13 @@ const Chat = () => {
   const width = useWindowDimensions().width;
   const navigation = useNavigation();
 
-  const threshold = 100;
-
   const session = useSelector((state) => state.user.session);
   const state = useSelector((state) => state.onboarding);
 
   const [isSetup, setIsSetup] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showSafari, setShowSafari] = useState(false);
-  const [redirect, setRedirect] = useState(null);
   const [toolId, setToolId] = useState(null);
   const [toolOutput, setToolOutput] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [programmaticDismissal, setProgrammaticDismissal] = useState(false);
   const [shouldCompleteTool, setShouldCompleteTool] = useState(false);
   const [canSend, setCanSend] = useState(false);
   const [userMessage, setUserMessage] = useState('');
@@ -69,12 +61,19 @@ const Chat = () => {
 
   const [animatedWidth] = useState(new Animated.Value(width * 0.9));
   const [animatedMargin] = useState(new Animated.Value(120));
-  const translateY = useRef(new Animated.Value(0)).current;
+
   const [opacity] = useState(new Animated.Value(userMessage.split('').length > 0 ? 1 : 0.2));
 
   const theme = useTheme();
 
   const Send = getIconFromLabel('send');
+
+  // Check if we should be on this screen
+  useEffect(() => {
+    if (session.user.onboardingData) {
+      navigation.navigate('Finalise');
+    }
+  }, []);
 
   // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
@@ -195,18 +194,12 @@ const Chat = () => {
         // Save the tool id so we can use it when getting the tool completion
         setToolId(id);
 
-        if (name === 'connectStrava') {
-          const redirect = await call('GET', `connect/getUrl/strava/${session.user?.id}`);
-          setRedirect(redirect);
-          setShowSafari(true);
-        }
-
-        // TODO: The catch seems to fail here, need to investigate
+        // Only the nextStep function is currently used, all other complexity has been moved
 
         if (name === 'nextStep') {
           try {
             // Complete the onboarding process
-            await call('POST', `users/completeOnboarding`, {
+            await call('POST', `users/saveOnboardingData`, {
               data: args,
               id: session.user?.id,
               threadId: state.thread.id,
@@ -217,14 +210,13 @@ const Chat = () => {
 
             // Update the state to move the user into the app
             setTimeout(() => {
-              dispatch(updateUserState({ onboarded: true }));
-              navigation.navigate('Authed');
+              navigation.navigate('Finalise');
             }, 2000);
           } catch (error) {
             console.log('Error completing onboarding: ' + error.message);
 
             setToolOutput(
-              "Error completing onboarding, you'll need to apologise to the user, tell them you've notified the team and ask them to reload the app and try again later on.",
+              "Error completing onboarding, you'll need to apologise to the user, say you've notified the team and ask them to try again later.",
             );
 
             setShouldCompleteTool(true);
@@ -245,96 +237,6 @@ const Chat = () => {
       }
     };
   }, [responsePending]);
-
-  // Handles opening the safari view when showSafrari is true
-  useEffect(() => {
-    if (!showSafari) return;
-
-    SafariView.show({ url: redirect });
-  }, [showSafari]);
-
-  // Handles closing the safari view when the user has connected their watch
-  useEffect(() => {
-    let timeoutId = null;
-
-    const _captureResponse = async () => {
-      if (!showSafari) return;
-
-      try {
-        // Retrieve the connections from the backend
-        const response = await call('GET', `connect/list/${session.user?.id}`);
-
-        if (response.length === 0) {
-          // If the user hasn't connected their watch, run the function again in 2 seconds
-          timeoutId = setTimeout(_captureResponse, 2000);
-        } else {
-          // If the user has connected their watch, close the safari view
-          SafariView.dismiss();
-          // So we know we auto closed the safari view
-          setProgrammaticDismissal(true);
-
-          // If the user has connected their watch, complete the tool
-          setToolOutput('User has connected their smart tracker successfully.');
-          setShouldCompleteTool(true);
-        }
-      } catch (error) {
-        console.log("Error retrieving user's connections" + error.message);
-        // If there was an error connecting the user to their smart tracker, complete the tool
-        setToolOutput('Error connecting user to smart tracker.');
-        setShouldCompleteTool(true);
-      }
-    };
-
-    _captureResponse();
-
-    // Cleanup function to clear the timeout when the component unmounts or before the useEffect runs again
-    return () => {
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [showSafari]);
-
-  // Handles the user manually closing the safari view
-  const handleSafariViewDismiss = async () => {
-    // If the dismissal was done by the user
-    if (!programmaticDismissal) {
-      // Retrieve the connections from the backend
-      const response = await call('GET', `connect/list/${session.user?.id}`);
-
-      if (response.length === 0) {
-        // If the user hasn't connected their watch, complete the tool
-        setToolOutput(
-          'User cancelled the safari view allowing them to connect their smart tracker. No smart tracker has been connected, you need to ask the user to connect something before continuing.',
-        );
-        setShouldCompleteTool(true);
-      } else {
-        // If the user has connected their watch, complete the tool
-        setToolOutput('User has connected their smart tracker successfully.');
-        setShouldCompleteTool(true);
-      }
-    }
-
-    // Scroll to the bottom of the chat
-    setTimeout(() => {
-      scrollRef.current?.scrollToEnd({ animated: true });
-    }, 100);
-
-    setShowSafari(false);
-    setProgrammaticDismissal(false); // Reset the dismissal flag
-  };
-
-  // Event listener to handle user manually closing the safari view
-  useEffect(() => {
-    SafariView.addEventListener('onDismiss', handleSafariViewDismiss);
-
-    // return () => {
-    //   // Remove event listener on cleanup if there is one
-    //   if (SafariView.removeEventListener) {
-    //     SafariView.removeEventListener('onDismiss', handleSafariViewDismiss);
-    //   }
-    // };
-  }, []);
 
   // Handles completing the tool
   useEffect(() => {
@@ -451,7 +353,7 @@ const Chat = () => {
                   justifyContent: 'center',
                 }}>
                 <Pressable onPress={logout}>
-                  <Logout />
+                  <Logout color={theme.text.colors.secondary} />
                 </Pressable>
               </View>
               {state.messages.map((message, index) => {

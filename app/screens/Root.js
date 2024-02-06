@@ -12,6 +12,7 @@ import Settings from './Main/Settings';
 
 import Landing from './Onboarding/Landing';
 import Payment from './Onboarding/Payment';
+import Finalise from './Onboarding/Finalise';
 import OnboardingChat from './Onboarding/Chat';
 
 import TabBar from '../components/TabBar';
@@ -50,6 +51,7 @@ const AppStack = createStackNavigator();
 
 const OnboardingApp = () => {
   const navigation = useNavigation();
+  const hasOnboardingData = useSelector((state) => state.user.session?.user?.onboardingData);
   const signedIn = useSelector((state) => state.user.signedIn);
   const subscribed = useSelector((state) => state.user.session?.user?.subscriptionStatus === 'SUBSCRIBED');
 
@@ -57,7 +59,11 @@ const OnboardingApp = () => {
     if (signedIn && !subscribed) {
       navigation.navigate('Payment');
     } else if (signedIn && subscribed) {
-      navigation.navigate('Chat');
+      if (hasOnboardingData) {
+        navigation.navigate('Finalise');
+      } else {
+        navigation.navigate('Chat');
+      }
     } else {
       navigation.navigate('Landing');
     }
@@ -70,6 +76,7 @@ const OnboardingApp = () => {
       <OnboardingStack.Screen name="Landing" component={Landing} />
       <OnboardingStack.Screen name="Payment" component={Payment} />
       <OnboardingStack.Screen name="Chat" component={OnboardingChat} />
+      <OnboardingStack.Screen name="Finalise" component={Finalise} />
     </OnboardingStack.Navigator>
   );
 };
