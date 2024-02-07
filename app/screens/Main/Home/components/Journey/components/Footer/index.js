@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Pressable, Dimensions, useColorScheme } from 'react-native';
+import { View, StyleSheet, Text, Pressable, Dimensions, useColorScheme, ActivityIndicator } from 'react-native';
 import styled, { useTheme } from 'styled-components';
 import { PanGestureHandler, ScrollView } from 'react-native-gesture-handler';
 import Animated, {
@@ -9,6 +9,8 @@ import Animated, {
   runOnJS,
   useAnimatedGestureHandler,
 } from 'react-native-reanimated';
+import EditScreen from './EditScreen';
+import { getIconFromLabel } from '../../../../../../../utils/icon';
 
 const Title = styled.Text`
   font-family: ${(props) => props.theme.text.family};
@@ -43,6 +45,11 @@ const Footer = ({ data, setModalData }) => {
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [renderFooter, setRenderFooter] = useState(data !== null);
   const [expanded, setExpanded] = useState(false);
+
+  const [showEditScreen, setShowEditScreen] = useState(false);
+
+  const EditIcon = getIconFromLabel('edit');
+  const CloseIcon = getIconFromLabel('missed');
 
   const screenHeight = Dimensions.get('window').height;
   const heightAnim = useSharedValue(155);
@@ -101,6 +108,7 @@ const Footer = ({ data, setModalData }) => {
         heightAnim.value = withTiming(0, { duration: 300 }, () => {
           runOnJS(setRenderFooter)(false);
           runOnJS(setExpanded)(false);
+          runOnJS(setShowEditScreen)(false);
         });
       } else {
         // Snap back to the expanded position
@@ -115,6 +123,23 @@ const Footer = ({ data, setModalData }) => {
     };
   });
 
+  const handleComplete = () => {};
+
+  const handleEditPress = () => {
+    if (showEditScreen) {
+      setShowEditScreen(false);
+      heightAnim.value = withTiming(0, { duration: 300 }, () => {
+        runOnJS(setRenderFooter)(false);
+        runOnJS(setExpanded)(false);
+      });
+    } else {
+      setShowEditScreen(true);
+      heightAnim.value = withTiming(screenHeight - 150, { duration: 300 }, () => {
+        runOnJS(setExpanded)(true);
+      });
+    }
+  };
+
   if (!renderFooter) {
     return null;
   }
@@ -127,12 +152,23 @@ const Footer = ({ data, setModalData }) => {
             styles.container,
             { backgroundColor: theme.text.colors.secondaryInverse, shadowOpacity: colorScheme === 'light' ? 0.5 : 0.1 },
           ]}>
-          <Title>{data?.item.title.toUpperCase()}</Title>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+            <View style={{ flex: 1 }}>
+              {!showEditScreen && <Title>{data?.item.title.toUpperCase()}</Title>}
+              {showEditScreen && <Body style={{ color: '#FF912D' }}>*Try to follow your plan as reccomended</Body>}
+            </View>
+            <Pressable onPress={handleEditPress} style={{ marginLeft: 5, marginRight: 5 }}>
+              {showEditScreen ? <CloseIcon /> : <EditIcon color={'#A2935B'} />}
+            </Pressable>
+          </View>
           {!expanded && <Body numberOfLines={1}>{data?.item.guidance}</Body>}
-          <StyledPressable onPress={handlePress}>
-            <Text style={styles.pressableText}>{expanded ? 'Close' : 'Open'}</Text>
-          </StyledPressable>
-          {expanded && (
+          {!showEditScreen && (
+            <StyledPressable onPress={handlePress}>
+              <Text style={styles.pressableText}>{expanded ? 'Close' : 'View'}</Text>
+            </StyledPressable>
+          )}
+          {expanded && showEditScreen && <EditScreen item={data?.item} handleEditPress={handleEditPress} />}
+          {expanded && !showEditScreen && (
             <View style={styles.content}>
               <ScrollView style={{ flex: 1, paddingBottom: 20 }}>
                 <View>

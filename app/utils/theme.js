@@ -15,6 +15,10 @@ export const theme = (colorTheme) => {
         dayBorder: '#A2935B',
         daySelectedBorder: '#FF912D',
       },
+      editScreen: {
+        inputBackground: '#EADDAF',
+        offsetColor: '#6C6141',
+      },
       colors: {
         primary: '#EE6E12',
         white: '#ffffff',
@@ -127,6 +131,10 @@ export const theme = (colorTheme) => {
       finalOnboarding: {
         dayBorder: '#EADDAF',
         daySelectedBorder: '#FF912D',
+      },
+      editScreen: {
+        inputBackground: '#5A4F31',
+        offsetColor: '#EADDAF',
       },
       colors: {
         primary: '#EE6E12',

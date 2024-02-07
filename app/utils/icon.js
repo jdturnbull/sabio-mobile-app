@@ -34,6 +34,7 @@ import Next from '../components/icons/general/Next';
 import Create from '../components/icons/actions/Create';
 import Delete from '../components/icons/actions/Delete';
 import Update from '../components/icons/actions/Update';
+import Edit from '../components/icons/actions/Edit';
 import ViewAnalysis from '../components/icons/cards/View';
 import Help from '../components/icons/general/Help';
 import Tick from '../components/icons/general/Tick';
@@ -86,6 +87,7 @@ export const ICONS = [
   { label: 'strength', icon: Strength },
   { label: 'weighttraining', icon: Strength },
   { label: 'default', icon: Default },
+  { label: 'custom', icon: Default },
   { label: 'yoga', icon: Yoga },
   { label: 'completed', icon: Completed },
   { label: 'floatingButton', icon: FloatingButton },
@@ -124,6 +126,7 @@ export const ICONS = [
   { label: 'tick', icon: Tick },
   { label: 'logout', icon: Logout },
   { label: 'strava', icon: Strava },
+  { label: 'edit', icon: Edit },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;
