@@ -39,11 +39,28 @@ const initial_chat_messages = JSON.stringify({
   ],
 });
 
+const initial_main_chat_messages = JSON.stringify({
+  messages: [
+    {
+      role: 'user',
+      content: 'Hey Sabio!',
+    },
+  ],
+});
+
 export const extractFunctionData = (res, userId) => {
   try {
     const { tool_calls } = res.required_action.submit_tool_outputs;
-    const { arguments: args, name } = tool_calls[0].function;
-    return { name, args, id: tool_calls[0].id };
+
+    const response = [];
+
+    for (let i = 0; i < tool_calls.length; i++) {
+      const call = tool_calls[i];
+      const { arguments: args, name } = call.function;
+      response.push({ name, args, id: call.id });
+    }
+
+    return response;
   } catch (error) {
     console.log(`Error extracting function data: ${error.message}`);
     sendToPosthog('extract_function_data', error.message, userId);
@@ -120,7 +137,7 @@ export const createThread = async (type, activity, userId) => {
                 },
               ],
             })
-          : initial_chat_messages;
+          : initial_main_chat_messages;
 
         thread = await axios.post('https://api.openai.com/v1/threads', initMessages, config);
       }
@@ -210,24 +227,18 @@ export const addUserMessage = async (thread_id, message, userId) => {
   }
 };
 
-export const submitToolResponse = async (thread_id, run_id, tool_id, output, userId) => {
+export const submitToolResponse = async ({ thread_id, run_id, body, userId }) => {
   let retryCount = 0;
   const maxRetries = 3;
 
   while (retryCount < maxRetries) {
     try {
-      console.log({ output });
-      let _output = output ? output : 'No tool output provided, assume success';
-
-      const body = JSON.stringify({
-        tool_outputs: [{ tool_call_id: tool_id, output: _output }],
-      });
-
       await axios.post(
         `https://api.openai.com/v1/threads/${thread_id}/runs/${run_id}/submit_tool_outputs`,
         body,
         config,
       );
+
       return true;
     } catch (error) {
       console.log(`Attempt ${retryCount + 1} failed: Error submitting tool response: ${error.message}`);

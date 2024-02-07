@@ -26,6 +26,7 @@ import AssistantMessage from '../../../components/chat/AssistantMessage';
 import TypingAnimation from '../../../components/chat/TypingAnimation';
 import BackgroundLight from '../../../assets/background-chat-light.png';
 import BackgroundDark from '../../../assets/background-chat-dark.png';
+import { getPlan } from '../../../stores/user/userSlice';
 
 const Chat = () => {
   const theme = useTheme();
@@ -39,9 +40,8 @@ const Chat = () => {
   const width = useWindowDimensions().width;
   const [isSetup, setIsSetup] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [toolId, setToolId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [toolOutput, setToolOutput] = useState(null);
+  const [toolOutputs, setToolOutputs] = useState([]);
   const [shouldCompleteTool, setShouldCompleteTool] = useState(false);
   const [canSend, setCanSend] = useState(false);
   const [userMessage, setUserMessage] = useState('');
@@ -174,49 +174,58 @@ const Chat = () => {
           setResponsePending(false);
         } else if (response.status === 'requires_action') {
           // Extract the function data from the response
-          const { args, name, id } = openai.extractFunctionData(response, session.user?.id);
+          const calls = openai.extractFunctionData(response, session.user?.id);
 
-          // Save the tool id so we can use it when getting the tool completion
-          setToolId(id);
+          for (let i = 0; i < calls.length; i++) {
+            const { args, name, id } = calls[i];
 
-          if (name === 'replan') {
-            // Send the data to the backend to replan
-            const response = await call('POST', 'users/replan', { data: args, userId: session.user?.id });
+            if (name === 'replan') {
+              try {
+                // Send the data to the backend to replan
+                const response = await call('POST', 'users/replan', { data: args, userId: session.user?.id });
 
-            // Save the response to the tool output so it can be used when completing the tool
-            setToolOutput(response);
+                // Save the response to the tool output so it can be used when completing the tool
+                setToolOutputs([...toolOutputs, { id, response }]);
 
-            // Trigger the tool completion
-            setShouldCompleteTool(true);
+                if (response === 'success') {
+                  dispatch(getPlan());
+                }
+              } catch (error) {
+                setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
+              }
+            }
+
+            if (name === 'feedback') {
+              try {
+                // Send the data to the backend to provide feedback
+                const response = await call('POST', 'users/feedback', { data: args, userId: session.user?.id });
+                // Save the response to the tool output so it can be used when completing the tool
+                setToolOutputs([...toolOutputs, { id, response }]);
+              } catch (error) {
+                setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
+              }
+            }
+
+            if (name === 'learn') {
+              try {
+                // Send the data to the backend to learn
+                const response = await call('POST', 'users/learn', { data: args, userId: session.user?.id });
+                // Save the response to the tool output so it can be used when completing the tool
+                setToolOutputs([...toolOutputs, { id, response }]);
+              } catch (error) {
+                setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
+              }
+            }
           }
 
-          if (name === 'feedback') {
-            // Send the data to the backend to provide feedback
-            const response = await call('POST', 'users/feedback', { data: args, userId: session.user?.id });
-
-            // Save the response to the tool output so it can be used when completing the tool
-            setToolOutput(response);
-
-            // Trigger the tool completion
-            setShouldCompleteTool(true);
-          }
-
-          if (name === 'learn') {
-            // Send the data to the backend to learn
-            const response = await call('POST', 'users/learn', { data: args, userId: session.user?.id });
-
-            // Save the response to the tool output so it can be used when completing the tool
-            setToolOutput(response);
-
-            // Trigger the tool completion
-            setShouldCompleteTool(true);
-          }
+          // Trigger the tool completion
+          setShouldCompleteTool(true);
 
           // Tell the component that a response is no longer pending
           setResponsePending(false);
         }
       } catch (error) {
-        // Reset threadId
+        // Reset threadId, here i want to move the messages over to the new thread
         await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: null } });
       }
     };
@@ -236,14 +245,38 @@ const Chat = () => {
     const _completeTool = async () => {
       if (!shouldCompleteTool) return;
 
-      // Complete the tool
-      await openai.submitToolResponse(state.thread.id, state.runId, toolId, toolOutput, session.user?.id);
+      let raw_body = toolOutputs.map((tool, index) => {
+        return { tool_call_id: tool.id, output: tool.response };
+      });
 
-      // Tell the component that the tool no longer needs to be completed
-      setShouldCompleteTool(false);
+      // Replace any undefined outputs with an error string
+      for (let i = 0; i < raw_body.length; i++) {
+        if (raw_body[i].output === undefined) {
+          raw_body[i].output = 'Error: No output';
+        }
+      }
 
-      // Tell the component a response is pending
-      setResponsePending(true);
+      const body = JSON.stringify({ tool_outputs: raw_body });
+
+      const response = await openai.submitToolResponse({
+        thread_id: state.thread.id,
+        run_id: state.runId,
+        body,
+        userId: session.user?.id,
+      });
+
+      setToolOutputs([]);
+
+      if (!response) {
+        // It's errored out, i need to take the message history, move it to a new thread?
+        console.log('Error completing tool');
+      } else {
+        // Tell the component that the tool no longer needs to be completed
+        setShouldCompleteTool(false);
+
+        // Tell the component a response is pending
+        setResponsePending(true);
+      }
     };
 
     _completeTool();
