@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   ImageBackground,
   useColorScheme,
+  Alert,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
@@ -40,7 +41,6 @@ const Chat = () => {
   const width = useWindowDimensions().width;
   const [isSetup, setIsSetup] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
   const [toolOutputs, setToolOutputs] = useState([]);
   const [shouldCompleteTool, setShouldCompleteTool] = useState(false);
   const [canSend, setCanSend] = useState(false);
@@ -72,14 +72,21 @@ const Chat = () => {
         // Does the user have an existing threadId?
         if (session.user?.threadId) {
           try {
+            // Attempt to retrieve their thread
             thread = await openai.retrieveThread(session.user?.threadId, session.user?.id);
           } catch (error) {
-            // If the thread is bugged just grab a new one
-            thread = await openai.createThread('main', state.activity, session.user?.id);
-            // Now save the new threadId to the user
-            await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: thread.id } });
+            // There was an error, so lets transfer old messages to new thread
+            thread = await openai.transferMessagesToNewThread(session.user?.threadId, session.user?.id);
+
+            if (!thread) {
+              Alert.alert('Error', 'There was an error retrieving your messages, please reload the app and try again');
+            } else {
+              // Save the new thread id to the user
+              await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: thread.id } });
+            }
           }
         } else {
+          // No existing threadId so lets just create a new one
           thread = await openai.createThread('main', state.activity, session.user?.id);
           // Now save the new threadId to the user
           await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: thread.id } });

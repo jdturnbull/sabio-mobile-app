@@ -155,6 +155,49 @@ export const createThread = async (type, activity, userId) => {
   }
 };
 
+export const transferMessagesToNewThread = async (old_thread_id, userId) => {
+  let messages = [];
+  // Attempt to get messages from old thread
+  try {
+    messages = await axios.get(`https://api.openai.com/v1/threads/${old_thread_id}/messages`, config);
+    messages = sortMessagesByDate(messages.data.data);
+  } catch (error) {
+    // If failed, use default chat messages
+    messages = initial_main_chat_messages;
+  }
+
+  // Format them
+  const init_thread_messages = messages.map((message) => {
+    return {
+      role: message.role,
+      content: message.content,
+    };
+  });
+
+  // Stringify them
+  const body = JSON.stringify({ messages: init_thread_messages });
+
+  let retryCount = 0;
+  const maxRetries = 3;
+
+  while (retryCount < maxRetries) {
+    try {
+      // Create and return new thread with the messages
+      const thread = await axios.post('https://api.openai.com/v1/threads', body, config);
+      return thread.data;
+    } catch (error) {
+      console.log(`Attempt ${retryCount + 1} failed: Error transferring messages to new thread: ${error.message}`);
+      retryCount++;
+      if (retryCount === maxRetries) {
+        console.log(`Failed to transfer messages to new thread after ${maxRetries} attempts.`);
+        const msg = error.response?.data?.error?.message || error.message;
+        sendToPosthog('transfer_messages_to_new_thread', msg, userId);
+        return null; // or throw new Error('Failed to transfer messages to new thread');
+      }
+    }
+  }
+};
+
 export const retrieveMessages = async (thread_id, userId) => {
   let retryCount = 0;
   const maxRetries = 3;
