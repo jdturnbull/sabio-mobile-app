@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { REACT_APP_POSTHOG_API_KEY } from '@env';
 import styled, { ThemeProvider } from 'styled-components';
 import { Appearance, StatusBar, useColorScheme } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -10,6 +11,7 @@ import { UIStateProvider } from './hooks/useUIState';
 import { OverlayPortal } from './components/Overlay';
 import { createDatabase } from './data/database';
 import Root from './screens/Root';
+import { usePostHog, PostHogProvider } from 'posthog-react-native';
 import { setup } from './stores/user/userSlice';
 import { theme } from './utils/theme';
 
@@ -22,8 +24,10 @@ const AppContainer = styled.View`
 
 const App = () => {
   const dispatch = useDispatch();
-  const colorScheme = Appearance.getColorScheme();
+  const colorScheme = useColorScheme();
   const loaded = useSelector((state) => state.user.loaded);
+
+  // Add a listener to the colorScheme changing
 
   useEffect(() => {
     if (!loaded) {
@@ -61,6 +65,16 @@ const ConnectedApp = () => {
   const [themeData, setThemeData] = useState(theme(colorScheme));
   const [activeRouteName, setActiveRouteName] = useState();
 
+  useEffect(() => {
+    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+      setThemeData(theme(colorScheme));
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   const handleNavStateChange = (state) => {
     if (state) {
       setActiveRouteName(getActiveRouteName(state));
@@ -69,11 +83,13 @@ const ConnectedApp = () => {
 
   return (
     <NavigationContainer ref={navigationRef} onStateChange={handleNavStateChange}>
-      <ThemeProvider theme={themeData}>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </ThemeProvider>
+      <PostHogProvider apiKey={REACT_APP_POSTHOG_API_KEY} autocapture={true}>
+        <ThemeProvider theme={themeData}>
+          <Provider store={store}>
+            <App />
+          </Provider>
+        </ThemeProvider>
+      </PostHogProvider>
     </NavigationContainer>
   );
 };
