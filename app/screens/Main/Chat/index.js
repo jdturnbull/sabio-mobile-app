@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useTheme } from 'styled-components';
 import {
   View,
-  Text,
   StyleSheet,
   useWindowDimensions,
   TextInput,
@@ -17,7 +16,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
 import { useKeyboard } from '@react-native-community/hooks';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
 import call from '../../../utils/call';
 import * as openai from '../../../utils/openai';
 import { getIconFromLabel } from '../../../utils/icon';
@@ -27,7 +25,7 @@ import AssistantMessage from '../../../components/chat/AssistantMessage';
 import TypingAnimation from '../../../components/chat/TypingAnimation';
 import BackgroundLight from '../../../assets/background-chat-light.png';
 import BackgroundDark from '../../../assets/background-chat-dark.png';
-import { getPlan } from '../../../stores/user/userSlice';
+import { getPlan, setup } from '../../../stores/user/userSlice';
 
 const Chat = () => {
   const theme = useTheme();
@@ -48,6 +46,8 @@ const Chat = () => {
   const [requiresResponse, setRequiresResponse] = useState(false);
   const [responsePending, setResponsePending] = useState(false);
 
+  const [hasResetThread, setHasResetThread] = useState(false);
+
   const session = useSelector((state) => state.user.session);
   const state = useSelector((state) => state.chat);
 
@@ -57,44 +57,60 @@ const Chat = () => {
 
   const Send = getIconFromLabel('send');
 
+  // Handles setting up the assistant
+  const setupAssistant = async () => {
+    if (state.assistant) return state.assistant;
+    const { response, error } = await openai.retrieveAssistant('main', session.user?.id);
+    if (error) {
+      Alert.alert('Error', 'There was an issue setting up the chat. Please reload the app.');
+      return null;
+    }
+    return response;
+  };
+
+  const setupThread = async () => {
+    if (state.thread) return state.thread; // If thread is already set, return it
+    let threadId = session.user?.threadId;
+
+    if (threadId) {
+      // Try to retrieve or move messages to a new thread based on the condition
+      const { response, error } = threadId.includes('error')
+        ? await openai.moveMessagesToNewThread(threadId)
+        : await openai.retrieveThread(threadId, session.user?.id);
+
+      if (!error) {
+        if (threadId.includes('error')) {
+          setHasResetThread(true);
+        }
+
+        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: response.id } });
+        return response;
+      }
+    }
+
+    // Create a new thread if there's no threadId or if there was an error
+    const { response, error } = await openai.createThread('main');
+
+    if (error) {
+      Alert.alert('Error', 'There was an issue setting up the chat. Please reload the app');
+      return null;
+    }
+
+    await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: response.id } });
+    return response;
+  };
+
+  const setupMessages = async (thread) => {
+    if (!thread) return [];
+    return await openai.retrieveMessages(thread.id, session.user?.id);
+  };
+
   // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
     const setup = async () => {
-      let assistant = state.assistant;
-      let thread = state.thread;
-      let messages = state.messages;
-
-      if (!state.assistant) {
-        assistant = await openai.retrieveAssistant('main', session.user?.id);
-      }
-
-      if (!state.thread) {
-        // Does the user have an existing threadId?
-        if (session.user?.threadId) {
-          try {
-            // Attempt to retrieve their thread
-            thread = await openai.retrieveThread(session.user?.threadId, session.user?.id);
-          } catch (error) {
-            // There was an error, so lets transfer old messages to new thread
-            thread = await openai.transferMessagesToNewThread(session.user?.threadId, session.user?.id);
-
-            if (!thread) {
-              Alert.alert('Error', 'There was an error retrieving your messages, please reload the app and try again');
-            } else {
-              // Save the new thread id to the user
-              await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: thread.id } });
-            }
-          }
-        } else {
-          // No existing threadId so lets just create a new one
-          thread = await openai.createThread('main', state.activity, session.user?.id);
-          // Now save the new threadId to the user
-          await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: thread.id } });
-        }
-      }
-
-      // Get the messages from the thread
-      messages = await openai.retrieveMessages(thread.id, session.user?.id);
+      const assistant = await setupAssistant();
+      const thread = await setupThread();
+      const messages = await setupMessages(thread);
 
       // Update the state with the assistant, thread and messages
       dispatch(updateState({ ...state, assistant, thread, messages }));
@@ -106,17 +122,13 @@ const Chat = () => {
       if (latestMessage?.role === 'user') {
         setRequiresResponse(true);
       } else {
-        // If the most recent message is from the AI, then set canSend to true
         setCanSend(true);
       }
 
       setIsSetup(true);
-      scrollRef.current?.scrollToEnd({ animated: true });
     };
 
-    if (isFocused) {
-      setup();
-    }
+    setup();
   }, [isFocused]);
 
   // Handles initialising the response from the AI to a new user message
@@ -129,16 +141,27 @@ const Chat = () => {
       setLoading(true);
 
       // Initialise a response from the AI
-      const id = await openai.run(state.thread.id, state.assistant.id, session.user?.id);
 
-      // Save the id of the response
-      dispatch(updateState({ ...state, runId: id }));
+      const { response, error } = await openai.run(
+        state.thread.id,
+        state.assistant.id,
+        session.user?.id,
+        hasResetThread,
+      );
 
-      // Tell the component that a response is no longer required
-      setRequiresResponse(false);
+      if (error) {
+        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
+        Alert.alert('Error', 'There was a problem with your assistant, please reload the app.');
+      } else {
+        // Save the id of the response
+        dispatch(updateState({ ...state, runId: response.id }));
 
-      // Tell the component that a response is pending
-      setResponsePending(true);
+        // Tell the component that a response is no longer required
+        setRequiresResponse(false);
+
+        // Tell the component that a response is pending
+        setResponsePending(true);
+      }
     };
 
     _run();
@@ -153,7 +176,13 @@ const Chat = () => {
 
       try {
         // Retrieve the response from the AI
-        const response = await openai.retrieveRun(state.thread.id, state.runId, session.user?.id);
+        const { response, error } = await openai.retrieveRun(state.thread.id, state.runId, session.user?.id);
+
+        if (error) {
+          Alert.alert('Error', 'There was an issue with the chat, please reload the app.');
+          await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
+        }
+
         console.log('Retrieved response, status is:' + response.status);
 
         if (response.status === 'in_progress' || response.status === 'queued') {
@@ -223,6 +252,17 @@ const Chat = () => {
                 setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
               }
             }
+
+            if (name === 'complete_activity') {
+              try {
+                // Args should be the id of the activity to complete
+                const response = await call('POST', 'users/completeActivity', { data: args, userId: session.user?.id });
+                // Save the response to the tool output so it can be used when completing the tool
+                setToolOutputs([...toolOutputs, { id, response }]);
+              } catch (error) {
+                setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
+              }
+            }
           }
 
           // Trigger the tool completion
@@ -233,7 +273,8 @@ const Chat = () => {
         }
       } catch (error) {
         // Reset threadId, here i want to move the messages over to the new thread
-        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: null } });
+        Alert.alert('Error', 'There was an issue with the chat, please reload the app.');
+        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
       }
     };
 
@@ -265,19 +306,20 @@ const Chat = () => {
 
       const body = JSON.stringify({ tool_outputs: raw_body });
 
-      const response = await openai.submitToolResponse({
+      const { response, error } = await openai.submitToolResponse({
         thread_id: state.thread.id,
         run_id: state.runId,
         body,
         userId: session.user?.id,
       });
 
-      setToolOutputs([]);
-
-      if (!response) {
-        // It's errored out, i need to take the message history, move it to a new thread?
-        console.log('Error completing tool');
+      if (error) {
+        Alert.alert('Error', 'There was an issue completing the tool, please reload the app.');
+        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
       } else {
+        // Save the response to the tool output so it can be used when completing the tool
+        setToolOutputs([]);
+
         // Tell the component that the tool no longer needs to be completed
         setShouldCompleteTool(false);
 
