@@ -8,6 +8,7 @@ import WaitingScreen from './components/WaitingScreen';
 import { getIconFromLabel } from '../../../utils/icon';
 import BackgroundDark from '../../../assets/home-background-dark.png';
 import BackgroundLight from '../../../assets/home-background-light.png';
+import { usePostHog } from 'posthog-react-native';
 
 const HelloContainer = styled.View`
   margin-top: 5px;
@@ -43,9 +44,17 @@ const ItemText = styled.Text`
 `;
 
 const Home = () => {
+  const posthog = usePostHog();
   const dispatch = useDispatch();
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
   const user = useSelector((state) => state.user?.session?.user);
+
+  useEffect(() => {
+    posthog.identify(user.id, {
+      email: user.email,
+      name: user.name,
+    });
+  }, []);
 
   const theme = useTheme();
   const colorScheme = useColorScheme();

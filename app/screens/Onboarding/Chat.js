@@ -31,12 +31,14 @@ import backgroundLight from '../../assets/background-chat-light.png';
 import call from '../../utils/call';
 import { hapticImpact } from '../../utils/haptics';
 import { setup } from '../../stores/user/userSlice';
+import { usePostHog } from 'posthog-react-native';
 
 const StyledGestureHandlerRootView = styled(GestureHandlerRootView)`
   flex: 1;
 `;
 
 const Chat = () => {
+  const posthog = usePostHog();
   const colorScheme = Appearance.getColorScheme();
   const scrollRef = useRef();
   const dispatch = useDispatch();
@@ -79,6 +81,7 @@ const Chat = () => {
     if (state.assistant) return state.assistant;
     const { response, error } = await openai.retrieveAssistant('onboarding', session.user?.id);
     if (error) {
+      posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'setup_assistant' });
       Alert.alert('Error', 'There was an issue setting up the chat. Please reload the app.');
       return null;
     }
@@ -97,11 +100,14 @@ const Chat = () => {
 
       if (!error) {
         if (threadId.includes('error')) {
+          posthog.capture('ONBOARDING_CHAT_ACTION', { type: 'moved_messages_to_new_thread' });
           setHasResetThread(true);
         }
 
         await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: response.id } });
         return response;
+      } else {
+        posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'setup_thread' });
       }
     }
 
@@ -109,6 +115,7 @@ const Chat = () => {
     const { response, error } = await openai.createThread('onboarding');
 
     if (error) {
+      posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'setup_blank_thread' });
       Alert.alert('Error', 'There was an issue setting up the chat. Please reload the app');
       return null;
     }
@@ -167,6 +174,7 @@ const Chat = () => {
       );
 
       if (error) {
+        posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'initialise_response' });
         await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
         Alert.alert('Error', 'There was a problem with your assistant, please reload the app.');
       } else {
@@ -178,6 +186,8 @@ const Chat = () => {
 
         // Tell the component that a response is pending
         setResponsePending(true);
+
+        posthog.capture('ONBOARDING_CHAT_ACTION', { type: 'initialise_response' });
       }
     };
 
@@ -196,6 +206,7 @@ const Chat = () => {
         const { response, error } = await openai.retrieveRun(state.thread.id, state.runId, session.user?.id);
 
         if (error) {
+          posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'capture_response' });
           Alert.alert('Error', 'There was an issue with the chat, please reload the app.');
           await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
         }
@@ -234,6 +245,8 @@ const Chat = () => {
 
             if (name === 'nextStep') {
               try {
+                posthog.capture('ONBOARDING_CHAT_ACTION', { type: 'next_step' });
+
                 await call('POST', `users/saveOnboardingData`, {
                   data: args,
                   id: session.user?.id,
@@ -250,6 +263,7 @@ const Chat = () => {
                   navigation.navigate('Finalise');
                 }, 2000);
               } catch (error) {
+                posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'next_step' });
                 setToolOutputs([
                   ...toolOutputs,
                   {
@@ -269,6 +283,7 @@ const Chat = () => {
           setResponsePending(false);
         }
       } catch (error) {
+        posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'capture_response' });
         // Reset threadId, here i want to move the messages over to the new thread
         Alert.alert('Error', 'There was an issue with the chat, please reload the app.');
         await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
@@ -311,6 +326,7 @@ const Chat = () => {
       });
 
       if (error) {
+        posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'complete_tool' });
         Alert.alert('Error', 'There was an issue completing the tool, please reload the app.');
         await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
       } else {
@@ -322,6 +338,8 @@ const Chat = () => {
 
         // Tell the component a response is pending
         setResponsePending(true);
+
+        posthog.capture('ONBOARDING_CHAT_ACTION', { type: 'complete_tool' });
       }
     };
 
@@ -352,6 +370,8 @@ const Chat = () => {
 
     // Tell the AI to respond to the user message
     setRequiresResponse(true);
+
+    posthog.capture('ONBOARDING_CHAT_ACTION', { type: 'send_user_message' });
 
     // Scroll to the bottom of the chat so the user can see the new message
     setTimeout(() => {

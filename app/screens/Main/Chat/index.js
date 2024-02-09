@@ -26,9 +26,11 @@ import TypingAnimation from '../../../components/chat/TypingAnimation';
 import BackgroundLight from '../../../assets/background-chat-light.png';
 import BackgroundDark from '../../../assets/background-chat-dark.png';
 import { getPlan, setup } from '../../../stores/user/userSlice';
+import { usePostHog } from 'posthog-react-native';
 
 const Chat = () => {
   const theme = useTheme();
+  const posthog = usePostHog();
   const colorScheme = useColorScheme();
 
   const isFocused = useIsFocused();
@@ -62,6 +64,7 @@ const Chat = () => {
     if (state.assistant) return state.assistant;
     const { response, error } = await openai.retrieveAssistant('main', session.user?.id);
     if (error) {
+      posthog.capture('ERROR', { type: 'main_chat', subType: 'setup_assistant' });
       Alert.alert('Error', 'There was an issue setting up the chat. Please reload the app.');
       return null;
     }
@@ -80,11 +83,14 @@ const Chat = () => {
 
       if (!error) {
         if (threadId.includes('error')) {
+          posthog.capture('MAIN_CHAT_ACTION', { type: 'moved_messages_to_new_thread' });
           setHasResetThread(true);
         }
 
         await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: response.id } });
         return response;
+      } else {
+        posthog.capture('ERROR', { type: 'main_chat', subType: 'setup_thread' });
       }
     }
 
@@ -92,6 +98,7 @@ const Chat = () => {
     const { response, error } = await openai.createThread('main');
 
     if (error) {
+      posthog.capture('ERROR', { type: 'main_chat', subType: 'create_blank_thread' });
       Alert.alert('Error', 'There was an issue setting up the chat. Please reload the app');
       return null;
     }
@@ -150,6 +157,7 @@ const Chat = () => {
       );
 
       if (error) {
+        posthog.capture('ERROR', { type: 'main_chat', subType: 'initialise_response' });
         await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
         Alert.alert('Error', 'There was a problem with your assistant, please reload the app.');
       } else {
@@ -206,6 +214,8 @@ const Chat = () => {
           // Set canSend true to enable the user to send a new message
           setCanSend(true);
 
+          posthog.capture('MAIN_CHAT_ACTION', { type: 'response_received' });
+
           // Tell the component that a response is no longer pending
           setResponsePending(false);
         } else if (response.status === 'requires_action') {
@@ -217,6 +227,7 @@ const Chat = () => {
 
             if (name === 'replan') {
               try {
+                posthog.capture('MAIN_CHAT_ACTION', { type: 'replan' });
                 // Send the data to the backend to replan
                 const response = await call('POST', 'users/replan', { data: args, userId: session.user?.id });
 
@@ -224,42 +235,70 @@ const Chat = () => {
                 setToolOutputs([...toolOutputs, { id, response }]);
 
                 if (response === 'success') {
+                  posthog.capture('MAIN_CHAT_ACTION', { type: 'replan_success' });
                   dispatch(getPlan());
                 }
               } catch (error) {
+                posthog.capture('ERROR', { type: 'main_chat', subType: 'replan' });
                 setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
               }
             }
 
             if (name === 'feedback') {
               try {
+                posthog.capture('MAIN_CHAT_ACTION', { type: 'feedback' });
                 // Send the data to the backend to provide feedback
                 const response = await call('POST', 'users/feedback', { data: args, userId: session.user?.id });
                 // Save the response to the tool output so it can be used when completing the tool
                 setToolOutputs([...toolOutputs, { id, response }]);
+                posthog.capture('MAIN_CHAT_ACTION', { type: 'feedback_success' });
               } catch (error) {
+                posthog.capture('ERROR', { type: 'main_chat', subType: 'feedback' });
                 setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
               }
             }
 
             if (name === 'learn') {
               try {
+                posthog.capture('MAIN_CHAT_ACTION', { type: 'learn' });
                 // Send the data to the backend to learn
                 const response = await call('POST', 'users/learn', { data: args, userId: session.user?.id });
                 // Save the response to the tool output so it can be used when completing the tool
                 setToolOutputs([...toolOutputs, { id, response }]);
+                posthog.capture('MAIN_CHAT_ACTION', { type: 'learn_success' });
               } catch (error) {
+                posthog.capture('ERROR', { type: 'main_chat', subType: 'learn' });
+                setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
+              }
+            }
+
+            if (name === 'change_restdays') {
+              try {
+                posthog.capture('MAIN_CHAT_ACTION', { type: 'change_restdays' });
+
+                // Send the data to the backend to change the rest days
+                const response = await call('POST', 'users/changeRestDays', { data: args, userId: session.user?.id });
+
+                // Save the response to the tool output so it can be used when completing the tool
+                setToolOutputs([...toolOutputs, { id, response }]);
+
+                posthog.capture('MAIN_CHAT_ACTION', { type: 'change_restdays_success' });
+              } catch (error) {
+                posthog.capture('ERROR', { type: 'main_chat', subType: 'change_restdays' });
                 setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
               }
             }
 
             if (name === 'complete_activity') {
               try {
+                posthog.capture('MAIN_CHAT_ACTION', { type: 'complete_activity' });
                 // Args should be the id of the activity to complete
                 const response = await call('POST', 'users/completeActivity', { data: args, userId: session.user?.id });
                 // Save the response to the tool output so it can be used when completing the tool
                 setToolOutputs([...toolOutputs, { id, response }]);
+                posthog.capture('MAIN_CHAT_ACTION', { type: 'complete_activity_success' });
               } catch (error) {
+                posthog.capture('ERROR', { type: 'main_chat', subType: 'complete_activity' });
                 setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
               }
             }
@@ -272,6 +311,7 @@ const Chat = () => {
           setResponsePending(false);
         }
       } catch (error) {
+        posthog.capture('ERROR', { type: 'main_chat', subType: 'capture_response' });
         // Reset threadId, here i want to move the messages over to the new thread
         Alert.alert('Error', 'There was an issue with the chat, please reload the app.');
         await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
@@ -314,6 +354,7 @@ const Chat = () => {
       });
 
       if (error) {
+        posthog.capture('ERROR', { type: 'main_chat', subType: 'complete_tool' });
         Alert.alert('Error', 'There was an issue completing the tool, please reload the app.');
         await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
       } else {
@@ -325,6 +366,8 @@ const Chat = () => {
 
         // Tell the component a response is pending
         setResponsePending(true);
+
+        posthog.capture('MAIN_CHAT_ACTION', { type: 'tool_completed' });
       }
     };
 
@@ -353,6 +396,8 @@ const Chat = () => {
 
     // Tell the AI to respond to the user message
     setRequiresResponse(true);
+
+    posthog.capture('MAIN_CHAT_ACTION', { type: 'user_message_sent' });
 
     // Scroll to the bottom of the chat so the user can see the new message
     setTimeout(() => {

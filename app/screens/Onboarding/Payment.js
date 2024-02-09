@@ -26,6 +26,7 @@ import { getIconFromLabel } from '../../utils/icon';
 import { useDispatch, useSelector } from 'react-redux';
 import { setup } from '../../stores/user/userSlice';
 import { useNavigation } from '@react-navigation/native';
+import { usePostHog } from 'posthog-react-native';
 
 const Container = styled.View`
   flex: 1;
@@ -104,6 +105,7 @@ const Payment = () => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const dispatch = useDispatch();
   const theme = useTheme();
+  const posthog = usePostHog();
   const [showCode, setShowCode] = useState(false);
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -112,6 +114,13 @@ const Payment = () => {
 
   const Logo = getIconFromLabel('logoLarge');
   const Tick = getIconFromLabel('tick');
+
+  useEffect(() => {
+    posthog.identify(user.id, {
+      email: user.email,
+      name: user.name,
+    });
+  }, []);
 
   const subscribe = async () => {
     try {

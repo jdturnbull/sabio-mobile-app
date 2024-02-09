@@ -83,7 +83,12 @@ const ConnectedApp = () => {
 
   return (
     <NavigationContainer ref={navigationRef} onStateChange={handleNavStateChange}>
-      <PostHogProvider apiKey={REACT_APP_POSTHOG_API_KEY} autocapture={true}>
+      <PostHogProvider
+        apiKey={REACT_APP_POSTHOG_API_KEY}
+        autocapture={true}
+        options={{
+          host: 'https://eu.posthog.com',
+        }}>
         <ThemeProvider theme={themeData}>
           <Provider store={store}>
             <App />

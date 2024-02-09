@@ -302,45 +302,6 @@ const Settings = () => {
           <View style={{ width: '100%', alignItems: 'flex-end' }}>
             <PercentageText>{`${Math.round(progressPercentage * 100) / 100}%`}</PercentageText>
           </View>
-          <StyledText style={{ marginVertical: 20 }}>Your Information</StyledText>
-          <InformationBox
-            title={'Goal:'}
-            value={user?.onboardingData.fitnessGoal || ''}
-            onPress={handleInfoBoxPress}
-            id={'goal'}
-            first={true}
-          />
-          <InformationBox
-            title={'Goal by:'}
-            value={moment(user?.onboardingData.goalByDate, 'YYYY-MM-DD').format('MMMM Do YYYY') || ''}
-            onPress={handleInfoBoxPress}
-            id={'goalByDate'}
-          />
-          <InformationBox
-            title={'Age:'}
-            value={user?.onboardingData.age || ''}
-            onPress={handleInfoBoxPress}
-            id={'age'}
-          />
-          <InformationBox
-            title={'Past experience:'}
-            value={user?.onboardingData.pastExperienceWithFitnessAndExercise || ''}
-            onPress={handleInfoBoxPress}
-            id={'experience'}
-          />
-          <InformationBox
-            title={'Availability:'}
-            value={user?.onboardingData.availability || ''}
-            onPress={handleInfoBoxPress}
-            id={'availability'}
-          />
-          <InformationBox
-            title={'Health concerns:'}
-            value={user?.onboardingData.injuriesOrHealthConcerns || ''}
-            onPress={handleInfoBoxPress}
-            id={'health'}
-            last={true}
-          />
         </View>
       </Container>
     </ImageBackground>
