@@ -169,7 +169,7 @@ const Payment = () => {
         if (response) {
           dispatch(setup());
           setLoading(false);
-          navigation.navigate('Finalise');
+          navigation.navigate('Chat');
         } else {
           setLoading(false);
           alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
