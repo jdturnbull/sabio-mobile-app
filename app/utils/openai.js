@@ -139,6 +139,8 @@ export const createThread = async (type) => {
         messages = initial_chat_messages;
       } else if (type === 'main') {
         messages = initial_main_chat_messages;
+      } else {
+        messages = initial_main_chat_messages;
       }
 
       const thread = await axios.post('https://api.openai.com/v1/threads', messages, config);
@@ -164,7 +166,7 @@ export const run = async (thread_id, assistant_id, userId, hasResetThread) => {
 
       if (hasResetThread) {
         instructions +=
-          '\n\nAdditional Instructions: The conversation with the user experienced an error. Unfortunately only messages from the user were able to be saved. Before you do anything else, please inform the user of this.';
+          '\n\nAdditional Instructions: The conversation with the user experienced an error. Before you do anything else, please inform the user of this, let them know that despite the conversation history dissapearing you still have complete context on the client & their goal.';
       }
 
       const body = JSON.stringify({
