@@ -7,6 +7,7 @@ import call from '../../utils/call';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIconFromLabel } from '../../utils/icon';
 import { setup } from '../../stores/user/userSlice';
+import { useMixpanel } from '../../hooks/useMixpanel';
 
 // Gather some data that is essential to make the plan bug free
 // This is going to be the goal date.
@@ -120,15 +121,21 @@ const NextButtonText = styled.Text`
 const Finalise = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
+  const track = useMixpanel();
   const session = useSelector((state) => state.user.session);
   const [connected, setConnected] = useState(session.user?.onboardingData?.hasMadeConnection || false);
 
   const [date, setDate] = useState(new Date());
   const [restDays, setRestDays] = useState([]);
 
+  useEffect(() => {
+    track('SCREEN_VIEW', { screen: 'Finalise' });
+  }, []);
+
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   const openConnection = async () => {
+    track('USER_ACTION', { action: 'Pressed connect Strava', screen: 'Finalise' });
     const url = await call('GET', `connect/getUrl/strava/${session.user?.id}`);
     SafariView.show({ url });
   };
@@ -147,10 +154,12 @@ const Finalise = () => {
           timeoutId = setTimeout(_captureResponse, 2000);
         } else {
           // If the user has connected their watch, close the safari view
+          track('USER_ACTION', { action: 'Connected Strava', screen: 'Finalise' });
           setConnected(true);
           SafariView.dismiss();
         }
       } catch (error) {
+        track('ERROR', { screen: 'Finalise', error: error.message });
         console.log("Error retrieving user's connections" + error.message);
       }
     };
@@ -184,6 +193,7 @@ const Finalise = () => {
   const StravaIcon = getIconFromLabel('strava');
 
   const handleNext = async () => {
+    track('USER_ACTION', { action: 'Pressed create my plan', screen: 'Finalise' });
     // Check if date is atleast a month in the future, and max a year in the future
     const today = new Date();
     const goalDate = new Date(date);
@@ -191,6 +201,7 @@ const Finalise = () => {
     const daysDiff = timeDiff / (1000 * 3600 * 24);
 
     if (daysDiff < 30 || daysDiff > 365) {
+      track('APP_ACTION', { action: 'Stopped navigation, invalid date', screen: 'Finalise' });
       Alert.alert('Invalid date', 'Please select a date that is at least a month in the future and at most a year');
     } else {
       const response = await call('POST', `users/completeOnboarding`, {
@@ -200,6 +211,8 @@ const Finalise = () => {
           goalDate: date,
         },
       });
+
+      track('APP_ACTION', { action: 'Completed onboarding', screen: 'Finalise' });
 
       dispatch(setup());
     }

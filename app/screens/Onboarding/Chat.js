@@ -130,6 +130,10 @@ const Chat = () => {
   const Send = getIconFromLabel('send');
 
   useEffect(() => {
+    track('SCREEN_VIEW', { screen: 'Onboarding chat' });
+  }, []);
+
+  useEffect(() => {
     if (session.user.onboardingData) {
       track('APP_ACTION', { action: 'Navigating to Finalise', screen: 'Onboarding chat', location: 'useEffect' });
       navigation.navigate('Finalise');

@@ -93,6 +93,7 @@ const Payment = () => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const dispatch = useDispatch();
   const theme = useTheme();
+
   const [loading, setLoading] = useState(false);
   const user = useSelector((state) => state.user.session?.user);
   const { getSubscriptions, connected } = useIAP();
@@ -131,6 +132,8 @@ const Payment = () => {
   const restorePurchases = async () => {
     setLoading(true);
 
+    track('USER_ACTION', { action: 'Pressed restore subscription', screen: 'Payment' });
+
     const availablePurchases = await RNIap.getAvailablePurchases();
     const sortedAvailablePurchases = availablePurchases.sort((a, b) => b.transactionDate - a.transactionDate);
     const latestAvailableReceipt = sortedAvailablePurchases[0].transactionReceipt;
@@ -138,6 +141,7 @@ const Payment = () => {
     const valid = await call('POST', 'users/restorePurchase', { receipt: latestAvailableReceipt, userId: user.id });
 
     if (valid) {
+      track('USER_ACTION', { action: 'Restored subscription', screen: 'Payment' });
       dispatch(setup());
       setLoading(false);
       navigation.navigate('Chat');
@@ -154,10 +158,15 @@ const Payment = () => {
         const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
 
         if (response) {
+          track('USER_ACTION', { action: 'Confirmed subscription', screen: 'Payment' });
           dispatch(setup());
           setLoading(false);
           navigation.navigate('Chat');
         } else {
+          track('ERROR', {
+            screen: 'Payment',
+            error: 'There was a problem with your purchase, you can contact support at support@heysabio.com',
+          });
           setLoading(false);
           alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
         }
@@ -165,6 +174,7 @@ const Payment = () => {
     });
 
     purchaseErrorListener((error) => {
+      track('ERROR', { screen: 'Payment', error: error.message });
       console.log('Purchase Error', error);
       setLoading(false);
     });

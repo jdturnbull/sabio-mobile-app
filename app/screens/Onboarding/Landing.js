@@ -6,6 +6,7 @@ import { continueWithApple, updateState } from '../../stores/user/userSlice';
 import { getIconFromLabel } from '../../utils/icon';
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useMixpanel } from '../../hooks/useMixpanel';
 
 const Container = styled.View`
   flex: 1;
@@ -65,9 +66,14 @@ const GetStartedText = styled.Text`
 const Landing = () => {
   const route = useRoute();
   const colorScheme = Appearance.getColorScheme();
+  const { track } = useMixpanel();
   const signedIn = useSelector((state) => state.user.signedIn);
 
   const { params } = route;
+
+  useEffect(() => {
+    track('SCREEN_VIEW', { screen: 'Landing' });
+  }, []);
 
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -82,6 +88,7 @@ const Landing = () => {
   const opacity = useRef(new Animated.Value(0)).current;
 
   const handlePress = () => {
+    track('USER_ACTION', { action: 'Continue with Apple', screen: 'Landing' });
     dispatch(continueWithApple());
   };
 
