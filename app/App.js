@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { REACT_APP_POSTHOG_API_KEY } from '@env';
 import styled, { ThemeProvider } from 'styled-components';
+import { REACT_APP_MIXPANEL_API_KEY } from '@env';
 import { Appearance, StatusBar, useColorScheme } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import { Mixpanel } from 'mixpanel-react-native';
 import { Provider, useDispatch } from 'react-redux';
 import store from './stores/store';
 import { useSelector } from 'react-redux';
@@ -11,11 +12,15 @@ import { UIStateProvider } from './hooks/useUIState';
 import { OverlayPortal } from './components/Overlay';
 import { createDatabase } from './data/database';
 import Root from './screens/Root';
-import { usePostHog, PostHogProvider } from 'posthog-react-native';
 import { setup } from './stores/user/userSlice';
 import { theme } from './utils/theme';
+import { MixpanelProvider } from './hooks/useMixpanel';
 
 createDatabase();
+
+const trackAutomaticEvents = false;
+const mixpanel = new Mixpanel(REACT_APP_MIXPANEL_API_KEY, trackAutomaticEvents);
+mixpanel.init();
 
 const AppContainer = styled.View`
   flex: 1;
@@ -82,20 +87,15 @@ const ConnectedApp = () => {
   };
 
   return (
-    <NavigationContainer ref={navigationRef} onStateChange={handleNavStateChange}>
-      <PostHogProvider
-        apiKey={REACT_APP_POSTHOG_API_KEY}
-        autocapture={true}
-        options={{
-          host: 'https://eu.posthog.com',
-        }}>
+    <MixpanelProvider>
+      <NavigationContainer ref={navigationRef} onStateChange={handleNavStateChange}>
         <ThemeProvider theme={themeData}>
           <Provider store={store}>
             <App />
           </Provider>
         </ThemeProvider>
-      </PostHogProvider>
-    </NavigationContainer>
+      </NavigationContainer>
+    </MixpanelProvider>
   );
 };
 

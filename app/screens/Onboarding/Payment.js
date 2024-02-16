@@ -1,19 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import * as RNIap from 'react-native-iap';
-import axios from 'axios';
-import { REACT_APP_SHARED_SECRET, REACT_APP_POSTHOG_API_KEY } from '@env';
-import {
-  ActivityIndicator,
-  Modal,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-  useWindowDimensions,
-  Platform,
-  Linking,
-} from 'react-native';
+import { ActivityIndicator, Pressable, Text, View, useWindowDimensions, Platform, Linking } from 'react-native';
 import {
   initConnection,
   requestSubscription,
@@ -26,7 +14,7 @@ import { getIconFromLabel } from '../../utils/icon';
 import { useDispatch, useSelector } from 'react-redux';
 import { setup } from '../../stores/user/userSlice';
 import { useNavigation } from '@react-navigation/native';
-import { usePostHog } from 'posthog-react-native';
+import { useMixpanel } from '../../hooks/useMixpanel';
 
 const Container = styled.View`
   flex: 1;
@@ -105,22 +93,21 @@ const Payment = () => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const dispatch = useDispatch();
   const theme = useTheme();
-  const posthog = usePostHog();
-  const [showCode, setShowCode] = useState(false);
-  const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const user = useSelector((state) => state.user.session?.user);
   const { getSubscriptions, connected } = useIAP();
 
-  const Logo = getIconFromLabel('logoLarge');
-  const Tick = getIconFromLabel('tick');
+  const { track, identify } = useMixpanel();
 
   useEffect(() => {
-    posthog.identify(user.id, {
-      email: user.email,
-      name: user.name,
-    });
-  }, []);
+    if (user) {
+      identify({ userId: user.id, email: user.email, name: user.name });
+      track('SCREEN_VIEW', { screen: 'Payment' });
+    }
+  }, [user]);
+
+  const Logo = getIconFromLabel('logoLarge');
+  const Tick = getIconFromLabel('tick');
 
   const subscribe = async () => {
     try {

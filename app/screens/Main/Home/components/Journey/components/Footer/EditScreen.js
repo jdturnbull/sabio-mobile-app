@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import styled, { useTheme } from 'styled-components';
 import { getIconFromLabel } from '../../../../../../../utils/icon';
@@ -6,6 +6,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import call from '../../../../../../../utils/call';
 import { useDispatch } from 'react-redux';
 import { getPlan } from '../../../../../../../stores/user/userSlice';
+import { useMixpanel } from '../../../../../../../hooks/useMixpanel';
 
 const Container = styled.View``;
 
@@ -78,9 +79,14 @@ const SaveText = styled.Text`
   font-weight: ${(props) => props.theme.text.weight.semibold};
 `;
 
-const EditScreen = ({ item, handleEditPress, loading, setLoading }) => {
+const EditScreen = ({ item, handleEditPress }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
+  const { track } = useMixpanel();
+
+  useEffect(() => {
+    track('SCREEN_VIEW', { screen: 'Edit activity' });
+  }, []);
 
   const types = [
     { id: 'swim', label: 'Swim' },
@@ -107,6 +113,7 @@ const EditScreen = ({ item, handleEditPress, loading, setLoading }) => {
       },
     });
     if (resp) {
+      track('USER_ACTION', { action: 'Edit Planned Activity', screen: 'Edit activity', activity: item.id });
       dispatch(getPlan());
       handleEditPress();
     }

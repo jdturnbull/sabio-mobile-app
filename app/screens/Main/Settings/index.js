@@ -12,6 +12,7 @@ import LightBackground from '../../../assets/home-background-light.png';
 import DarkBackground from '../../../assets/home-background-dark.png';
 import { setup, signout } from '../../../stores/user/userSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useMixpanel } from '../../../hooks/useMixpanel';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -139,6 +140,7 @@ const InformationBox = ({ title, value, onPress, id, last, first }) => {
 const Settings = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const { track } = useMixpanel();
   const theme = useTheme();
   const colorScheme = useColorScheme();
   const [hasConnection, setHasConnection] = useState(false);
@@ -175,6 +177,8 @@ const Settings = () => {
   };
 
   const handleOptionPress = async (opt) => {
+    track('USER_ACTION', { action: 'Settings option pressed', option: opt });
+
     if (opt === 'support') {
       Alert.alert('support@heysabio.com', '', [{ text: 'OK' }]);
     }
@@ -202,6 +206,7 @@ const Settings = () => {
         {
           text: 'Confirm',
           onPress: async () => {
+            track('USER_ACTION', { action: 'Logout' });
             await AsyncStorage.removeItem('session');
             dispatch(setup());
           },
@@ -215,6 +220,7 @@ const Settings = () => {
         {
           text: 'Confirm',
           onPress: async () => {
+            track('USER_ACTION', { action: 'Account deleted' });
             await call('GET', `users/delete/${user?.id}`);
             await AsyncStorage.removeItem('session');
             dispatch(setup());

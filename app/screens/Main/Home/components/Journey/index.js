@@ -10,10 +10,13 @@ import Separator from './components/Separator';
 import Footer from './components/Footer';
 import ModalContent from './components/ModalContent';
 import { getPlan } from '../../../../../stores/user/userSlice';
+import { useMixpanel } from '../../../../../hooks/useMixpanel';
 
 const Journey = () => {
   const dispatch = useDispatch();
   const flatListRef = useRef(null);
+
+  const { track } = useMixpanel();
 
   const user = useSelector((state) => state.user?.session?.user);
   const plannedActivities = useSelector((state) => state.user?.plannedActivities);
@@ -29,6 +32,7 @@ const Journey = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
+    track('USER_ACTION', { action: 'Pull to refresh', screen: 'Home' });
     dispatch(getPlan()).then(() => {
       setTimeout(() => {
         setRefreshing(false);

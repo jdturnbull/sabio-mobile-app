@@ -1,20 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  useWindowDimensions,
-  TextInput,
-  Pressable,
-  Animated,
-  KeyboardAvoidingView,
-  ImageBackground,
-  Alert,
-  Appearance,
-} from 'react-native';
+import { View, useWindowDimensions, Animated, ImageBackground, Alert, Appearance } from 'react-native';
 import styled from 'styled-components';
 import { useTheme } from 'styled-components';
-import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useKeyboard } from '@react-native-community/hooks';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,21 +15,92 @@ import UserMessage from '../../components/chat/UserMessage';
 import TypingAnimation from '../../components/chat/TypingAnimation';
 import backgroundDark from '../../assets/background-chat-dark.png';
 import backgroundLight from '../../assets/background-chat-light.png';
-
 import call from '../../utils/call';
 import { hapticImpact } from '../../utils/haptics';
 import { setup } from '../../stores/user/userSlice';
-import { usePostHog } from 'posthog-react-native';
+import { useMixpanel } from '../../hooks/useMixpanel';
 
 const StyledGestureHandlerRootView = styled(GestureHandlerRootView)`
   flex: 1;
 `;
 
+const Container = styled.View`
+  flex: 1;
+  align-items: center;
+  background-color: ${(props) => props.theme.colors.chatBackground};
+`;
+
+const LogoutContainer = styled.View`
+  margin-top: 50px;
+  height: 50px;
+  padding-horizontal: 20px;
+  display: flex;
+  justify-content: center;
+`;
+
+const AnimationContainer = styled.View`
+  background-color: ${(props) => props.theme.text.chatMessage.backgroundAssistant};
+  border-radius: 18px;
+  border-top-left-radius: 0;
+  padding: 15px;
+  margin-bottom: 20px;
+  margin-left: 28px;
+  margin-right: 45px;
+  align-self: flex-start;
+`;
+
+const FooterContainer = styled(Animated.View)`
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 50px;
+  padding-top: 10px;
+`;
+
+const InputContainer = styled(Animated.View)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: ${(props) => props.theme.text.chatMessage.inputBackground};
+  border-radius: 20px;
+  padding: 7px;
+  padding-left: 15px;
+  padding-right: 7px;
+  padding-bottom: 7px;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const StyledInput = styled.TextInput`
+  flex: 1;
+  color: ${(props) => props.theme.text.colors.secondary};
+  font-size: 16px;
+  font-weight: 400;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 3px;
+  max-height: 70px;
+`;
+
+const InputPressable = styled.Pressable`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  shadowcolor: #000;
+  shadowoffset: 0px 10px;
+  shadowopacity: 0.3;
+  shadowradius: 11px;
+  elevation: 10;
+`;
+
+const LogoutPressable = styled.Pressable``;
+
+const KeyboardAvoidingView = styled.KeyboardAvoidingView``;
+
 const Chat = () => {
-  const posthog = usePostHog();
   const colorScheme = Appearance.getColorScheme();
   const scrollRef = useRef();
   const dispatch = useDispatch();
+  const { track } = useMixpanel();
   const keyboard = useKeyboard();
   const width = useWindowDimensions().width;
   const navigation = useNavigation();
@@ -49,16 +108,17 @@ const Chat = () => {
   const session = useSelector((state) => state.user.session);
   const state = useSelector((state) => state.onboarding);
 
-  const [isSetup, setIsSetup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toolOutputs, setToolOutputs] = useState([]);
   const [shouldCompleteTool, setShouldCompleteTool] = useState(false);
   const [canSend, setCanSend] = useState(false);
   const [userMessage, setUserMessage] = useState('');
+
+  // Maybe use this to show a button if the app doesn't auto redirect?
+  const [showNext, setShowNext] = useState(false);
+
   const [requiresResponse, setRequiresResponse] = useState(false);
   const [responsePending, setResponsePending] = useState(false);
-
-  const [hasResetThread, setHasResetThread] = useState(false);
 
   const [animatedWidth] = useState(new Animated.Value(width * 0.9));
   const [animatedMargin] = useState(new Animated.Value(120));
@@ -69,69 +129,52 @@ const Chat = () => {
 
   const Send = getIconFromLabel('send');
 
-  // Check if we should be on this screen
   useEffect(() => {
     if (session.user.onboardingData) {
+      track('APP_ACTION', { action: 'Navigating to Finalise', screen: 'Onboarding chat', location: 'useEffect' });
       navigation.navigate('Finalise');
     }
   }, []);
 
-  // Handles setting up the assistant
+  const handleError = ({ error }) => {
+    track('ERROR', { screen: 'Onboarding Chat', error: error });
+    console.log(error);
+  };
+
   const setupAssistant = async () => {
     if (state.assistant) return state.assistant;
-    const { response, error } = await openai.retrieveAssistant('onboarding', session.user?.id);
-    if (error) {
-      posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'setup_assistant' });
-      Alert.alert('Error', 'There was an issue setting up the chat. Please reload the app.');
-      return null;
-    }
-    return response;
+    const { response, error } = await openai.retrieveAssistant('onboarding');
+
+    if (response) return response;
+    if (error) handleError({ error });
   };
 
   const setupThread = async () => {
-    if (state.thread) return state.thread; // If thread is already set, return it
+    if (state.thread) return state.thread;
     let threadId = session.user?.threadId;
 
     if (threadId) {
-      // Try to retrieve or move messages to a new thread based on the condition
-      const { response, error } = threadId.includes('error')
-        ? await openai.moveMessagesToNewThread(threadId)
-        : await openai.retrieveThread(threadId, session.user?.id);
-
-      if (!error) {
-        if (threadId.includes('error')) {
-          posthog.capture('ONBOARDING_CHAT_ACTION', { type: 'moved_messages_to_new_thread' });
-          setHasResetThread(true);
-        }
-
-        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: response.id } });
-        return response;
-      } else {
-        posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'setup_thread' });
-      }
+      const { response, error } = await openai.retrieveThread(threadId, session.user?.id);
+      if (response) return response;
+      if (error) handleError({ error });
+    } else {
+      const { response, error } = await openai.createThread('onboarding', session.user?.id);
+      if (response) return response;
+      if (error) handleError({ error });
     }
-
-    // Create a new thread if there's no threadId or if there was an error
-    const { response, error } = await openai.createThread('onboarding');
-
-    if (error) {
-      posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'setup_blank_thread' });
-      Alert.alert('Error', 'There was an issue setting up the chat. Please reload the app');
-      return null;
-    }
-
-    await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: response.id } });
-    return response;
   };
 
   const setupMessages = async (thread) => {
     if (!thread) return [];
-    return await openai.retrieveMessages(thread.id, session.user?.id);
+    const { response, error } = await openai.retrieveMessages(thread.id);
+    if (response) return response;
+    if (error) handleError({ error });
   };
 
   // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
     const setup = async () => {
+      track('SCREEN_VIEW', { screen: 'Onboarding chat' });
       const assistant = await setupAssistant();
       const thread = await setupThread();
       const messages = await setupMessages(thread);
@@ -139,17 +182,14 @@ const Chat = () => {
       // Update the state with the assistant, thread and messages
       dispatch(updateState({ ...state, assistant, thread, messages }));
 
+      track('APP_ACTION', { action: 'Onboarding chat setup', screen: 'Onboarding chat' });
+
       // Get the most recent message
       const latestMessage = messages[messages.length - 1];
 
       // If the most recent message is from the user trigger an AI response
-      if (latestMessage?.role === 'user') {
-        setRequiresResponse(true);
-      } else {
-        setCanSend(true);
-      }
-
-      setIsSetup(true);
+      if (latestMessage?.role === 'user') setRequiresResponse(true);
+      if (latestMessage?.role === 'assistant') setCanSend(true);
     };
 
     setup();
@@ -165,19 +205,12 @@ const Chat = () => {
       setLoading(true);
 
       // Initialise a response from the AI
+      const { response, error } = await openai.run(state.thread.id, state.assistant.id, session.user?.id);
 
-      const { response, error } = await openai.run(
-        state.thread.id,
-        state.assistant.id,
-        session.user?.id,
-        hasResetThread,
-      );
+      if (error) handleError({ error });
 
-      if (error) {
-        posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'initialise_response' });
-        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
-        Alert.alert('Error', 'There was a problem with your assistant, please reload the app.');
-      } else {
+      if (response) {
+        track('APP_ACTION', { action: 'AI response initialised', screen: 'Onboarding chat' });
         // Save the id of the response
         dispatch(updateState({ ...state, runId: response.id }));
 
@@ -186,8 +219,6 @@ const Chat = () => {
 
         // Tell the component that a response is pending
         setResponsePending(true);
-
-        posthog.capture('ONBOARDING_CHAT_ACTION', { type: 'initialise_response' });
       }
     };
 
@@ -201,92 +232,89 @@ const Chat = () => {
     const _captureResponse = async () => {
       if (!responsePending) return;
 
-      try {
-        // Retrieve the response from the AI
-        const { response, error } = await openai.retrieveRun(state.thread.id, state.runId, session.user?.id);
+      // Retrieve the response from the AI
+      const { response, error } = await openai.retrieveRun(state.thread.id, state.runId, session.user?.id);
 
-        if (error) {
-          posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'capture_response' });
-          Alert.alert('Error', 'There was an issue with the chat, please reload the app.');
-          await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
-        }
+      if (error) handleError({ error });
+      if (!response) return;
 
-        console.log('Retrieved response, status is:' + response.status);
+      console.log('Retrieved response, status is:' + response.status);
 
-        if (response.status === 'in_progress' || response.status === 'queued') {
-          // If the response isn't ready yet, run the function again in 2 seconds
-          timeoutId = setTimeout(_captureResponse, 2000);
-        } else if (response.status === 'completed') {
-          // Get the new messages from the message thread and save them
-          const messages = await openai.retrieveMessages(state.thread.id, session.user?.id);
+      track('APP_ACTION', { action: 'AI response retrieved', status: response.status, screen: 'Onboarding chat' });
 
-          // Set loading to false to remove the loading indicator
-          setLoading(false);
+      if (response.status === 'in_progress' || response.status === 'queued') {
+        // If the response isn't ready yet, run the function again in 2 seconds
+        timeoutId = setTimeout(_captureResponse, 2000);
+      } else if (response.status === 'completed') {
+        // Get the new messages from the message thread and save them
+        const messages = await openai.retrieveMessages(state.thread.id, session.user?.id);
 
-          // Update the state with the new messages
-          dispatch(updateState({ messages }));
+        // Set loading to false to remove the loading indicator
+        setLoading(false);
 
-          // Scroll to the bottom of the chat so the user can see the new message
-          setTimeout(() => {
-            scrollRef.current?.scrollToEnd({ animated: true });
-          }, 100);
+        // Update the state with the new messages
+        dispatch(updateState({ messages }));
 
-          // Set canSend true to enable the user to send a new message
-          setCanSend(true);
+        // Scroll to the bottom of the chat so the user can see the new message
+        setTimeout(() => {
+          scrollRef.current?.scrollToEnd({ animated: true });
+        }, 100);
 
-          // Tell the component that a response is no longer pending
-          setResponsePending(false);
-        } else if (response.status === 'requires_action') {
-          // Extract the function data from the response
-          const calls = openai.extractFunctionData(response, session.user?.id);
+        // Set canSend true to enable the user to send a new message
+        setCanSend(true);
 
-          for (let i = 0; i < calls.length; i++) {
-            const { args, name, id } = calls[i];
+        // Tell the component that a response is no longer pending
+        setResponsePending(false);
+      } else if (response.status === 'requires_action') {
+        // Extract the function data from the response
+        const calls = openai.extractFunctionData(response, session.user?.id);
 
-            if (name === 'nextStep') {
-              try {
-                posthog.capture('ONBOARDING_CHAT_ACTION', { type: 'next_step' });
+        for (let i = 0; i < calls.length; i++) {
+          const { args, name, id } = calls[i];
 
-                await call('POST', `users/saveOnboardingData`, {
-                  data: args,
-                  id: session.user?.id,
-                  threadId: state.thread.id,
+          if (name === 'nextStep') {
+            try {
+              track('APP_ACTION', { action: 'Called next step function', screen: 'Onboarding chat' });
+
+              await call('POST', `users/saveOnboardingData`, {
+                data: args,
+                id: session.user?.id,
+                threadId: state.thread.id,
+              });
+
+              setToolOutputs([
+                ...toolOutputs,
+                { id, response: 'User has completed the onboarding, wish them farewell for now.' },
+              ]);
+
+              // Update the state to move the user into the app
+              setTimeout(() => {
+                track('APP_ACTION', {
+                  action: 'Navigating to Finalise',
+                  screen: 'Onboarding chat',
+                  location: 'Function call',
                 });
 
-                setToolOutputs([
-                  ...toolOutputs,
-                  { id, response: 'User has completed the onboarding, wish them farewell for now.' },
-                ]);
-
-                // Update the state to move the user into the app
-                setTimeout(() => {
-                  navigation.navigate('Finalise');
-                }, 2000);
-              } catch (error) {
-                posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'next_step' });
-                setToolOutputs([
-                  ...toolOutputs,
-                  {
-                    id,
-                    response:
-                      "Error completing onboarding, you'll need to apologise to the user and ask them if they'd like you to try again.",
-                  },
-                ]);
-              }
+                navigation.navigate('Finalise');
+              }, 1000);
+            } catch (error) {
+              setToolOutputs([
+                ...toolOutputs,
+                {
+                  id,
+                  response:
+                    "Error completing onboarding, you'll need to apologise to the user and ask them if they'd like you to try again.",
+                },
+              ]);
             }
           }
-
-          // Trigger the tool completion
-          setShouldCompleteTool(true);
-
-          // Tell the component that a response is no longer pending
-          setResponsePending(false);
         }
-      } catch (error) {
-        posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'capture_response' });
-        // Reset threadId, here i want to move the messages over to the new thread
-        Alert.alert('Error', 'There was an issue with the chat, please reload the app.');
-        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
+
+        // Trigger the tool completion
+        setShouldCompleteTool(true);
+
+        // Tell the component that a response is no longer pending
+        setResponsePending(false);
       }
     };
 
@@ -326,11 +354,11 @@ const Chat = () => {
       });
 
       if (error) {
-        posthog.capture('ERROR', { type: 'onboarding_chat', subType: 'complete_tool' });
-        Alert.alert('Error', 'There was an issue completing the tool, please reload the app.');
-        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
+        handleError({ error });
       } else {
-        // Save the response to the tool output so it can be used when completing the tool
+        track('APP_ACTION', { action: 'Tool output submitted', screen: 'Onboarding chat' });
+
+        // Clear tool outputs
         setToolOutputs([]);
 
         // Tell the component that the tool no longer needs to be completed
@@ -338,8 +366,6 @@ const Chat = () => {
 
         // Tell the component a response is pending
         setResponsePending(true);
-
-        posthog.capture('ONBOARDING_CHAT_ACTION', { type: 'complete_tool' });
       }
     };
 
@@ -359,6 +385,8 @@ const Chat = () => {
     // Add the user message to the message thread
     await openai.addUserMessage(state.thread.id, userMessage, session.user?.id);
 
+    track('USER_ACTION', { action: 'User message sent', screen: 'Onboarding chat' });
+
     // Clear the user message
     setUserMessage('');
 
@@ -370,8 +398,6 @@ const Chat = () => {
 
     // Tell the AI to respond to the user message
     setRequiresResponse(true);
-
-    posthog.capture('ONBOARDING_CHAT_ACTION', { type: 'send_user_message' });
 
     // Scroll to the bottom of the chat so the user can see the new message
     setTimeout(() => {
@@ -406,6 +432,7 @@ const Chat = () => {
   const Logout = getIconFromLabel('logout');
 
   const logout = () => {
+    track('USER_ACTION', { action: 'User pressed logout', screen: 'Onboarding chat' });
     Alert.alert(
       'Logout',
       'Are you sure you want to logout?',
@@ -418,6 +445,7 @@ const Chat = () => {
           text: 'Logout',
           onPress: async () => {
             // remove token from local storage
+            track('USER_ACTION', { action: 'User logged out', screen: 'Onboarding chat' });
             await AsyncStorage.removeItem('session');
             dispatch(setup());
           },
@@ -428,26 +456,19 @@ const Chat = () => {
   };
 
   return (
-    <View style={{ ...styles.container, backgroundColor: theme.colors.chatBackground }}>
+    <Container>
       <ImageBackground
         source={colorScheme === 'light' ? backgroundLight : backgroundDark}
         resizeMode="cover"
-        style={styles.background}>
+        style={{ flex: 1 }}>
         <KeyboardAvoidingView behavior="padding">
           <StyledGestureHandlerRootView>
             <Animated.ScrollView ref={scrollRef} showsVerticalScrollIndicator={false}>
-              <View
-                style={{
-                  marginTop: 50,
-                  height: 50,
-                  paddingHorizontal: 20,
-                  display: 'flex',
-                  justifyContent: 'center',
-                }}>
-                <Pressable onPress={logout}>
+              <LogoutContainer>
+                <LogoutPressable onPress={logout}>
                   <Logout color={theme.text.colors.secondary} />
-                </Pressable>
-              </View>
+                </LogoutPressable>
+              </LogoutContainer>
               {state.messages.map((message, index) => {
                 if (message?.role === 'assistant') {
                   return <AssistantMessage key={index} message={message.content[0].text.value} />;
@@ -456,165 +477,28 @@ const Chat = () => {
                 }
               })}
               {loading && (
-                <View
-                  style={{
-                    backgroundColor: theme.text.chatMessage.backgroundAssistant,
-                    borderRadius: 18,
-                    borderTopLeftRadius: 0,
-                    padding: 15,
-                    marginBottom: 20,
-                    marginLeft: 28,
-                    marginRight: 45,
-                    alignSelf: 'flex-start',
-                  }}>
+                <AnimationContainer>
                   <TypingAnimation />
-                </View>
+                </AnimationContainer>
               )}
             </Animated.ScrollView>
           </StyledGestureHandlerRootView>
-          <Animated.View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              minHeight: 50,
-              paddingTop: 10,
-              width,
-            }}>
-            <Animated.View
-              style={{
-                ...styles.inputContainer,
-                width: animatedWidth,
-                marginBottom: animatedMargin,
-                backgroundColor: theme.text.chatMessage.inputBackground,
-              }}>
-              <TextInput
-                multiline
-                style={{ ...styles.input, color: theme.text.colors.secondary }}
-                value={userMessage}
-                onChangeText={(text) => setUserMessage(text)}
-              />
+          <FooterContainer style={{ width }}>
+            <InputContainer style={{ width: animatedWidth, marginBottom: animatedMargin }}>
+              <StyledInput multiline value={userMessage} onChangeText={(text) => setUserMessage(text)} />
               <View style={{ height: '100%', width: 34 }}>
-                <Pressable style={{ ...styles.inputPressable }} onPress={handleSendUserMessage}>
+                <InputPressable onPress={handleSendUserMessage}>
                   <Animated.View style={{ opacity }}>
                     <Send />
                   </Animated.View>
-                </Pressable>
+                </InputPressable>
               </View>
-            </Animated.View>
-          </Animated.View>
+            </InputContainer>
+          </FooterContainer>
         </KeyboardAvoidingView>
       </ImageBackground>
-    </View>
+    </Container>
   );
 };
 
 export default Chat;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  background: {
-    flex: 1,
-  },
-
-  inputContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1F2025',
-    borderRadius: 20,
-    padding: 7,
-    paddingLeft: 15,
-    paddingRight: 7,
-    paddingBottom: 7,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  input: {
-    flex: 1,
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '400',
-    padding: 0,
-    margin: 0,
-    marginBottom: 3,
-    maxHeight: 70,
-  },
-  inputPressable: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 11,
-    elevation: 10,
-  },
-  modal: {
-    flex: 1,
-  },
-  modalContent: {
-    height: '100%',
-    backgroundColor: '#16171B',
-    borderTopRightRadius: 35,
-    borderTopLeftRadius: 35,
-    zIndex: 100,
-    padding: 20,
-  },
-  modalTop: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  line: {
-    width: 40,
-    height: 4,
-    borderRadius: 4,
-    backgroundColor: '#ffffff40',
-  },
-  modalBody: {
-    flex: 1,
-    marginTop: 30,
-    padding: 20,
-  },
-  modalTitle: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 20,
-    marginBottom: 20,
-  },
-  modalText: {
-    marginTop: 20,
-    fontSize: 15,
-    lineHeight: 20,
-    color: '#737476',
-    fontWeight: '600',
-  },
-  pressable: {
-    marginTop: 40,
-    marginRight: 10,
-    backgroundColor: '#1F2025',
-    padding: 20,
-    borderRadius: 8,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 3,
-    shadowOpacity: 0.3,
-    shadowColor: '#000',
-  },
-  pressableText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-});

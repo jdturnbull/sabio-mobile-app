@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { REACT_APP_OPENAI_API_KEY, REACT_APP_POSTHOG_API_KEY } from '@env';
+import { REACT_APP_OPENAI_API_KEY } from '@env';
 import _ from 'lodash';
 import call from './call';
 
@@ -48,13 +48,18 @@ const sortMessagesByDate = (messages) => {
 };
 
 export const retrieveMessages = async (thread_id) => {
-  const messages = await axios.get(`https://api.openai.com/v1/threads/${thread_id}/messages`, config);
-  return sortMessagesByDate(messages.data.data);
+  try {
+    const messages = await axios.get(`https://api.openai.com/v1/threads/${thread_id}/messages`, config);
+    return { response: sortMessagesByDate(messages.data.data) };
+  } catch (error) {
+    return { error: error.response.data || error.message };
+  }
 };
 
 export const retrieveAssistant = async (type) => {
   let retryCount = 0;
   let maxRetries = 3;
+  let error_message = '';
 
   while (retryCount < maxRetries) {
     try {
@@ -67,69 +72,38 @@ export const retrieveAssistant = async (type) => {
 
       return { response: assistant.data };
     } catch (error) {
-      console.log('error retrieving the assistant, retrying...', error);
       retryCount++;
+      error_message = error.response.data || error.message;
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait a second before the next retry
     }
   }
 
-  return { error: 'There was an error retrieving the assistant, please try again later' };
+  return { error: error_message };
 };
 
 export const retrieveThread = async (thread_id) => {
   let retryCount = 0;
   let maxRetries = 3;
+  let error_message = '';
 
   while (retryCount < maxRetries) {
     try {
       const thread = await axios.get(`https://api.openai.com/v1/threads/${thread_id}`, config);
       return { response: thread.data };
     } catch (error) {
-      console.log('error retrieving the thread, retrying...', error);
+      error_message = error.response.data || error.message;
       retryCount++;
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait a second before the next retry
     }
   }
 
-  return { error: 'There was an error retrieving your thread' };
+  return { error: error_message };
 };
 
-export const moveMessagesToNewThread = async (old_thread_id) => {
-  try {
-    const cleaned_thread_id = old_thread_id.replace('error-', '');
-
-    const messages = await retrieveMessages(cleaned_thread_id);
-
-    let formatted_messages = messages.map((message) => {
-      return {
-        role: message.role,
-        content: message.content[0].text.value || '',
-      };
-    });
-
-    formatted_messages = formatted_messages.filter((message) => message.role === 'user');
-
-    // Reverse the order of the messages
-    formatted_messages = formatted_messages.reverse();
-
-    const old_messages = JSON.stringify({
-      messages: formatted_messages,
-    });
-
-    const new_thread = await axios.post('https://api.openai.com/v1/threads', old_messages, config);
-
-    console.log({ new_thread });
-    return { response: new_thread.data };
-  } catch (error) {
-    console.log(error.response.data);
-    console.log('error moving messages to a new thread', error);
-    return { error: 'There was an error moving your messages to a new thread' };
-  }
-};
-
-export const createThread = async (type) => {
+export const createThread = async (type, userId) => {
   let retryCount = 0;
   let maxRetries = 3;
+  let error_message = '';
 
   while (retryCount < maxRetries) {
     try {
@@ -145,20 +119,23 @@ export const createThread = async (type) => {
 
       const thread = await axios.post('https://api.openai.com/v1/threads', messages, config);
 
+      await call('POST', 'users/update', { userId, data: { threadId: thread.data.id } });
+
       return { response: thread.data };
     } catch (error) {
-      console.log('error creating the thread, retrying...', error);
+      error_message = error.response.data || error.message;
       retryCount++;
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait a second before the next retry
     }
   }
 
-  return { error: 'There was an error creating the thread, please try again later' };
+  return { error: error_message };
 };
 
 export const run = async (thread_id, assistant_id, userId, hasResetThread) => {
   let retryCount = 0;
   let maxRetries = 3;
+  let error_message = '';
 
   while (retryCount < maxRetries) {
     try {
@@ -177,16 +154,16 @@ export const run = async (thread_id, assistant_id, userId, hasResetThread) => {
       const runRequest = await axios.post(`https://api.openai.com/v1/threads/${thread_id}/runs`, body, config);
       return { response: runRequest.data };
     } catch (error) {
-      console.log('error running the assistant, retrying...', error);
       retryCount++;
+      error_message = error.response.data || error.message;
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait a second before the next retry
     }
   }
 
-  return { error: 'There was an error running the assistant, please try again later' };
+  return { error: error_message };
 };
 
-export const addUserMessage = async (thread_id, message, userId) => {
+export const addUserMessage = async (thread_id, message) => {
   const body = JSON.stringify({ role: 'user', content: message });
   await axios.post(`https://api.openai.com/v1/threads/${thread_id}/messages`, body, config);
 };
@@ -194,6 +171,7 @@ export const addUserMessage = async (thread_id, message, userId) => {
 export const submitToolResponse = async ({ thread_id, run_id, body }) => {
   let retryCount = 0;
   let maxRetries = 3;
+  let error_message = '';
 
   while (retryCount < maxRetries) {
     try {
@@ -205,13 +183,13 @@ export const submitToolResponse = async ({ thread_id, run_id, body }) => {
 
       return { response: 'success' };
     } catch (error) {
-      console.log('error submitting tool response, retrying...', error);
+      error_message = error.response.data || error.message;
       retryCount++;
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait a second before the next retry
     }
   }
 
-  return { error: 'There was an error submitting the tool response, please try again later' };
+  return { error: error_message };
 };
 
 export const retrieveRun = async (thread_id, run_id) => {
@@ -219,7 +197,6 @@ export const retrieveRun = async (thread_id, run_id) => {
     const response = await axios.get(`https://api.openai.com/v1/threads/${thread_id}/runs/${run_id}`, config);
     return { response: response.data };
   } catch (error) {
-    console.log('error retrieving run', error);
-    return { error: 'There was an error retrieving the run' };
+    return { error: error.response.data || error.message };
   }
 };

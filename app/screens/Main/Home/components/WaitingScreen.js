@@ -3,6 +3,7 @@ import { Animated, View, StyleSheet, ActivityIndicator, Text, useColorScheme } f
 import { getIconFromLabel } from '../../../../utils/icon';
 import styled, { useTheme } from 'styled-components';
 import { useSelector } from 'react-redux';
+import { useMixpanel } from '../../../../hooks/useMixpanel';
 
 const Title = styled.Text`
   font-size: 16px;
@@ -25,6 +26,7 @@ const SubTitle = styled.Text`
 const WaitingScreen = () => {
   const theme = useTheme();
   const colorScheme = useColorScheme();
+  const { track } = useMixpanel();
   const Logo = getIconFromLabel('logoMedium');
   const WaitingIcon = getIconFromLabel(colorScheme === 'light' ? 'waitingLight' : 'waitingDark');
 
@@ -42,6 +44,14 @@ const WaitingScreen = () => {
   if (stage === 3) label = 'Forming weekly focuses';
   if (stage === 4) label = 'Planning your first two weeks';
   if (stage === 5) label = 'Plan creation complete';
+
+  useEffect(() => {
+    track('SCREEN_VIEW', { screen: 'Waiting' });
+  }, []);
+
+  useEffect(() => {
+    track('APP_ACTION', { action: 'Waiting screen stage change', stage });
+  }, [stage]);
 
   useEffect(() => {
     Animated.timing(widthAnim, {

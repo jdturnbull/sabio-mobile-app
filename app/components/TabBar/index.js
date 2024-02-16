@@ -23,8 +23,6 @@ const TabBar = ({ state, navigation, width }) => {
     return <View />;
   }
 
-  console.log(theme.tabBar.backgroundColor);
-
   return (
     <View
       style={{

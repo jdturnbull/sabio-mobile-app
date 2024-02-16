@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import EditScreen from './EditScreen';
 import { getIconFromLabel } from '../../../../../../../utils/icon';
+import { useMixpanel } from '../../../../../../../hooks/useMixpanel';
 
 const Title = styled.Text`
   font-family: ${(props) => props.theme.text.family};
@@ -41,6 +42,7 @@ const StyledPressable = styled.Pressable`
 
 const Footer = ({ data, setModalData }) => {
   const theme = useTheme();
+  const { track } = useMixpanel();
   const colorScheme = useColorScheme();
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [renderFooter, setRenderFooter] = useState(data !== null);
@@ -91,6 +93,7 @@ const Footer = ({ data, setModalData }) => {
     } else {
       heightAnim.value = withTiming(screenHeight / 2, { duration: 300 }, () => {
         runOnJS(setExpanded)(true);
+        runOnJS(track('USER_ACTION', { action: 'View guidance' }));
       });
     }
   };
@@ -127,12 +130,14 @@ const Footer = ({ data, setModalData }) => {
 
   const handleEditPress = () => {
     if (showEditScreen) {
+      track('USER_ACTION', { action: 'Close edit screen' });
       setShowEditScreen(false);
       heightAnim.value = withTiming(0, { duration: 300 }, () => {
         runOnJS(setRenderFooter)(false);
         runOnJS(setExpanded)(false);
       });
     } else {
+      track('USER_ACTION', { action: 'Open edit screen' });
       setShowEditScreen(true);
       heightAnim.value = withTiming(screenHeight - 150, { duration: 300 }, () => {
         runOnJS(setExpanded)(true);

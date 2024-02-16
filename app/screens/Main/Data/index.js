@@ -6,6 +6,7 @@ import call from '../../../utils/call';
 import Loading from './components/Loading';
 import NoReports from './components/NoReports';
 import ReportsList from './components/ReportsList';
+import { useMixpanel } from '../../../hooks/useMixpanel';
 
 const Container = styled.View`
   flex: 1;
@@ -30,6 +31,8 @@ const Data = () => {
   const theme = useTheme();
   const focused = useIsFocused();
 
+  const { track } = useMixpanel();
+
   const user = useSelector((state) => state.user.session?.user);
 
   const [loading, setLoading] = useState(true);
@@ -44,6 +47,7 @@ const Data = () => {
     };
 
     if (focused) {
+      track('SCREEN_VIEW', { screen: 'Data' });
       fetchReports();
     }
   }, [focused]);

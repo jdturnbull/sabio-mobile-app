@@ -4,6 +4,7 @@ import { Pressable, Dimensions } from 'react-native';
 import moment from 'moment';
 import { hapticSelection } from '../../../../../../utils/haptics';
 import { getIconFromLabel } from '../../../../../../utils/icon';
+import { useMixpanel } from '../../../../../../hooks/useMixpanel';
 
 const BOX_WIDTH = 164;
 const BOX_HEIGHT = 60;
@@ -47,6 +48,8 @@ const ListItem = forwardRef(
     const { width: screenWidth } = Dimensions.get('window');
     const center = screenWidth / 2 - BOX_WIDTH / 2;
 
+    const { track } = useMixpanel();
+
     const theme = useTheme();
 
     let isSelected = modalData?.id === item.id;
@@ -68,6 +71,7 @@ const ListItem = forwardRef(
 
     const handlePress = () => {
       if (item.type === 'unplanned') {
+        track('USER_ACTION', { action: 'Activity pressed', screen: 'Home', type: 'unplanned' });
         return;
       }
 
@@ -75,6 +79,8 @@ const ListItem = forwardRef(
         setModalData(null);
         return;
       }
+
+      track('USER_ACTION', { action: 'Activity pressed', screen: 'Home', type: item.type });
 
       setIsAutoScrolling(true);
 

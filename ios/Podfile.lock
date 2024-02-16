@@ -82,6 +82,12 @@ PODS:
   - lottie-react-native (6.5.1):
     - lottie-ios (~> 4.3.3)
     - React-Core
+  - Mixpanel-swift (4.2.0):
+    - Mixpanel-swift/Complete (= 4.2.0)
+  - Mixpanel-swift/Complete (4.2.0)
+  - MixpanelReactNative (2.4.0):
+    - Mixpanel-swift (= 4.2.0)
+    - React-Core
   - OpenSSL-Universal (1.1.1100)
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -604,6 +610,7 @@ DEPENDENCIES:
   - "kingstinct-react-native-healthkit (from `../node_modules/@kingstinct/react-native-healthkit`)"
   - libevent (~> 2.1.12)
   - lottie-react-native (from `../node_modules/lottie-react-native`)
+  - MixpanelReactNative (from `../node_modules/mixpanel-react-native`)
   - OpenSSL-Universal (= 1.1.1100)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
@@ -673,6 +680,7 @@ SPEC REPOS:
     - fmt
     - libevent
     - lottie-ios
+    - Mixpanel-swift
     - OpenSSL-Universal
     - SocketRocket
     - Stripe
@@ -705,6 +713,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@kingstinct/react-native-healthkit"
   lottie-react-native:
     :path: "../node_modules/lottie-react-native"
+  MixpanelReactNative:
+    :path: "../node_modules/mixpanel-react-native"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -830,6 +840,8 @@ SPEC CHECKSUMS:
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   lottie-ios: 25e7b2675dad5c3ddad369ac9baab03560c5bfdd
   lottie-react-native: cdeae481649c11d586084b8662f03251c4dd8249
+  Mixpanel-swift: e5dd85295923e6a875acf17ccbab8d2ecb10ea65
+  MixpanelReactNative: 9e83f45fdcb6c2d83e97226d2dff79a780f882b4
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: 28469809442eb4eb5528462705f7d852948c8a74

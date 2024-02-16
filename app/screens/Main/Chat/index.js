@@ -1,17 +1,6 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useTheme } from 'styled-components';
-import {
-  View,
-  StyleSheet,
-  useWindowDimensions,
-  TextInput,
-  Pressable,
-  Animated,
-  KeyboardAvoidingView,
-  ImageBackground,
-  useColorScheme,
-  Alert,
-} from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import styled from 'styled-components';
+import { View, useWindowDimensions, Animated, ImageBackground, useColorScheme, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
 import { useKeyboard } from '@react-native-community/hooks';
@@ -25,30 +14,85 @@ import AssistantMessage from '../../../components/chat/AssistantMessage';
 import TypingAnimation from '../../../components/chat/TypingAnimation';
 import BackgroundLight from '../../../assets/background-chat-light.png';
 import BackgroundDark from '../../../assets/background-chat-dark.png';
-import { getPlan, setup } from '../../../stores/user/userSlice';
-import { usePostHog } from 'posthog-react-native';
+import { useMixpanel } from '../../../hooks/useMixpanel';
+
+const Container = styled.View`
+  flex: 1;
+  align-items: center;
+  background-color: #0f1013;
+  background-color: ${(props) => props.theme.colors.chatBackground};
+`;
+
+const TypingAnimationContainer = styled.View`
+  background-color: ${(props) => props.theme.text.chatMessage.backgroundAssistant};
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  margin-right: 30px;
+  margin-left: 30px;
+  align-self: flex-start;
+  width: 65px;
+`;
+
+const FooterContainer = styled(Animated.View)`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  min-height: 63px;
+  padding-top: 10px;
+`;
+
+const InputContainer = styled(Animated.View)`
+  background-color: ${(props) => props.theme.text.chatMessage.inputBackground};
+  border-radius: 20px;
+  padding: 7px;
+  padding-left: 15px;
+  padding-right: 7px;
+  padding-bottom: 7px;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const StyledInput = styled.TextInput`
+  flex: 1;
+  color: ${(props) => props.theme.text.colors.secondary};
+  font-size: 16px;
+  font-weight: 400;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 3px;
+  max-height: 70px;
+`;
+
+const StyledPressable = styled.Pressable`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  shadowcolor: #000;
+  shadowoffset: 0px 10px;
+  shadowopacity: 0.3;
+  shadowradius: 11px;
+  elevation: 10;
+`;
+
+const StyledKeyboardAvoidingView = styled.KeyboardAvoidingView``;
 
 const Chat = () => {
-  const theme = useTheme();
-  const posthog = usePostHog();
   const colorScheme = useColorScheme();
 
   const isFocused = useIsFocused();
+
+  const { track } = useMixpanel();
 
   const scrollRef = useRef();
   const dispatch = useDispatch();
   const keyboard = useKeyboard();
   const width = useWindowDimensions().width;
-  const [isSetup, setIsSetup] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [toolOutputs, setToolOutputs] = useState([]);
-  const [shouldCompleteTool, setShouldCompleteTool] = useState(false);
   const [canSend, setCanSend] = useState(false);
   const [userMessage, setUserMessage] = useState('');
   const [requiresResponse, setRequiresResponse] = useState(false);
   const [responsePending, setResponsePending] = useState(false);
-
-  const [hasResetThread, setHasResetThread] = useState(false);
 
   const session = useSelector((state) => state.user.session);
   const state = useSelector((state) => state.chat);
@@ -59,62 +103,46 @@ const Chat = () => {
 
   const Send = getIconFromLabel('send');
 
-  // Handles setting up the assistant
+  const handleError = ({ error }) => {
+    track('ERROR', { screen: 'Main chat', error });
+    // Tell the user of the issue
+    // reset their chat state and rerun the setup function
+  };
+
   const setupAssistant = async () => {
     if (state.assistant) return state.assistant;
     const { response, error } = await openai.retrieveAssistant('main', session.user?.id);
-    if (error) {
-      posthog.capture('ERROR', { type: 'main_chat', subType: 'setup_assistant' });
-      Alert.alert('Error', 'There was an issue setting up the chat. Please reload the app.');
-      return null;
-    }
-    return response;
+
+    if (response) return response;
+    if (error) handleError({ error });
   };
 
   const setupThread = async () => {
-    if (state.thread) return state.thread; // If thread is already set, return it
+    if (state.thread) return state.thread;
     let threadId = session.user?.threadId;
 
     if (threadId) {
-      // Try to retrieve or move messages to a new thread based on the condition
-      const { response, error } = threadId.includes('error')
-        ? await openai.moveMessagesToNewThread(threadId)
-        : await openai.retrieveThread(threadId, session.user?.id);
-
-      if (!error) {
-        if (threadId.includes('error')) {
-          posthog.capture('MAIN_CHAT_ACTION', { type: 'moved_messages_to_new_thread' });
-          setHasResetThread(true);
-        }
-
-        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: response.id } });
-        return response;
-      } else {
-        posthog.capture('ERROR', { type: 'main_chat', subType: 'setup_thread' });
-      }
+      const { response, error } = await openai.retrieveThread(threadId, session.user?.id);
+      if (response) return response;
+      if (error) handleError({ error });
+    } else {
+      const { response, error } = await openai.createThread('main', session.user?.id);
+      if (response) return response;
+      if (error) handleError({ error });
     }
-
-    // Create a new thread if there's no threadId or if there was an error
-    const { response, error } = await openai.createThread('main');
-
-    if (error) {
-      posthog.capture('ERROR', { type: 'main_chat', subType: 'create_blank_thread' });
-      Alert.alert('Error', 'There was an issue setting up the chat. Please reload the app');
-      return null;
-    }
-
-    await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: response.id } });
-    return response;
   };
 
   const setupMessages = async (thread) => {
     if (!thread) return [];
-    return await openai.retrieveMessages(thread.id, session.user?.id);
+    const { response, error } = await openai.retrieveMessages(thread.id);
+    if (response) return response;
+    if (error) handleError({ error });
   };
 
   // Handles setting up the assistant and thread & retrieving messages
   useEffect(() => {
     const setup = async () => {
+      track('SCREEN_VIEW', { screen: 'Main chat' });
       const assistant = await setupAssistant();
       const thread = await setupThread();
       const messages = await setupMessages(thread);
@@ -126,13 +154,8 @@ const Chat = () => {
       const latestMessage = messages[messages.length - 1];
 
       // If the most recent message is from the user trigger an AI response
-      if (latestMessage?.role === 'user') {
-        setRequiresResponse(true);
-      } else {
-        setCanSend(true);
-      }
-
-      setIsSetup(true);
+      if (latestMessage?.role === 'user') setRequiresResponse(true);
+      if (latestMessage?.role === 'assistant') setCanSend(true);
     };
 
     setup();
@@ -148,19 +171,12 @@ const Chat = () => {
       setLoading(true);
 
       // Initialise a response from the AI
+      const { response, error } = await openai.run(state.thread.id, state.assistant.id, session.user?.id);
 
-      const { response, error } = await openai.run(
-        state.thread.id,
-        state.assistant.id,
-        session.user?.id,
-        hasResetThread,
-      );
+      if (error) handleError({ error });
 
-      if (error) {
-        posthog.capture('ERROR', { type: 'main_chat', subType: 'initialise_response' });
-        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
-        Alert.alert('Error', 'There was a problem with your assistant, please reload the app.');
-      } else {
+      if (response) {
+        track('APP_ACTION', { action: 'AI response initialised', screen: 'Main chat' });
         // Save the id of the response
         dispatch(updateState({ ...state, runId: response.id }));
 
@@ -182,139 +198,39 @@ const Chat = () => {
     const _captureResponse = async () => {
       if (!responsePending) return;
 
-      try {
-        // Retrieve the response from the AI
-        const { response, error } = await openai.retrieveRun(state.thread.id, state.runId, session.user?.id);
+      // Retrieve the response from the AI
+      const { response, error } = await openai.retrieveRun(state.thread.id, state.runId, session.user?.id);
 
-        if (error) {
-          Alert.alert('Error', 'There was an issue with the chat, please reload the app.');
-          await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
-        }
+      if (error) handleError({ error });
+      if (!response) return;
 
-        console.log('Retrieved response, status is:' + response.status);
+      console.log(response.status);
+      track('APP_ACTION', { action: 'AI response retrieved', status: response.status, screen: 'Main chat' });
 
-        if (response.status === 'in_progress' || response.status === 'queued') {
-          // If the response isn't ready yet, run the function again in 2 seconds
-          timeoutId = setTimeout(_captureResponse, 2000);
-        } else if (response.status === 'completed') {
-          // Get the new messages from the message thread and save them
-          const messages = await openai.retrieveMessages(state.thread.id, session.user?.id);
+      if (response.status === 'in_progress' || response.status === 'queued') {
+        // If the response isn't ready yet, run the function again in 2 seconds
+        timeoutId = setTimeout(_captureResponse, 2000);
+      }
 
-          // Set loading to false to remove the loading indicator
-          setLoading(false);
+      if (response.status === 'completed') {
+        const { response, error } = await openai.retrieveMessages(state.thread.id, session.user?.id);
+        if (error) handleError({ error });
 
-          // Update the state with the new messages
-          dispatch(updateState({ messages }));
+        // Get rid of the typing animation
+        setLoading(false);
+        // Load new messages
+        dispatch(updateState({ messages: response }));
 
-          // Scroll to the bottom of the chat so the user can see the new message
-          setTimeout(() => {
-            scrollRef.current?.scrollToEnd({ animated: true });
-          }, 100);
+        // Scroll to the bottom of the chat so the user can see the new message
+        setTimeout(() => {
+          scrollRef.current?.scrollToEnd({ animated: true });
+        }, 100);
 
-          // Set canSend true to enable the user to send a new message
-          setCanSend(true);
+        // Set canSend true to enable the user to send a new message
+        setCanSend(true);
 
-          posthog.capture('MAIN_CHAT_ACTION', { type: 'response_received' });
-
-          // Tell the component that a response is no longer pending
-          setResponsePending(false);
-        } else if (response.status === 'requires_action') {
-          // Extract the function data from the response
-          const calls = openai.extractFunctionData(response, session.user?.id);
-
-          for (let i = 0; i < calls.length; i++) {
-            const { args, name, id } = calls[i];
-
-            if (name === 'replan') {
-              try {
-                posthog.capture('MAIN_CHAT_ACTION', { type: 'replan' });
-                // Send the data to the backend to replan
-                const response = await call('POST', 'users/replan', { data: args, userId: session.user?.id });
-
-                // Save the response to the tool output so it can be used when completing the tool
-                setToolOutputs([...toolOutputs, { id, response }]);
-
-                if (response === 'success') {
-                  posthog.capture('MAIN_CHAT_ACTION', { type: 'replan_success' });
-                  dispatch(getPlan());
-                }
-              } catch (error) {
-                posthog.capture('ERROR', { type: 'main_chat', subType: 'replan' });
-                setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
-              }
-            }
-
-            if (name === 'feedback') {
-              try {
-                posthog.capture('MAIN_CHAT_ACTION', { type: 'feedback' });
-                // Send the data to the backend to provide feedback
-                const response = await call('POST', 'users/feedback', { data: args, userId: session.user?.id });
-                // Save the response to the tool output so it can be used when completing the tool
-                setToolOutputs([...toolOutputs, { id, response }]);
-                posthog.capture('MAIN_CHAT_ACTION', { type: 'feedback_success' });
-              } catch (error) {
-                posthog.capture('ERROR', { type: 'main_chat', subType: 'feedback' });
-                setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
-              }
-            }
-
-            if (name === 'learn') {
-              try {
-                posthog.capture('MAIN_CHAT_ACTION', { type: 'learn' });
-                // Send the data to the backend to learn
-                const response = await call('POST', 'users/learn', { data: args, userId: session.user?.id });
-                // Save the response to the tool output so it can be used when completing the tool
-                setToolOutputs([...toolOutputs, { id, response }]);
-                posthog.capture('MAIN_CHAT_ACTION', { type: 'learn_success' });
-              } catch (error) {
-                posthog.capture('ERROR', { type: 'main_chat', subType: 'learn' });
-                setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
-              }
-            }
-
-            if (name === 'change_restdays') {
-              try {
-                posthog.capture('MAIN_CHAT_ACTION', { type: 'change_restdays' });
-
-                // Send the data to the backend to change the rest days
-                const response = await call('POST', 'users/changeRestDays', { data: args, userId: session.user?.id });
-
-                // Save the response to the tool output so it can be used when completing the tool
-                setToolOutputs([...toolOutputs, { id, response }]);
-
-                posthog.capture('MAIN_CHAT_ACTION', { type: 'change_restdays_success' });
-              } catch (error) {
-                posthog.capture('ERROR', { type: 'main_chat', subType: 'change_restdays' });
-                setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
-              }
-            }
-
-            if (name === 'complete_activity') {
-              try {
-                posthog.capture('MAIN_CHAT_ACTION', { type: 'complete_activity' });
-                // Args should be the id of the activity to complete
-                const response = await call('POST', 'users/completeActivity', { data: args, userId: session.user?.id });
-                // Save the response to the tool output so it can be used when completing the tool
-                setToolOutputs([...toolOutputs, { id, response }]);
-                posthog.capture('MAIN_CHAT_ACTION', { type: 'complete_activity_success' });
-              } catch (error) {
-                posthog.capture('ERROR', { type: 'main_chat', subType: 'complete_activity' });
-                setToolOutputs([...toolOutputs, { id, response: 'There was an error' }]);
-              }
-            }
-          }
-
-          // Trigger the tool completion
-          setShouldCompleteTool(true);
-
-          // Tell the component that a response is no longer pending
-          setResponsePending(false);
-        }
-      } catch (error) {
-        posthog.capture('ERROR', { type: 'main_chat', subType: 'capture_response' });
-        // Reset threadId, here i want to move the messages over to the new thread
-        Alert.alert('Error', 'There was an issue with the chat, please reload the app.');
-        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
+        // Tell the component that a response is no longer pending
+        setResponsePending(false);
       }
     };
 
@@ -328,52 +244,6 @@ const Chat = () => {
     };
   }, [responsePending]);
 
-  // Handles completing the tool
-  useEffect(() => {
-    const _completeTool = async () => {
-      if (!shouldCompleteTool) return;
-
-      let raw_body = toolOutputs.map((tool, index) => {
-        return { tool_call_id: tool.id, output: tool.response };
-      });
-
-      // Replace any undefined outputs with an error string
-      for (let i = 0; i < raw_body.length; i++) {
-        if (raw_body[i].output === undefined) {
-          raw_body[i].output = 'Error: No output';
-        }
-      }
-
-      const body = JSON.stringify({ tool_outputs: raw_body });
-
-      const { response, error } = await openai.submitToolResponse({
-        thread_id: state.thread.id,
-        run_id: state.runId,
-        body,
-        userId: session.user?.id,
-      });
-
-      if (error) {
-        posthog.capture('ERROR', { type: 'main_chat', subType: 'complete_tool' });
-        Alert.alert('Error', 'There was an issue completing the tool, please reload the app.');
-        await call('POST', 'users/update', { userId: session.user?.id, data: { threadId: `error-${thread.id}` } });
-      } else {
-        // Save the response to the tool output so it can be used when completing the tool
-        setToolOutputs([]);
-
-        // Tell the component that the tool no longer needs to be completed
-        setShouldCompleteTool(false);
-
-        // Tell the component a response is pending
-        setResponsePending(true);
-
-        posthog.capture('MAIN_CHAT_ACTION', { type: 'tool_completed' });
-      }
-    };
-
-    _completeTool();
-  }, [shouldCompleteTool]);
-
   // Handles sending user message to the assistant
   const handleSendUserMessage = async () => {
     if (!userMessage) return;
@@ -385,19 +255,21 @@ const Chat = () => {
     // Add the user message to the message thread
     await openai.addUserMessage(state.thread.id, userMessage, session.user?.id);
 
+    track('USER_ACTION', { action: 'User message sent', screen: 'Main chat' });
+
     // Clear the user message
     setUserMessage('');
 
     // Retrieve the messages from the message thread
-    const messages = await openai.retrieveMessages(state.thread.id, session.user?.id);
+    const { error, response } = await openai.retrieveMessages(state.thread.id, session.user?.id);
+
+    if (error) handleError({ error });
 
     // Update the state with the new messages
-    dispatch(updateState({ messages }));
+    dispatch(updateState({ messages: response }));
 
     // Tell the AI to respond to the user message
     setRequiresResponse(true);
-
-    posthog.capture('MAIN_CHAT_ACTION', { type: 'user_message_sent' });
 
     // Scroll to the bottom of the chat so the user can see the new message
     setTimeout(() => {
@@ -434,12 +306,12 @@ const Chat = () => {
   }, [keyboard.keyboardShown]);
 
   return (
-    <View style={{ ...styles.container, backgroundColor: theme.colors.chatBackground }}>
+    <Container>
       <ImageBackground
         source={colorScheme === 'light' ? BackgroundLight : BackgroundDark}
         resizeMode="cover"
-        style={styles.background}>
-        <KeyboardAvoidingView behavior="padding">
+        style={{ flex: 1 }}>
+        <StyledKeyboardAvoidingView behavior="padding">
           <GestureHandlerRootView style={{ flex: 1, paddingTop: 60 }}>
             <Animated.ScrollView ref={scrollRef} showsVerticalScrollIndicator={false}>
               {state.messages.map((message, index) => {
@@ -450,166 +322,28 @@ const Chat = () => {
                 }
               })}
               {loading && (
-                <View
-                  style={{
-                    backgroundColor: theme.text.chatMessage.backgroundAssistant,
-                    borderRadius: 10,
-                    padding: 15,
-                    marginBottom: 20,
-                    marginRight: 30,
-                    marginLeft: 30,
-                    alignSelf: 'flex-start',
-                    width: 65,
-                  }}>
+                <TypingAnimationContainer>
                   <TypingAnimation />
-                </View>
+                </TypingAnimationContainer>
               )}
             </Animated.ScrollView>
           </GestureHandlerRootView>
-          <Animated.View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-evenly',
-              minHeight: 63,
-              paddingTop: 10,
-              width,
-            }}>
-            <Animated.View
-              style={{
-                ...styles.inputContainer,
-                width: animatedWidth,
-                marginBottom: animatedMargin,
-                backgroundColor: theme.text.chatMessage.inputBackground,
-              }}>
-              <TextInput
-                multiline
-                style={{ ...styles.input, color: theme.text.colors.secondary }}
-                value={userMessage}
-                onChangeText={(text) => setUserMessage(text)}
-              />
+          <FooterContainer style={{ width }}>
+            <InputContainer style={{ width: animatedWidth, marginBottom: animatedMargin }}>
+              <StyledInput multiline value={userMessage} onChangeText={(text) => setUserMessage(text)} />
               <View style={{ height: '100%', width: 34 }}>
-                <Pressable style={{ ...styles.inputPressable }} onPress={handleSendUserMessage}>
+                <StyledPressable onPress={handleSendUserMessage}>
                   <Animated.View style={{ opacity }}>
                     <Send />
                   </Animated.View>
-                </Pressable>
+                </StyledPressable>
               </View>
-            </Animated.View>
-          </Animated.View>
-        </KeyboardAvoidingView>
+            </InputContainer>
+          </FooterContainer>
+        </StyledKeyboardAvoidingView>
       </ImageBackground>
-    </View>
+    </Container>
   );
 };
 
 export default Chat;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#0f1013',
-  },
-  background: {
-    flex: 1,
-  },
-  inputContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#16171B',
-    borderRadius: 20,
-    padding: 7,
-    paddingLeft: 15,
-    paddingRight: 7,
-    paddingBottom: 7,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  input: {
-    flex: 1,
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '400',
-    padding: 0,
-    margin: 0,
-    marginBottom: 3,
-    maxHeight: 70,
-  },
-  inputPressable: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 11,
-    elevation: 10,
-  },
-  modal: {
-    flex: 1,
-  },
-  modalContent: {
-    height: '100%',
-    backgroundColor: '#1F2025',
-    borderTopRightRadius: 35,
-    borderTopLeftRadius: 35,
-    zIndex: 100,
-    padding: 20,
-  },
-  modalTop: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  line: {
-    width: 40,
-    height: 4,
-    borderRadius: 4,
-    backgroundColor: '#ffffff40',
-  },
-  modalBody: {
-    flex: 1,
-    marginTop: 30,
-    padding: 20,
-  },
-  modalTitle: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 20,
-    marginBottom: 20,
-  },
-  modalText: {
-    marginTop: 20,
-    fontSize: 15,
-    lineHeight: 20,
-    color: '#737476',
-    fontWeight: '600',
-  },
-  pressable: {
-    marginTop: 40,
-    marginRight: 10,
-    backgroundColor: '#1F2025',
-    padding: 20,
-    borderRadius: 8,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 3,
-    shadowOpacity: 0.3,
-    shadowColor: '#000',
-  },
-  pressableText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-});
