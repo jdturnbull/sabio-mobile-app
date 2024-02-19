@@ -20,6 +20,7 @@ createDatabase();
 
 const trackAutomaticEvents = false;
 const mixpanel = new Mixpanel(REACT_APP_MIXPANEL_API_KEY, trackAutomaticEvents);
+
 mixpanel.init();
 
 const AppContainer = styled.View`

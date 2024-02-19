@@ -142,7 +142,7 @@ const Chat = () => {
 
   const handleError = ({ error }) => {
     track('ERROR', { screen: 'Onboarding Chat', error: error });
-    console.log(error);
+    console.log(error.message);
   };
 
   const setupAssistant = async () => {
@@ -251,13 +251,15 @@ const Chat = () => {
         timeoutId = setTimeout(_captureResponse, 2000);
       } else if (response.status === 'completed') {
         // Get the new messages from the message thread and save them
-        const messages = await openai.retrieveMessages(state.thread.id, session.user?.id);
+        const { response, error } = await openai.retrieveMessages(state.thread.id, session.user?.id);
+
+        if (error) handleError({ error });
 
         // Set loading to false to remove the loading indicator
         setLoading(false);
 
         // Update the state with the new messages
-        dispatch(updateState({ messages }));
+        dispatch(updateState({ messages: response }));
 
         // Scroll to the bottom of the chat so the user can see the new message
         setTimeout(() => {
@@ -395,10 +397,12 @@ const Chat = () => {
     setUserMessage('');
 
     // Retrieve the messages from the message thread
-    const messages = await openai.retrieveMessages(state.thread.id, session.user?.id);
+    const { response, error } = await openai.retrieveMessages(state.thread.id, session.user?.id);
+
+    if (error) handleError({ error });
 
     // Update the state with the new messages
-    dispatch(updateState({ messages }));
+    dispatch(updateState({ messages: response }));
 
     // Tell the AI to respond to the user message
     setRequiresResponse(true);

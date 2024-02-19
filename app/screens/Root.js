@@ -56,18 +56,22 @@ const OnboardingApp = () => {
   const subscribed = useSelector((state) => state.user.session?.user?.subscriptionStatus === 'SUBSCRIBED');
 
   useEffect(() => {
-    if (signedIn && !subscribed) {
-      navigation.navigate('Payment');
-    } else if (signedIn && subscribed) {
-      if (hasOnboardingData) {
-        navigation.navigate('Finalise');
+    if (signedIn && !subscribed && !hasOnboardingData) {
+      navigation.navigate('Chat');
+    }
+
+    if (signedIn && hasOnboardingData && !subscribed) {
+      if (hasOnboardingData.restDays) {
+        navigation.navigate('Payment');
       } else {
-        navigation.navigate('Chat');
+        navigation.navigate('Finalise');
       }
-    } else {
+    }
+
+    if (!signedIn) {
       navigation.navigate('Landing');
     }
-  }, [signedIn]);
+  }, [signedIn, subscribed, hasOnboardingData]);
 
   return (
     <OnboardingStack.Navigator
@@ -104,11 +108,12 @@ const AuthedApp = () => {
 
 const RootApp = () => {
   const navigation = useNavigation();
+  const subscriptionStatus = useSelector((state) => state.user.session?.user?.subscriptionStatus);
   const onboarded = useSelector((state) => state.user.session?.user?.onboarded);
 
   // Listen for changes to authed state
   useEffect(() => {
-    if (onboarded) {
+    if (subscriptionStatus === 'SUBSCRIBED' && onboarded) {
       navigation.navigate('Authed');
     } else {
       navigation.navigate('Onboarding');

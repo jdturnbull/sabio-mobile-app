@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getIconFromLabel } from '../../utils/icon';
 import { setup } from '../../stores/user/userSlice';
 import { useMixpanel } from '../../hooks/useMixpanel';
+import { useNavigation } from '@react-navigation/native';
 
 // Gather some data that is essential to make the plan bug free
 // This is going to be the goal date.
@@ -121,7 +122,8 @@ const NextButtonText = styled.Text`
 const Finalise = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
-  const track = useMixpanel();
+  const { track } = useMixpanel();
+  const navigation = useNavigation();
   const session = useSelector((state) => state.user.session);
   const [connected, setConnected] = useState(session.user?.onboardingData?.hasMadeConnection || false);
 
@@ -204,17 +206,23 @@ const Finalise = () => {
       track('APP_ACTION', { action: 'Stopped navigation, invalid date', screen: 'Finalise' });
       Alert.alert('Invalid date', 'Please select a date that is at least a month in the future and at most a year');
     } else {
-      const response = await call('POST', `users/completeOnboarding`, {
-        userId: session.user?.id,
-        onboardingData: {
+      try {
+        await call('POST', 'users/finaliseOnboarding', {
+          userId: session.user?.id,
           restDays,
-          goalDate: date,
-        },
-      });
+          goalDate,
+        });
 
-      track('APP_ACTION', { action: 'Completed onboarding', screen: 'Finalise' });
+        track('APP_ACTION', { action: 'Completed finalise screen', screen: 'Finalise' });
 
-      dispatch(setup());
+        dispatch(setup());
+
+        // Navigate to the chat screen
+        navigation.navigate('Payment');
+      } catch (error) {
+        track('ERROR', { screen: 'Finalise', error: error.message });
+        console.log('Error finalising onboarding' + error.message);
+      }
     }
   };
 
@@ -222,7 +230,7 @@ const Finalise = () => {
     <Container>
       <Content>
         <Headline>
-          Last bit! Let's <Text style={{ color: theme.colors.primary }}>finalise your plan</Text>
+          Let's <Text style={{ color: theme.colors.primary }}>finalise your plan</Text>
         </Headline>
         {/* First lets get them to select the days they'd like to train */}
         <ItemContainer>

@@ -54,8 +54,8 @@ export const continueWithApple = createAsyncThunk('user/continueWithApple', asyn
     } else {
       // Error with Apple Signin
     }
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log(error.message);
   }
 });
 
@@ -114,8 +114,6 @@ export const userSlice = createSlice({
       state.onboarded = action.payload.session?.user?.onboarded;
     });
     builder.addCase(continueWithApple.fulfilled, (state, action) => {
-      console.log(action.payload);
-
       if (action.payload) {
         state.session = action.payload;
         state.signedIn = true;

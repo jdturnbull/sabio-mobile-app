@@ -124,7 +124,7 @@ const Payment = () => {
         appAccountToken: user.id,
       });
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
       setLoading(false);
     }
   };
@@ -144,7 +144,6 @@ const Payment = () => {
       track('USER_ACTION', { action: 'Restored subscription', screen: 'Payment' });
       dispatch(setup());
       setLoading(false);
-      navigation.navigate('Chat');
     } else {
       setLoading(false);
       alert('No subscription found, if you are having issues please contact support@heysabio.com');
@@ -161,7 +160,6 @@ const Payment = () => {
           track('USER_ACTION', { action: 'Confirmed subscription', screen: 'Payment' });
           dispatch(setup());
           setLoading(false);
-          navigation.navigate('Chat');
         } else {
           track('ERROR', {
             screen: 'Payment',

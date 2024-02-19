@@ -10,6 +10,8 @@ export const MixpanelProvider = ({ children }) => {
   useEffect(() => {
     const initMixpanel = async () => {
       const mixpanel = new Mixpanel(REACT_APP_MIXPANEL_API_KEY, false);
+      mixpanel.init();
+
       setMixpanelInstance(mixpanel);
     };
 
