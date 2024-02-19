@@ -145,6 +145,11 @@ const Payment = () => {
       track('USER_ACTION', { action: 'Restored subscription', screen: 'Payment' });
       dispatch(setup());
       setLoading(false);
+
+      // Navigate to the next screen
+      setTimeout(() => {
+        navigation.navigate('Authed', { screen: 'home' });
+      }, 2000);
     } else {
       setLoading(false);
       Alert.alert('No subscription found, if you are having issues please contact support@heysabio.com');
@@ -162,8 +167,9 @@ const Payment = () => {
           dispatch(setup());
           setLoading(false);
 
-          // This should force the user to the next screen
-          dispatch(updateState({ session: { ...session, user: { ...user, subscriptionStatus: 'SUBSCRIBED' } } }));
+          setTimeout(() => {
+            navigation.navigate('Authed', { screen: 'home' });
+          }, 2000);
         } else {
           track('ERROR', {
             screen: 'Payment',

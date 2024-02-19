@@ -113,7 +113,7 @@ const RootApp = () => {
 
   // Listen for changes to authed state
   useEffect(() => {
-    if (subscriptionStatus === 'SUBSCRIBED' && onboarded) {
+    if (subscriptionStatus === 'SUBSCRIBED') {
       navigation.navigate('Authed');
     } else {
       navigation.navigate('Onboarding');

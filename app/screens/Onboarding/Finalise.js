@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 import styled, { useTheme } from 'styled-components';
 import DatePicker from 'react-native-date-picker';
 import SafariView from 'react-native-safari-view';
@@ -108,6 +108,7 @@ const NextButton = styled.Pressable`
   align-items: center;
   justify-content: center;
   align-self: flex-end;
+  width: 100px;
 `;
 
 const NextButtonText = styled.Text`
@@ -126,6 +127,8 @@ const Finalise = () => {
   const navigation = useNavigation();
   const session = useSelector((state) => state.user.session);
   const [connected, setConnected] = useState(session.user?.onboardingData?.hasMadeConnection || false);
+
+  const [loading, setLoading] = useState(false);
 
   const [date, setDate] = useState(new Date());
   const [restDays, setRestDays] = useState([]);
@@ -195,13 +198,13 @@ const Finalise = () => {
   const StravaIcon = getIconFromLabel('strava');
 
   const handleNext = async () => {
+    setLoading(true);
     track('USER_ACTION', { action: 'Pressed create my plan', screen: 'Finalise' });
     // Check if date is atleast a month in the future, and max a year in the future
     const today = new Date();
     const goalDate = new Date(date);
     const timeDiff = goalDate.getTime() - today.getTime();
     const daysDiff = timeDiff / (1000 * 3600 * 24);
-
     if (daysDiff < 30 || daysDiff > 365) {
       track('APP_ACTION', { action: 'Stopped navigation, invalid date', screen: 'Finalise' });
       Alert.alert('Invalid date', 'Please select a date that is at least a month in the future and at most a year');
@@ -212,11 +215,8 @@ const Finalise = () => {
           restDays,
           goalDate,
         });
-
         track('APP_ACTION', { action: 'Completed finalise screen', screen: 'Finalise' });
-
         dispatch(setup());
-
         // Navigate to the chat screen
         navigation.navigate('Payment');
       } catch (error) {
@@ -224,6 +224,7 @@ const Finalise = () => {
         console.log('Error finalising onboarding' + error.message);
       }
     }
+    setLoading(false);
   };
 
   return (
@@ -275,7 +276,7 @@ const Finalise = () => {
         {/* Finally they connect their Strava */}
         <ItemContainer>
           <NextButton onPress={handleNext}>
-            <NextButtonText>Create my plan</NextButtonText>
+            {loading ? <ActivityIndicator color={'#fff'} /> : <NextButtonText>Next</NextButtonText>}
           </NextButton>
         </ItemContainer>
       </Content>
