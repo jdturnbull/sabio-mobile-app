@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import * as RNIap from 'react-native-iap';
-import { ActivityIndicator, Pressable, Text, View, useWindowDimensions, Platform, Linking } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View, useWindowDimensions, Platform, Linking, Alert } from 'react-native';
 import {
   initConnection,
   requestSubscription,
@@ -12,7 +12,7 @@ import {
 import call from '../../utils/call';
 import { getIconFromLabel } from '../../utils/icon';
 import { useDispatch, useSelector } from 'react-redux';
-import { setup } from '../../stores/user/userSlice';
+import { setup, updateState } from '../../stores/user/userSlice';
 import { useNavigation } from '@react-navigation/native';
 import { useMixpanel } from '../../hooks/useMixpanel';
 
@@ -95,6 +95,7 @@ const Payment = () => {
   const theme = useTheme();
 
   const [loading, setLoading] = useState(false);
+  const session = useSelector((state) => state.user.session);
   const user = useSelector((state) => state.user.session?.user);
   const { getSubscriptions, connected } = useIAP();
 
@@ -146,7 +147,7 @@ const Payment = () => {
       setLoading(false);
     } else {
       setLoading(false);
-      alert('No subscription found, if you are having issues please contact support@heysabio.com');
+      Alert.alert('No subscription found, if you are having issues please contact support@heysabio.com');
     }
   };
 
@@ -160,13 +161,16 @@ const Payment = () => {
           track('USER_ACTION', { action: 'Confirmed subscription', screen: 'Payment' });
           dispatch(setup());
           setLoading(false);
+
+          // This should force the user to the next screen
+          dispatch(updateState({ session: { ...session, user: { ...user, subscriptionStatus: 'SUBSCRIBED' } } }));
         } else {
           track('ERROR', {
             screen: 'Payment',
             error: 'There was a problem with your purchase, you can contact support at support@heysabio.com',
           });
           setLoading(false);
-          alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
+          Alert.alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
         }
       }
     });

@@ -34,7 +34,7 @@ const WaitingScreen = () => {
   const [widthAnim] = useState(new Animated.Value(0));
 
   const user = useSelector((state) => state.user?.session?.user);
-  const stage = user?.onboardingData?.stage || 0;
+  const stage = user?.onboardingData?.stage || null;
 
   let label = '';
 
