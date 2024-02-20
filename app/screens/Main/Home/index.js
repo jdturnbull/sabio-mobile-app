@@ -59,17 +59,12 @@ const Home = () => {
   useEffect(() => {
     identify({ userId: user?.id, email: user?.email, name: user?.name });
     track('SCREEN_VIEW', { screen: 'Home' });
+  }, []);
 
-    const fetchPlans = () => {
-      dispatch(getPlan());
-      dispatch(setup());
-    };
-
-    fetchPlans();
-
+  useEffect(() => {
     if (plannedActivities?.length === 0) {
       intervalRef.current = setInterval(() => {
-        fetchPlans();
+        dispatch(getPlan());
       }, 5000);
     }
 
