@@ -96,6 +96,19 @@ const LogoutPressable = styled.Pressable``;
 
 const KeyboardAvoidingView = styled.KeyboardAvoidingView``;
 
+const NextButton = styled.Pressable`
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+`;
+
+const NextText = styled.Text`
+  color: ${(props) => props.theme.colors.primary};
+  font-size: 16px;
+  font-weight: 600;
+  margin-right: 10px;
+`;
+
 const Chat = () => {
   const colorScheme = Appearance.getColorScheme();
   const scrollRef = useRef();
@@ -136,6 +149,7 @@ const Chat = () => {
   useEffect(() => {
     if (session.user.onboardingData) {
       track('APP_ACTION', { action: 'Navigating to Finalise', screen: 'Onboarding chat', location: 'useEffect' });
+      setShowNext(true);
       navigation.navigate('Finalise');
     }
   }, []);
@@ -301,6 +315,8 @@ const Chat = () => {
                   location: 'Function call',
                 });
 
+                setShowNext(true);
+
                 navigation.navigate('Finalise');
               }, 1000);
             } catch (error) {
@@ -463,6 +479,8 @@ const Chat = () => {
     );
   };
 
+  const NextIcon = getIconFromLabel('next');
+
   return (
     <Container>
       <ImageBackground
@@ -492,16 +510,31 @@ const Chat = () => {
             </Animated.ScrollView>
           </StyledGestureHandlerRootView>
           <FooterContainer style={{ width }}>
-            <InputContainer style={{ width: animatedWidth, marginBottom: animatedMargin }}>
-              <StyledInput multiline value={userMessage} onChangeText={(text) => setUserMessage(text)} />
-              <View style={{ height: '100%', width: 34 }}>
-                <InputPressable onPress={handleSendUserMessage}>
-                  <Animated.View style={{ opacity }}>
-                    <Send />
-                  </Animated.View>
-                </InputPressable>
-              </View>
-            </InputContainer>
+            {!showNext ? (
+              <InputContainer style={{ width: animatedWidth, marginBottom: animatedMargin }}>
+                <StyledInput multiline value={userMessage} onChangeText={(text) => setUserMessage(text)} />
+                <View style={{ height: '100%', width: 34 }}>
+                  <InputPressable onPress={handleSendUserMessage}>
+                    <Animated.View style={{ opacity }}>
+                      <Send />
+                    </Animated.View>
+                  </InputPressable>
+                </View>
+              </InputContainer>
+            ) : (
+              <InputContainer
+                style={{
+                  width: animatedWidth,
+                  marginBottom: animatedMargin,
+                  backgroundColor: 'transparent',
+                  justifyContent: 'flex-end',
+                }}>
+                <NextButton onPress={() => navigation.navigate('Finalise')}>
+                  <NextText>Next screen</NextText>
+                  <NextIcon />
+                </NextButton>
+              </InputContainer>
+            )}
           </FooterContainer>
         </KeyboardAvoidingView>
       </ImageBackground>

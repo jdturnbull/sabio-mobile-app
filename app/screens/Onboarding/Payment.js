@@ -115,17 +115,15 @@ const Payment = () => {
     try {
       setLoading(true);
       await initConnection();
-
       if (connected) {
         await getSubscriptions({ skus: ['com.heysabio.sabio.product.base'] });
       }
-
       await requestSubscription({
         sku: 'com.heysabio.sabio.product.base',
         appAccountToken: user.id,
       });
     } catch (error) {
-      console.log(error.message);
+      track('ERROR', { screen: 'Payment', error: error });
       setLoading(false);
     }
   };
@@ -143,7 +141,11 @@ const Payment = () => {
 
     if (valid) {
       track('USER_ACTION', { action: 'Restored subscription', screen: 'Payment' });
-      dispatch(setup());
+
+      // Get the user, and update the user state
+      const updated_user = await call('GET', `users/${user.id}`);
+      dispatch(updateState({ session: { ...session, user: updated_user } }));
+
       setLoading(false);
 
       // Navigate to the next screen
@@ -164,7 +166,10 @@ const Payment = () => {
 
         if (response) {
           track('USER_ACTION', { action: 'Confirmed subscription', screen: 'Payment' });
-          dispatch(setup());
+          // Get the user, and update the user state
+          const updated_user = await call('GET', `users/${user.id}`);
+          dispatch(updateState({ session: { ...session, user: updated_user } }));
+
           setLoading(false);
 
           setTimeout(() => {

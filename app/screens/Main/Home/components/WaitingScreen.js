@@ -34,11 +34,11 @@ const WaitingScreen = () => {
   const [widthAnim] = useState(new Animated.Value(0));
 
   const user = useSelector((state) => state.user?.session?.user);
-  const stage = user?.onboardingData?.stage || null;
+  const stage = user?.onboardingData?.stage || 0;
 
   let label = '';
 
-  if (!stage) label = 'Analysing your conversation';
+  if (stage === 0) label = 'Analysing your conversation';
   if (stage === 1) label = 'Forming holistic strategy';
   if (stage === 2) label = 'Forming monthly focuses';
   if (stage === 3) label = 'Forming weekly focuses';
