@@ -14,6 +14,7 @@ const Label = styled.Text`
   font-size: ${(props) => props.theme.text.size.md};
   color: ${(props) => props.theme.colors.labelColor};
   font-weight: ${(props) => props.theme.text.weight.semibold};
+  font-family: ${(props) => props.theme.text.family};
   margin-bottom: 15px;
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
 `;
@@ -21,6 +22,7 @@ const Label = styled.Text`
 const EditBox = styled.TextInput`
   background-color: ${(props) => props.theme.editScreen.inputBackground};
   color: ${(props) => props.theme.text.colors.secondary};
+  font-family: ${(props) => props.theme.text.family};
   padding: 15px;
   border-radius: 10px;
   margin: 10px 0;
@@ -39,6 +41,7 @@ const TypeText = styled.Text`
   font-size: ${(props) => props.theme.text.size.md};
   color: ${(props) => props.theme.text.colors.secondary};
   font-weight: ${(props) => props.theme.text.weight.semibold};
+  font-family: ${(props) => props.theme.text.family};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
   margin-left: 10px;
   flex: 1;

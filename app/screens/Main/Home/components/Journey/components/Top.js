@@ -32,6 +32,7 @@ const StyledTextBottom = styled.Text`
   margin-top: 5px;
   font-size: ${(props) => props.theme.text.size.sm};
   font-weight: ${(props) => props.theme.text.weight.regular};
+  font-family: ${(props) => props.theme.text.family};
   color: ${(props) => props.theme.text.colors.secondary};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
   line-height: 20px;

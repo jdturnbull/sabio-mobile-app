@@ -73,6 +73,7 @@ const InputContainer = styled(Animated.View)`
 const StyledInput = styled.TextInput`
   flex: 1;
   color: ${(props) => props.theme.text.colors.secondary};
+  font-family: ${(props) => props.theme.text.family};
   font-size: 16px;
   font-weight: 400;
   padding: 0;
@@ -104,6 +105,7 @@ const NextButton = styled.Pressable`
 
 const NextText = styled.Text`
   color: ${(props) => props.theme.colors.primary};
+  font-family: ${(props) => props.theme.text.family};
   font-size: 16px;
   font-weight: 600;
   margin-right: 10px;

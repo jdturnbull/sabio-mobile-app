@@ -32,6 +32,7 @@ const Headline = styled.Text`
   color: ${(props) => props.theme.text.colors.secondary};
   font-weight: ${(props) => props.theme.text.weight.bold};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const ItemContainer = styled.View`
@@ -44,6 +45,7 @@ const ItemLabel = styled.Text`
   font-size: ${(props) => props.theme.text.size.md};
   font-weight: ${(props) => props.theme.text.weight.semibold};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-family: ${(props) => props.theme.text.family};
   margin-bottom: 5px;
 `;
 
@@ -55,6 +57,7 @@ const ItemSubLabel = styled.Text`
   font-size: ${(props) => props.theme.text.size.sm};
   font-weight: ${(props) => props.theme.text.weight.regular};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const DaysContainer = styled.View`
@@ -78,6 +81,7 @@ const DayText = styled.Text`
   font-size: ${(props) => props.theme.text.size.sm};
   font-weight: ${(props) => props.theme.text.weight.regular};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const ConnectButton = styled.Pressable`
@@ -96,6 +100,7 @@ const ButtonText = styled.Text`
   font-size: ${(props) => props.theme.text.size.md};
   font-weight: ${(props) => props.theme.text.weight.semibold};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-family: ${(props) => props.theme.text.family};
   margin-left: 5px;
 `;
 
@@ -117,6 +122,7 @@ const NextButtonText = styled.Text`
   font-size: ${(props) => props.theme.text.size.md};
   font-weight: ${(props) => props.theme.text.weight.semibold};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-family: ${(props) => props.theme.text.family};
   margin-left: 5px;
 `;
 

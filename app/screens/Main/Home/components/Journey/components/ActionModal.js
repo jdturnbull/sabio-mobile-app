@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Modal } from 'react-native';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import call from '../../../../../../utils/call';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPlan, updateState } from '../../../../../../stores/user/userSlice';
@@ -22,12 +22,14 @@ const Inner = styled.View`
 `;
 
 const Input = styled.TextInput`
-  background-color: white;
+  background-color: ${(props) => props.theme.home.cards.rightBackground};
+  color: ${(props) => props.theme.home.cards.iconPendingColor};
   width: 100%;
   padding: 10px;
   border-radius: 10px;
   margin-bottom: 20px;
   height: 60px;
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const ButtonRow = styled.View`
@@ -61,10 +63,14 @@ const Button = styled.TouchableOpacity`
 
 const CancelText = styled.Text`
   color: ${(props) => props.theme.home.cards.iconPendingColor};
+  font-weight: bold;
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const SubmitText = styled.Text`
   color: white;
+  font-weight: bold;
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const ActionModal = ({ visible, setVisible, action }) => {
@@ -73,12 +79,14 @@ const ActionModal = ({ visible, setVisible, action }) => {
   const [loading, setLoading] = useState(false);
   const [placeholder, setPlaceholder] = useState('');
 
+  const theme = useTheme();
+
   const user = useSelector((state) => state.user?.session?.user);
 
   useEffect(() => {
     if (!action) setPlaceholder('');
-    if (action === 'replan_day') setPlaceholder('How would you like to change your day?');
-    if (action === 'replan_week') setPlaceholder('How would you like to change your week?');
+    if (action === 'replan_day') setPlaceholder("I'm tired, can we schedule something small?");
+    if (action === 'replan_week') setPlaceholder('I rolled my ankle, can you replan?');
     if (action === 'feedback') setPlaceholder('What would you like to tell us?');
   }, [action]);
 
@@ -104,7 +112,7 @@ const ActionModal = ({ visible, setVisible, action }) => {
         }
       }
       if (action === 'feedback') {
-        const response = await call('POST', `users/feedback`, { description: value, userId: user?.id });
+        const response = await call('POST', `users/feedback`, { feedback: value, userId: user?.id });
 
         if (response) {
           Alert.alert('Thank you', 'Your feedback has been sent.');
@@ -118,19 +126,27 @@ const ActionModal = ({ visible, setVisible, action }) => {
     }
 
     setLoading(false);
+    setValue('');
     setVisible(false);
   };
 
   const handleCancel = () => {
     setLoading(false);
     setVisible(false);
+    setValue('');
   };
 
   return (
     <Modal visible={visible} animationType="fade" transparent={true}>
       <Container>
         <Inner>
-          <Input multiline placeholder={placeholder} value={value} onChangeText={(text) => setValue(text)} />
+          <Input
+            multiline
+            placeholder={placeholder}
+            placeholderTextColor={`${theme.text.colors.secondary}80`}
+            value={value}
+            onChangeText={(text) => setValue(text)}
+          />
           <ButtonRow>
             <CancelButton onPress={handleCancel}>
               <CancelText>Cancel</CancelText>

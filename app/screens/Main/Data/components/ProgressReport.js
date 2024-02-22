@@ -18,6 +18,7 @@ const HeaderText = styled.Text`
   font-weight: ${(props) => props.theme.text.weight.bold};
   color: ${(props) => props.theme.colors.progressReportTopText};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const ProgressReport = ({ report }) => {

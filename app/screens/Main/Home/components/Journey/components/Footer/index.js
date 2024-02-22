@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Pressable, Dimensions, useColorScheme, ActivityIndicator } from 'react-native';
 import styled, { useTheme } from 'styled-components';
+import moment from 'moment';
 import { PanGestureHandler, ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
@@ -12,6 +13,9 @@ import Animated, {
 import EditScreen from './EditScreen';
 import { getIconFromLabel } from '../../../../../../../utils/icon';
 import { useMixpanel } from '../../../../../../../hooks/useMixpanel';
+import call from '../../../../../../../utils/call';
+import { useDispatch } from 'react-redux';
+import { getPlan } from '../../../../../../../stores/user/userSlice';
 
 const Title = styled.Text`
   font-family: ${(props) => props.theme.text.family};
@@ -32,12 +36,20 @@ const Body = styled.Text`
 
 const StyledPressable = styled.Pressable`
   margin-top: 20px;
+  flex: 1;
   background-color: ${(props) => props.theme.text.colors.primary};
   border-radius: 10px;
   padding: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const ButtonRow = styled.View`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
 `;
 
 const Footer = ({ data, setModalData, setHideButton }) => {
@@ -49,6 +61,8 @@ const Footer = ({ data, setModalData, setHideButton }) => {
   const [expanded, setExpanded] = useState(false);
 
   const [showEditScreen, setShowEditScreen] = useState(false);
+
+  const dispatch = useDispatch();
 
   const EditIcon = getIconFromLabel('edit');
   const CloseIcon = getIconFromLabel('missed');
@@ -132,7 +146,37 @@ const Footer = ({ data, setModalData, setHideButton }) => {
     };
   });
 
-  const handleComplete = () => {};
+  const handleComplete = async () => {
+    track('USER_ACTION', { action: 'Complete activity' });
+
+    await call('POST', 'users/completeActivity', {
+      id: data.item.id,
+      userId: data.item.userId,
+    });
+
+    dispatch(getPlan());
+
+    setRenderFooter(false);
+    setExpanded(false);
+    setModalData(null);
+    setHideButton(false);
+  };
+
+  const handleUncomplete = async () => {
+    track('USER_ACTION', { action: 'Uncomplete activity' });
+
+    await call('POST', 'users/uncompleteActivity', {
+      id: data.item.id,
+      userId: data.item.userId,
+    });
+
+    dispatch(getPlan());
+
+    setRenderFooter(false);
+    setExpanded(false);
+    setModalData(null);
+    setHideButton(false);
+  };
 
   const handleEditPress = () => {
     if (showEditScreen) {
@@ -176,9 +220,21 @@ const Footer = ({ data, setModalData, setHideButton }) => {
           </View>
           {!expanded && <Body numberOfLines={1}>{data?.item.guidance}</Body>}
           {!showEditScreen && (
-            <StyledPressable onPress={handlePress}>
-              <Text style={styles.pressableText}>{expanded ? 'Close' : 'View'}</Text>
-            </StyledPressable>
+            <ButtonRow>
+              <StyledPressable onPress={handlePress}>
+                <Text style={styles.pressableText}>{expanded ? 'Close' : 'View'}</Text>
+              </StyledPressable>
+              {data?.item?.date === moment().format('YYYY-MM-DD') && (
+                <StyledPressable
+                  style={[
+                    { backgroundColor: '#D4D72B', marginLeft: 10 },
+                    data?.item?.completed && { backgroundColor: '#FFAC0A' },
+                  ]}
+                  onPress={data?.item?.completed ? handleUncomplete : handleComplete}>
+                  <Text style={styles.pressableText}>{data?.item?.completed ? 'Uncomplete' : 'Complete'}</Text>
+                </StyledPressable>
+              )}
+            </ButtonRow>
           )}
           {expanded && showEditScreen && <EditScreen item={data?.item} handleEditPress={handleEditPress} />}
           {expanded && !showEditScreen && (

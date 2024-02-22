@@ -56,6 +56,7 @@ const InputContainer = styled(Animated.View)`
 const StyledInput = styled.TextInput`
   flex: 1;
   color: ${(props) => props.theme.text.colors.secondary};
+  font-family: ${(props) => props.theme.text.family};
   font-size: 16px;
   font-weight: 400;
   padding: 0;

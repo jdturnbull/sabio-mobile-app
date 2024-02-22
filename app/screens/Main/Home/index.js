@@ -167,3 +167,7 @@ const Home = () => {
 };
 
 export default Home;
+
+// TODO: Clean up UI for action modal & loading
+// TODO: Add change rest days option in settings
+// TODO: Add learnings to replan day and replan week

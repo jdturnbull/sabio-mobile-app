@@ -4,8 +4,6 @@ import { View, Pressable, Alert, useWindowDimensions, ImageBackground, useColorS
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import SafariView from 'react-native-safari-view';
-import moment from 'moment';
-
 import call from '../../../utils/call';
 import { getIconFromLabel } from '../../../utils/icon';
 import LightBackground from '../../../assets/home-background-light.png';
@@ -13,6 +11,8 @@ import DarkBackground from '../../../assets/home-background-dark.png';
 import { setup, signout } from '../../../stores/user/userSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useMixpanel } from '../../../hooks/useMixpanel';
+
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -42,6 +42,7 @@ const Top = styled.View`
 `;
 
 const HeaderText = styled.Text`
+  font-family: ${(props) => props.theme.text.family};
   font-size: ${(props) => props.theme.text.size.lg};
   font-weight: ${(props) => props.theme.text.weight.bold};
   color: ${(props) => props.theme.text.colors.secondary};
@@ -49,6 +50,7 @@ const HeaderText = styled.Text`
 
 const HeaderSubText = styled.Text`
   font-size: ${(props) => props.theme.text.size.md};
+  font-family: ${(props) => props.theme.text.family};
   font-weight: ${(props) => props.theme.text.weight.regular};
   color: ${(props) => props.theme.text.colors.secondary};
   margin-top: 5px;
@@ -78,6 +80,7 @@ const StyledText = styled.Text`
   font-size: ${(props) => props.theme.text.size.lg};
   font-weight: ${(props) => props.theme.text.weight.bold};
   color: ${(props) => props.theme.settings.labelColor};
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const ProgressContainer = styled.View`
@@ -99,47 +102,35 @@ const PercentageText = styled.Text`
   font-size: ${(props) => props.theme.text.size.sm};
   font-weight: ${(props) => props.theme.text.weight.regular};
   color: ${(props) => props.theme.text.colors.secondary};
-`;
-
-const InformationContainer = styled.Pressable`
-  display: flex;
-  padding: 15px;
-  flex-direction: row;
-  align-items: center;
-  border-bottom-width: 0;
-  background-color: ${(props) => props.theme.settings.optionBoxColor};
-`;
-
-const InformationText = styled.Text`
-  line-height: 20px;
-  font-size: ${(props) => props.theme.text.size.sm};
-  color: ${(props) => props.theme.settings.optionTextColor};
   font-family: ${(props) => props.theme.text.family};
 `;
 
-const InformationBox = ({ title, value, onPress, id, last, first }) => {
-  const handlePress = () => onPress(id);
+const DaysContainer = styled.View`
+  margin-top: 20px;
+`;
 
-  return (
-    <InformationContainer
-      style={
-        last
-          ? { marginBottom: 50, borderBottomLeftRadius: 18, borderBottomRightRadius: 18 }
-          : first
-          ? { borderTopLeftRadius: 18, borderTopRightRadius: 18, marginBottom: 3 }
-          : { marginBottom: 3 }
-      }
-      onPress={handlePress}>
-      <InformationText>
-        <InformationText style={{ fontWeight: 600 }}>{title}</InformationText> {value}
-      </InformationText>
-    </InformationContainer>
-  );
-};
+const DaySelectable = styled.Pressable`
+  margin-bottom: 10px;
+  border: ${(props) =>
+    props.selected
+      ? `1px solid ${props.theme.finalOnboarding.daySelectedBorder}`
+      : `1px solid ${props.theme.finalOnboarding.dayBorder}`};
+  padding: 10px;
+  border-radius: 8px;
+`;
+
+const DayText = styled.Text`
+  color: ${(props) =>
+    props.selected ? props.theme.finalOnboarding.daySelectedBorder : props.theme.finalOnboarding.dayBorder};
+  font-family: ${(props) => props.theme.text.family};
+  font-size: ${(props) => props.theme.text.size.sm};
+  font-weight: ${(props) => props.theme.text.weight.regular};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-family: ${(props) => props.theme.text.family};
+`;
 
 const Settings = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation();
   const { track } = useMixpanel();
   const theme = useTheme();
   const colorScheme = useColorScheme();
@@ -147,7 +138,7 @@ const Settings = () => {
   const user = useSelector((state) => state.user.session?.user);
   const activities = useSelector((state) => state.user?.plannedActivities);
 
-  const [modalOpen, setModalOpen] = useState(false);
+  const [restDays, setRestDays] = useState(user?.onboardingData.restDays || []);
 
   const { width: screenWidth } = useWindowDimensions();
 
@@ -167,15 +158,6 @@ const Settings = () => {
     checkConnection();
   }, []);
 
-  const handleResetConfirm = async () => {
-    try {
-      await call('GET', `users/reset/${user?.id}`);
-      Alert.alert('Plan reset', '', [{ text: 'OK' }]);
-    } catch (error) {
-      Alert.alert('Failed to reset plan, please contact support', '', [{ text: 'OK' }]);
-    }
-  };
-
   const handleOptionPress = async (opt) => {
     track('USER_ACTION', { action: 'Settings option pressed', option: opt });
 
@@ -184,15 +166,7 @@ const Settings = () => {
     }
 
     if (opt === 'newPlan') {
-      // Alert.alert('Reset your plan', 'This will remove all existing data & progress reports', [
-      //   { text: 'Cancel' },
-      //   { text: 'Confirm', onPress: handleResetConfirm },
-      // ]);
       Alert.alert('Contact support to reset your plan', '', [{ text: 'Cancel' }]);
-    }
-
-    if (opt === 'subscription') {
-      // Open apple pay
     }
 
     if (opt === 'connect') {
@@ -267,9 +241,28 @@ const Settings = () => {
   const progressPercentage = (numCompleted / totalNum) * 100;
   const progressWidth = (progressBarWidth * progressPercentage) / 100;
 
-  const handleInfoBoxPress = () => {};
-
   const ProfileIcon = getIconFromLabel('profile');
+
+  const handleRestDaySelect = async (day) => {
+    if (restDays.includes(day.toLowerCase())) {
+      try {
+        await call('POST', 'users/setRestDays', {
+          userId: user.id,
+          restDays: restDays.filter((d) => d !== day.toLowerCase()),
+        });
+        setRestDays(restDays.filter((d) => d !== day.toLowerCase()));
+      } catch (error) {
+        Alert.alert('Error', 'An error occurred. Please try again later.', [{ text: 'OK' }]);
+      }
+    } else {
+      try {
+        await call('POST', 'users/setRestDays', { userId: user.id, restDays: [...restDays, day.toLowerCase()] });
+        setRestDays([...restDays, day.toLowerCase()]);
+      } catch (error) {
+        Alert.alert('Error', 'An error occurred. Please try again later.', [{ text: 'OK' }]);
+      }
+    }
+  };
 
   return (
     <ImageBackground
@@ -309,6 +302,19 @@ const Settings = () => {
             <PercentageText>{`${Math.round(progressPercentage * 100) / 100}%`}</PercentageText>
           </View>
         </View>
+        <StyledText>Change your rest days</StyledText>
+        <DaysContainer>
+          {days.map((day, index) => {
+            return (
+              <DaySelectable
+                key={day}
+                selected={restDays.includes(day.toLowerCase())}
+                onPress={() => handleRestDaySelect(day)}>
+                <DayText selected={restDays.includes(day.toLowerCase())}>{day}</DayText>
+              </DaySelectable>
+            );
+          })}
+        </DaysContainer>
       </Container>
     </ImageBackground>
   );

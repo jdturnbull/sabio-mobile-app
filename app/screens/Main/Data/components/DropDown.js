@@ -22,6 +22,7 @@ const DropDownText = styled.Text`
   font-weight: ${(props) => props.theme.text.weight.regular};
   color: ${(props) => props.theme.colors.primary};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-family: ${(props) => props.theme.text.family};
   margin-right: 5px;
 `;
 
@@ -34,6 +35,7 @@ const OptionText = styled.Text`
   font-weight: ${(props) => props.theme.text.weight.regular};
   color: ${(props) => props.theme.colors.progressDropDownOptionText};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const DropDown = () => {

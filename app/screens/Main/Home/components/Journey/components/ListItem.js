@@ -41,6 +41,7 @@ const ContentText = styled.Text`
   color: ${(props) => props.theme.text.colors.secondaryInverse};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
   font-weight: ${(props) => props.theme.text.weight.bold};
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const ListItem = forwardRef(

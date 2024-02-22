@@ -22,6 +22,7 @@ const TopBoxText = Styled.Text`
   font-weight: ${(props) => props.theme.text.weight.regular};
   color: ${(props) => props.theme.colors.progressLabelText};  
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const Chart = Styled.View`
