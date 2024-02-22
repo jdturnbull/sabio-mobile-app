@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { ImageBackground, View, useColorScheme } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { FloatingAction } from 'react-native-floating-action';
 import { getPlan, setup } from '../../../stores/user/userSlice';
 import Journey from './components/Journey';
 import WaitingScreen from './components/WaitingScreen';
@@ -9,6 +10,7 @@ import { getIconFromLabel } from '../../../utils/icon';
 import BackgroundDark from '../../../assets/home-background-dark.png';
 import BackgroundLight from '../../../assets/home-background-light.png';
 import { useMixpanel } from '../../../hooks/useMixpanel';
+import ActionModal from './components/Journey/components/ActionModal';
 
 const HelloContainer = styled.View`
   margin-top: 5px;
@@ -46,6 +48,7 @@ const ItemText = styled.Text`
 const Home = () => {
   const dispatch = useDispatch();
   const { track, identify } = useMixpanel();
+  const [hideButton, setHideButton] = useState(false);
   const plannedActivities = useSelector((state) => state.user.plannedActivities);
   const user = useSelector((state) => state.user?.session?.user);
 
@@ -56,12 +59,19 @@ const Home = () => {
 
   const intervalRef = useRef(null);
 
-  useEffect(() => {
-    identify({ userId: user?.id, email: user?.email, name: user?.name });
-    track('SCREEN_VIEW', { screen: 'Home' });
-  }, []);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedAction, setSelectedAction] = useState(null);
 
   useEffect(() => {
+    if (user) {
+      identify({ userId: user?.id, email: user?.email, name: user?.name });
+      track('SCREEN_VIEW', { screen: 'Home' });
+    }
+  }, [user]);
+
+  useEffect(() => {
+    getPlan();
+
     if (plannedActivities?.length === 0) {
       intervalRef.current = setInterval(() => {
         dispatch(getPlan());
@@ -80,6 +90,36 @@ const Home = () => {
       clearInterval(intervalRef.current);
     }
   }, [plannedActivities?.length]);
+
+  const actions = [
+    {
+      text: 'Replan day',
+      color: theme.home.cards.rightBackground,
+      textBackground: theme.home.cards.rightBackground,
+      textColor: theme.text.colors.secondary,
+      icon: require('../../../assets/replan.png'),
+      name: 'replan_day',
+      position: 1,
+    },
+    {
+      text: 'Replan week',
+      color: theme.home.cards.rightBackground,
+      textBackground: theme.home.cards.rightBackground,
+      textColor: theme.text.colors.secondary,
+      icon: require('../../../assets/replan.png'),
+      name: 'replan_week',
+      position: 2,
+    },
+    {
+      text: 'Feedback',
+      color: theme.home.cards.rightBackground,
+      textBackground: theme.home.cards.rightBackground,
+      textColor: theme.text.colors.secondary,
+      icon: require('../../../assets/replan.png'),
+      name: 'feedback',
+      position: 3,
+    },
+  ];
 
   if (!plannedActivities || plannedActivities?.length === 0) {
     return (
@@ -107,7 +147,20 @@ const Home = () => {
             <ItemText>{user?.streak || 0}</ItemText>
           </ItemContainer>
         </HelloContainer>
-        <Journey />
+        <Journey setHideButton={setHideButton} />
+        {!hideButton && (
+          <FloatingAction
+            actions={actions}
+            // floatingIcon={SabioLogo}
+            color={theme.colors.primary}
+            overlayColor="rgba(0, 0, 0, 0.5)"
+            onPressItem={(name) => {
+              setSelectedAction(name);
+              setModalVisible(true);
+            }}
+          />
+        )}
+        <ActionModal action={selectedAction} visible={isModalVisible} setVisible={setModalVisible} />
       </ImageBackground>
     );
   }

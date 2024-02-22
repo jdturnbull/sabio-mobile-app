@@ -9,10 +9,10 @@ import ListItem from './components/ListItem';
 import Separator from './components/Separator';
 import Footer from './components/Footer';
 import ModalContent from './components/ModalContent';
-import { getPlan } from '../../../../../stores/user/userSlice';
+import { getPlan, updateState } from '../../../../../stores/user/userSlice';
 import { useMixpanel } from '../../../../../hooks/useMixpanel';
 
-const Journey = () => {
+const Journey = ({ setHideButton }) => {
   const dispatch = useDispatch();
   const flatListRef = useRef(null);
 
@@ -98,6 +98,7 @@ const Journey = () => {
             setModalData={setModalData}
             modalData={modalData}
             index={index}
+            setHideButton={setHideButton}
             setIsAutoScrolling={setIsAutoScrolling}
             visibleIndexs={visibleIndexs}
             scrollPosition={scrollPosition}
@@ -111,7 +112,7 @@ const Journey = () => {
         viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       />
-      <Footer data={modalData} setModalData={setModalData} />
+      <Footer data={modalData} setModalData={setModalData} setHideButton={setHideButton} />
       <Modal visible={showPlan} animationType="slide" transparent>
         <ModalContent setShowPlan={setShowPlan} />
       </Modal>
@@ -120,5 +121,3 @@ const Journey = () => {
 };
 
 export default Journey;
-
-const styles = StyleSheet.create({});

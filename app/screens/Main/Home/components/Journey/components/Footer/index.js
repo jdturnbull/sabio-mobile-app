@@ -40,7 +40,7 @@ const StyledPressable = styled.Pressable`
   align-items: center;
 `;
 
-const Footer = ({ data, setModalData }) => {
+const Footer = ({ data, setModalData, setHideButton }) => {
   const theme = useTheme();
   const { track } = useMixpanel();
   const colorScheme = useColorScheme();
@@ -59,9 +59,11 @@ const Footer = ({ data, setModalData }) => {
 
   useEffect(() => {
     if (data) {
+      setHideButton(true);
       setRenderFooter(true);
       heightAnim.value = withTiming(155, { duration: 200 });
     } else {
+      setHideButton(false);
       heightAnim.value = withTiming(0, { duration: 200 }, () => {
         runOnJS(setRenderFooter)(false);
         runOnJS(setExpanded)(false);
@@ -76,6 +78,7 @@ const Footer = ({ data, setModalData }) => {
   // If data is null, reset everything
   useEffect(() => {
     if (!data) {
+      setHideButton(false);
       setExpanded(false);
       setRenderFooter(false);
     }
@@ -89,11 +92,12 @@ const Footer = ({ data, setModalData }) => {
 
         // Reset the modal data
         runOnJS(setModalData)(null);
+        runOnJS(setHideButton)(false);
       });
     } else {
+      setHideButton(true);
       heightAnim.value = withTiming(screenHeight / 2, { duration: 300 }, () => {
         runOnJS(setExpanded)(true);
-        runOnJS(track('USER_ACTION', { action: 'View guidance' }));
       });
     }
   };
@@ -112,6 +116,8 @@ const Footer = ({ data, setModalData }) => {
           runOnJS(setRenderFooter)(false);
           runOnJS(setExpanded)(false);
           runOnJS(setShowEditScreen)(false);
+          runOnJS(setModalData)(null);
+          runOnJS(setHideButton)(false);
         });
       } else {
         // Snap back to the expanded position
@@ -135,6 +141,8 @@ const Footer = ({ data, setModalData }) => {
       heightAnim.value = withTiming(0, { duration: 300 }, () => {
         runOnJS(setRenderFooter)(false);
         runOnJS(setExpanded)(false);
+        runOnJS(setModalData)(null);
+        runOnJS(setHideButton)(false);
       });
     } else {
       track('USER_ACTION', { action: 'Open edit screen' });

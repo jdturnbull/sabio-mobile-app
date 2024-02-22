@@ -118,7 +118,8 @@ const RootApp = () => {
     } else {
       navigation.navigate('Onboarding');
     }
-  }, [onboarded]);
+  }, [onboarded, subscriptionStatus]);
+
   return (
     <AppStack.Navigator
       initialRouteName={onboarded ? 'Authed' : 'Onboarding'}

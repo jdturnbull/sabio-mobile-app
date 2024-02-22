@@ -12,10 +12,10 @@ export default async (method, path, data) => {
     const url = `${apiBase}/${path}`;
 
     const response = await axios({ method, url, data });
-    mixpanel.track('APP_ACTION', { action: 'Call', method, path, data });
+    // mixpanel.track('APP_ACTION', { action: 'Call', method, path, data });
     return response.data;
   } catch (error) {
-    mixpanel.track('APP_ERROR', { action: 'Call', method, path, data, error });
+    // mixpanel.track('APP_ERROR', { action: 'Call', method, path, data, error: error.message });
     console.log(error.message);
   }
 };

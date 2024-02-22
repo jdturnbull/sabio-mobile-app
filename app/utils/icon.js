@@ -26,6 +26,8 @@ import Missed from '../components/icons/cards/Missed';
 import Stretch from '../components/icons/cards/Stretch';
 import Brick from '../components/icons/cards/Brick';
 
+import Replan from '../components/icons/actions/Replan';
+
 import FloatingButton from '../components/icons/home/FloatingButton';
 import Analytics from '../components/icons/tabs/Analytics';
 import Runner from '../components/icons/general/Runner';
@@ -127,6 +129,7 @@ export const ICONS = [
   { label: 'logout', icon: Logout },
   { label: 'strava', icon: Strava },
   { label: 'edit', icon: Edit },
+  { label: 'replan', icon: Replan },
 ];
 
 export const getIconFromLabel = (label) => ICONS.find((i) => i.label === label)?.icon;

@@ -147,11 +147,7 @@ const Payment = () => {
       dispatch(updateState({ session: { ...session, user: updated_user } }));
 
       setLoading(false);
-
-      // Navigate to the next screen
-      setTimeout(() => {
-        navigation.navigate('Authed', { screen: 'home' });
-      }, 2000);
+      navigation.navigate('Authed');
     } else {
       setLoading(false);
       Alert.alert('No subscription found, if you are having issues please contact support@heysabio.com');
@@ -172,9 +168,7 @@ const Payment = () => {
 
           setLoading(false);
 
-          setTimeout(() => {
-            navigation.navigate('Authed', { screen: 'home' });
-          }, 2000);
+          navigation.navigate('Authed');
         } else {
           track('ERROR', {
             screen: 'Payment',

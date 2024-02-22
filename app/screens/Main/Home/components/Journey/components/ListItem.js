@@ -44,7 +44,7 @@ const ContentText = styled.Text`
 `;
 
 const ListItem = forwardRef(
-  ({ item, setModalData, modalData, index, visibleIndexs, scrollPosition, setIsAutoScrolling }, ref) => {
+  ({ item, setModalData, modalData, index, visibleIndexs, scrollPosition, setIsAutoScrolling, setHideButton }, ref) => {
     const { width: screenWidth } = Dimensions.get('window');
     const center = screenWidth / 2 - BOX_WIDTH / 2;
 
@@ -76,9 +76,12 @@ const ListItem = forwardRef(
       }
 
       if (isSelected) {
+        setHideButton(false);
         setModalData(null);
         return;
       }
+
+      setHideButton(true);
 
       track('USER_ACTION', { action: 'Activity pressed', screen: 'Home', type: item.type });
 
@@ -107,6 +110,7 @@ const ListItem = forwardRef(
 
     const handleOverlayPress = () => {
       if (modalData) {
+        setHideButton(false);
         setModalData(null);
       }
     };
