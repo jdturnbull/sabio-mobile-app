@@ -24,13 +24,13 @@
 		5039EF440F5D4EF69C460F2C /* NotoSans-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CC99183CF92347FEBDB105AE /* NotoSans-MediumItalic.ttf */; };
 		5DF9E91BC5E54C2D83DE2663 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8ECE16BE0978477AABF87E02 /* OFL.txt */; };
 		62F11C70A877485AB9BA27D8 /* NotoSans-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 073DD3CE29C145C1AD554E0C /* NotoSans-BlackItalic.ttf */; };
-		66A11EEBA366915776AB8482 /* libPods-Sabio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29C551BED27E9E9B8A610416 /* libPods-Sabio.a */; };
 		70E4F98791314674B2B1942E /* NotoSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 19B497BDCD7C46DAAD249043 /* NotoSans-Regular.ttf */; };
 		79B7ACB338A34DE384296C7D /* NotoSans-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60E3BDC57DBE4346B2DA6268 /* NotoSans-Black.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		896A82D20FF7DC5D6C2CD7A5 /* libPods-Sabio-SabioTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D124CA5BCD7606D27C0704C3 /* libPods-Sabio-SabioTests.a */; };
+		92A7569AD87D9D23CD59B2EF /* libPods-Sabio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6223B3275244CBED7BE6BBD6 /* libPods-Sabio.a */; };
 		9335B6317F644AC9B3CDA95B /* NotoSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0AE85B2EED114FAE96D7C5E8 /* NotoSans-BoldItalic.ttf */; };
 		A13A9CB5230F4332BE48FE27 /* NotoSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E45F891419D14A4BB7DE0DD4 /* NotoSans-Medium.ttf */; };
+		AFE3569709A33EC97AB9C44C /* libPods-Sabio-SabioTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AD5E7C413F2AA2B81303E34 /* libPods-Sabio-SabioTests.a */; };
 		C3D5E2C4ED134D8D85433A5B /* NotoSans-ExtraLightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D5A5983DBB5B436D85977E29 /* NotoSans-ExtraLightItalic.ttf */; };
 		C6AC1A5B85A64FD5AA451B9C /* NotoSans-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FB366D18AF446C7A05AB760 /* NotoSans-ExtraBoldItalic.ttf */; };
 		E462CA66CF3B4146A5C94249 /* NotoSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A388687476CA4AA8A8AEF74C /* NotoSans-Bold.ttf */; };
@@ -69,27 +69,27 @@
 		1A4EBB0E2B4712190003229D /* Sabio.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Sabio.storekit; sourceTree = "<group>"; };
 		1A5941242AF6F65000F3CE01 /* Sabio.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Sabio.entitlements; path = Sabio/Sabio.entitlements; sourceTree = "<group>"; };
 		23685B21375C4708A11EB82B /* NotoSans-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-ExtraBold.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-ExtraBold.ttf"; sourceTree = "<group>"; };
-		29C551BED27E9E9B8A610416 /* libPods-Sabio.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Sabio.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A68963943C443AC8CEEF5FB /* NotoSans-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-SemiBold.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		2EC8170297F74C0A93273227 /* NotoSans-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-Thin.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-Thin.ttf"; sourceTree = "<group>"; };
 		60E3BDC57DBE4346B2DA6268 /* NotoSans-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-Black.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-Black.ttf"; sourceTree = "<group>"; };
+		6223B3275244CBED7BE6BBD6 /* libPods-Sabio.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Sabio.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65AFB01542B949D1B8085A42 /* NotoSans-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-Italic.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-Italic.ttf"; sourceTree = "<group>"; };
-		6B6912CDF9CB84319B974FA0 /* Pods-Sabio.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sabio.debug.xcconfig"; path = "Target Support Files/Pods-Sabio/Pods-Sabio.debug.xcconfig"; sourceTree = "<group>"; };
+		6AD5E7C413F2AA2B81303E34 /* libPods-Sabio-SabioTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Sabio-SabioTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F27DF8F8C1E33D104962ACE /* Pods-Sabio.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sabio.debug.xcconfig"; path = "Target Support Files/Pods-Sabio/Pods-Sabio.debug.xcconfig"; sourceTree = "<group>"; };
 		7D774FA087034D1690A1B061 /* NotoSans-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-Light.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-Light.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Sabio/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		868B8D06323320748E94BD53 /* Pods-Sabio-SabioTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sabio-SabioTests.release.xcconfig"; path = "Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests.release.xcconfig"; sourceTree = "<group>"; };
 		8ECE16BE0978477AABF87E02 /* OFL.txt */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = OFL.txt; path = ../assets/fonts/Noto_Sans/OFL.txt; sourceTree = "<group>"; };
-		94A1B16A42918341886528E9 /* Pods-Sabio.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sabio.release.xcconfig"; path = "Target Support Files/Pods-Sabio/Pods-Sabio.release.xcconfig"; sourceTree = "<group>"; };
 		A388687476CA4AA8A8AEF74C /* NotoSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-Bold.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-Bold.ttf"; sourceTree = "<group>"; };
 		A39FF2627D2F4F8ABA5A3EA0 /* NotoSans-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-LightItalic.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-LightItalic.ttf"; sourceTree = "<group>"; };
 		B25C8561F7DE4BFF98738658 /* NotoSans-SemiBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-SemiBoldItalic.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
+		BDD50ABA972FE4530FBE6B68 /* Pods-Sabio-SabioTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sabio-SabioTests.release.xcconfig"; path = "Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests.release.xcconfig"; sourceTree = "<group>"; };
 		CC99183CF92347FEBDB105AE /* NotoSans-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-MediumItalic.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-MediumItalic.ttf"; sourceTree = "<group>"; };
-		D124CA5BCD7606D27C0704C3 /* libPods-Sabio-SabioTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Sabio-SabioTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D29B40797BB1AE1E4E9D14AC /* Pods-Sabio-SabioTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sabio-SabioTests.debug.xcconfig"; path = "Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests.debug.xcconfig"; sourceTree = "<group>"; };
 		D5A5983DBB5B436D85977E29 /* NotoSans-ExtraLightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-ExtraLightItalic.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
 		E45F891419D14A4BB7DE0DD4 /* NotoSans-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-Medium.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-Medium.ttf"; sourceTree = "<group>"; };
 		E50A870904C64880AFCABDC3 /* NotoSans-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-ExtraLight.ttf"; path = "../assets/fonts/Noto_Sans/NotoSans-ExtraLight.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F4F690B71374A9306E9926D9 /* Pods-Sabio-SabioTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sabio-SabioTests.debug.xcconfig"; path = "Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests.debug.xcconfig"; sourceTree = "<group>"; };
+		FB7CE8CB700783466301E8ED /* Pods-Sabio.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sabio.release.xcconfig"; path = "Target Support Files/Pods-Sabio/Pods-Sabio.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,7 +97,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				896A82D20FF7DC5D6C2CD7A5 /* libPods-Sabio-SabioTests.a in Frameworks */,
+				AFE3569709A33EC97AB9C44C /* libPods-Sabio-SabioTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,7 +106,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A4021392B46DD62003612C1 /* StoreKit.framework in Frameworks */,
-				66A11EEBA366915776AB8482 /* libPods-Sabio.a in Frameworks */,
+				92A7569AD87D9D23CD59B2EF /* libPods-Sabio.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,8 +160,8 @@
 			children = (
 				1A4021382B46DD62003612C1 /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				29C551BED27E9E9B8A610416 /* libPods-Sabio.a */,
-				D124CA5BCD7606D27C0704C3 /* libPods-Sabio-SabioTests.a */,
+				6223B3275244CBED7BE6BBD6 /* libPods-Sabio.a */,
+				6AD5E7C413F2AA2B81303E34 /* libPods-Sabio-SabioTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -201,10 +201,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				6B6912CDF9CB84319B974FA0 /* Pods-Sabio.debug.xcconfig */,
-				94A1B16A42918341886528E9 /* Pods-Sabio.release.xcconfig */,
-				F4F690B71374A9306E9926D9 /* Pods-Sabio-SabioTests.debug.xcconfig */,
-				868B8D06323320748E94BD53 /* Pods-Sabio-SabioTests.release.xcconfig */,
+				6F27DF8F8C1E33D104962ACE /* Pods-Sabio.debug.xcconfig */,
+				FB7CE8CB700783466301E8ED /* Pods-Sabio.release.xcconfig */,
+				D29B40797BB1AE1E4E9D14AC /* Pods-Sabio-SabioTests.debug.xcconfig */,
+				BDD50ABA972FE4530FBE6B68 /* Pods-Sabio-SabioTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -242,12 +242,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "SabioTests" */;
 			buildPhases = (
-				2974C86F65213127CE348A1E /* [CP] Check Pods Manifest.lock */,
+				46EBCF6FA842B75D77914E67 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				F34A9F0663F0A9A3E7968412 /* [CP] Embed Pods Frameworks */,
-				F5456E4777FC9D5DB546ED4D /* [CP] Copy Pods Resources */,
+				774F22C622C6B403A5C2DBEA /* [CP] Embed Pods Frameworks */,
+				50AF52A4440440F7F0B0014E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -263,14 +263,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Sabio" */;
 			buildPhases = (
-				96CE1E1871BC0AF748F204EC /* [CP] Check Pods Manifest.lock */,
+				F9C5798E541306172D19CAAF /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				82E8F539749F6964B246CA2B /* [CP] Embed Pods Frameworks */,
-				B91F801B36372034441199ED /* [CP] Copy Pods Resources */,
+				DFEA633D722F7141DB7FB56C /* [CP] Embed Pods Frameworks */,
+				BFD3EE70AA458DCAAB04EF69 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -374,7 +374,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		2974C86F65213127CE348A1E /* [CP] Check Pods Manifest.lock */ = {
+		46EBCF6FA842B75D77914E67 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -396,7 +396,58 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		82E8F539749F6964B246CA2B /* [CP] Embed Pods Frameworks */ = {
+		50AF52A4440440F7F0B0014E /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		774F22C622C6B403A5C2DBEA /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BFD3EE70AA458DCAAB04EF69 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Sabio/Pods-Sabio-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Sabio/Pods-Sabio-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sabio/Pods-Sabio-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DFEA633D722F7141DB7FB56C /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -413,7 +464,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sabio/Pods-Sabio-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		96CE1E1871BC0AF748F204EC /* [CP] Check Pods Manifest.lock */ = {
+		F9C5798E541306172D19CAAF /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -433,57 +484,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		B91F801B36372034441199ED /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sabio/Pods-Sabio-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sabio/Pods-Sabio-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sabio/Pods-Sabio-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F34A9F0663F0A9A3E7968412 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F5456E4777FC9D5DB546ED4D /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sabio-SabioTests/Pods-Sabio-SabioTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -538,7 +538,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F4F690B71374A9306E9926D9 /* Pods-Sabio-SabioTests.debug.xcconfig */;
+			baseConfigurationReference = D29B40797BB1AE1E4E9D14AC /* Pods-Sabio-SabioTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -565,7 +565,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 868B8D06323320748E94BD53 /* Pods-Sabio-SabioTests.release.xcconfig */;
+			baseConfigurationReference = BDD50ABA972FE4530FBE6B68 /* Pods-Sabio-SabioTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -589,7 +589,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6B6912CDF9CB84319B974FA0 /* Pods-Sabio.debug.xcconfig */;
+			baseConfigurationReference = 6F27DF8F8C1E33D104962ACE /* Pods-Sabio.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=iphoneos*]" = AppIcon;
@@ -630,7 +630,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 94A1B16A42918341886528E9 /* Pods-Sabio.release.xcconfig */;
+			baseConfigurationReference = FB7CE8CB700783466301E8ED /* Pods-Sabio.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=iphoneos*]" = AppIcon;
@@ -736,7 +736,10 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -806,7 +809,10 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
