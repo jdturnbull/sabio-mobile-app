@@ -39,10 +39,6 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Sign in with apple</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>In order to access heart rate &amp; workouts</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>In order to access heart rate &amp; workouts</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>In order to access device timezone</string>
 	<key>UIAppFonts</key>
