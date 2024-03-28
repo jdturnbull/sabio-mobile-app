@@ -91,8 +91,10 @@ const Chat = () => {
   const width = useWindowDimensions().width;
   const [loading, setLoading] = useState(false);
   const [canSend, setCanSend] = useState(false);
+  const [shouldCompleteTool, setShouldCompleteTool] = useState(false);
   const [userMessage, setUserMessage] = useState('');
   const [requiresResponse, setRequiresResponse] = useState(false);
+  const [toolOutputs, setToolOutputs] = useState([]);
   const [responsePending, setResponsePending] = useState(false);
 
   const session = useSelector((state) => state.user.session);
@@ -213,6 +215,30 @@ const Chat = () => {
         timeoutId = setTimeout(_captureResponse, 2000);
       }
 
+      if (response.status === 'requires_action') {
+        // Extract the function data from the response
+        const calls = openai.extractFunctionData(response, session.user?.id);
+
+        for (let i = 0; i < calls.length; i++) {
+          const { args, name, id } = calls[i];
+
+          if (name === 'learn') {
+            track('APP_ACTION', { action: 'Called learn function', screen: 'Main chat' });
+
+            const response = await call('POST', `users/learn`, {
+              data: args,
+              id: session.user?.id,
+              threadId: state.thread.id,
+            });
+
+            setToolOutputs([...toolOutputs, { id, response }]);
+          }
+        }
+
+        setShouldCompleteTool(true);
+        setResponsePending(false);
+      }
+
       if (response.status === 'completed') {
         const { response, error } = await openai.retrieveMessages(state.thread.id, session.user?.id);
         if (error) handleError({ error });
@@ -277,6 +303,50 @@ const Chat = () => {
       scrollRef.current.scrollToEnd({ animated: true });
     }, 100);
   };
+
+  // Handles completing the tool
+  useEffect(() => {
+    const _completeTool = async () => {
+      if (!shouldCompleteTool) return;
+
+      let raw_body = toolOutputs.map((tool, index) => {
+        return { tool_call_id: tool.id, output: tool.response };
+      });
+
+      // Replace any undefined outputs with an error string
+      for (let i = 0; i < raw_body.length; i++) {
+        if (raw_body[i].output === undefined) {
+          raw_body[i].output = 'Error: No output';
+        }
+      }
+
+      const body = JSON.stringify({ tool_outputs: raw_body });
+
+      const { response, error } = await openai.submitToolResponse({
+        thread_id: state.thread.id,
+        run_id: state.runId,
+        body,
+        userId: session.user?.id,
+      });
+
+      if (error) {
+        handleError({ error });
+      } else {
+        track('APP_ACTION', { action: 'Tool output submitted', screen: 'Onboarding chat' });
+
+        // Clear tool outputs
+        setToolOutputs([]);
+
+        // Tell the component that the tool no longer needs to be completed
+        setShouldCompleteTool(false);
+
+        // Tell the component a response is pending
+        setResponsePending(true);
+      }
+    };
+
+    _completeTool();
+  }, [shouldCompleteTool]);
 
   // Handles animating the width of the input container (can't use native driver when animating layout props)
   useEffect(() => {
