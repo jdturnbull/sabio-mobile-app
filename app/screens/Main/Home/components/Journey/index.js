@@ -11,12 +11,15 @@ import Footer from './components/Footer';
 import ModalContent from './components/ModalContent';
 import { getPlan, updateState } from '../../../../../stores/user/userSlice';
 import { useMixpanel } from '../../../../../hooks/useMixpanel';
+import call from '../../../../../utils/call';
 
 const Journey = ({ setHideButton }) => {
   const dispatch = useDispatch();
   const flatListRef = useRef(null);
 
   const { track } = useMixpanel();
+
+  const intervalRef = useRef(null);
 
   const user = useSelector((state) => state.user?.session?.user);
   const plannedActivities = useSelector((state) => state.user?.plannedActivities);
@@ -30,15 +33,61 @@ const Journey = ({ setHideButton }) => {
   const [showPlan, setShowPlan] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = () => {
+  useEffect(() => {
+    dispatch(getPlan());
+
+    if (!plannedActivities?.length || plannedActivities?.length === 0) {
+      console.log('No activities found, running the interval');
+      intervalRef.current = setInterval(() => {
+        console.log('Interval run...');
+        dispatch(getPlan());
+      }, 5000);
+    }
+  }, []);
+
+  const onRefresh = async () => {
+    console.log('Refresh control running...');
     setRefreshing(true);
     track('USER_ACTION', { action: 'Pull to refresh', screen: 'Home' });
-    dispatch(getPlan()).then(() => {
-      setTimeout(() => {
-        setRefreshing(false);
-      }, 1000);
-    });
+
+    // Lets individually grab the plannedActivities, if the length is = 0 then start an interval because we know the waiting screen will be showing.
+    const activities = await call('GET', `users/retrievePlan/${user.id}`);
+
+    if (activities.plan.length === 0) {
+      console.log('No activities found, starting interval...');
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current); // Clear any existing interval
+      }
+      intervalRef.current = setInterval(async () => {
+        const updatedActivities = await call('GET', `users/retrievePlan/${user.id}`);
+        if (updatedActivities.plan.length > 0) {
+          console.log('Activities found, stopping interval...');
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+          dispatch(getPlan());
+          setRefreshing(false);
+        } else {
+          dispatch(getPlan());
+        }
+      }, 5000);
+    } else {
+      console.log('Activities found, initiating regular refresh control..');
+      dispatch(getPlan()).then(() => {
+        setTimeout(() => {
+          setRefreshing(false);
+        }, 1000);
+      });
+    }
   };
+
+  useEffect(() => {
+    if (plannedActivities?.length > 0) {
+      if (intervalRef.current) {
+        console.log('Clearing the interval');
+        clearInterval(intervalRef.current);
+      }
+    }
+  }, [plannedActivities]);
 
   // Set the start of the week dates for the separators
   useEffect(() => {

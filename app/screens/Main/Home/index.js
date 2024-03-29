@@ -3,7 +3,7 @@ import styled, { useTheme } from 'styled-components';
 import { ImageBackground, View, useColorScheme } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { FloatingAction } from 'react-native-floating-action';
-import { getPlan, setup } from '../../../stores/user/userSlice';
+import { getPlan, setup, updateState } from '../../../stores/user/userSlice';
 import Journey from './components/Journey';
 import WaitingScreen from './components/WaitingScreen';
 import { getIconFromLabel } from '../../../utils/icon';
@@ -11,6 +11,8 @@ import BackgroundDark from '../../../assets/home-background-dark.png';
 import BackgroundLight from '../../../assets/home-background-light.png';
 import { useMixpanel } from '../../../hooks/useMixpanel';
 import ActionModal from './components/Journey/components/ActionModal';
+import { useIsFocused } from '@react-navigation/native';
+import call from '../../../utils/call';
 
 const HelloContainer = styled.View`
   margin-top: 5px;
@@ -70,16 +72,19 @@ const Home = () => {
   }, [user]);
 
   useEffect(() => {
-    getPlan();
+    dispatch(getPlan());
 
-    if (plannedActivities?.length === 0) {
+    if (!plannedActivities?.length || plannedActivities?.length === 0) {
+      console.log('No activities found, running the interval');
       intervalRef.current = setInterval(() => {
+        console.log('Interval run...');
         dispatch(getPlan());
       }, 5000);
     }
 
     return () => {
       if (intervalRef.current) {
+        console.log('Clearing interval, component unmounted');
         clearInterval(intervalRef.current);
       }
     };
