@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, useWindowDimensions, Animated, ImageBackground, Alert, Appearance } from 'react-native';
 import styled from 'styled-components';
 import { useTheme } from 'styled-components';
+import PushNotification from 'react-native-push-notification';
+import DeviceInfo from 'react-native-device-info';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useKeyboard } from '@react-native-community/hooks';
@@ -128,6 +130,17 @@ const Chat = () => {
   const [shouldCompleteTool, setShouldCompleteTool] = useState(false);
   const [canSend, setCanSend] = useState(false);
   const [userMessage, setUserMessage] = useState('');
+
+  useEffect(() => {
+    // Request permission for notifications on component mount
+    PushNotification.requestPermissions().then(async (response) => {
+      const deviceId = await DeviceInfo.getUniqueId();
+      await call('POST', 'users/update', {
+        userId: session.user.id,
+        data: { notificationsEnabled: response.alert, deviceToken: deviceId },
+      });
+    });
+  }, []);
 
   // Maybe use this to show a button if the app doesn't auto redirect?
   const [showNext, setShowNext] = useState(false);
