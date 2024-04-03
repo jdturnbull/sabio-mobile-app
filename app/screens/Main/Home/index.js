@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { ImageBackground, View, useColorScheme } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import PushNotification from 'react-native-push-notification';
 import { FloatingAction } from 'react-native-floating-action';
 import { getPlan, setup, updateState } from '../../../stores/user/userSlice';
 import Journey from './components/Journey';
@@ -13,6 +14,7 @@ import { useMixpanel } from '../../../hooks/useMixpanel';
 import ActionModal from './components/Journey/components/ActionModal';
 import { useIsFocused } from '@react-navigation/native';
 import call from '../../../utils/call';
+import DeviceInfo from 'react-native-device-info';
 
 const HelloContainer = styled.View`
   margin-top: 5px;
@@ -63,6 +65,17 @@ const Home = () => {
 
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedAction, setSelectedAction] = useState(null);
+
+  useEffect(() => {
+    // Request permission for notifications on component mount
+    PushNotification.requestPermissions().then(async (response) => {
+      const deviceId = await DeviceInfo.getUniqueId();
+      await call('POST', 'users/update', {
+        userId: user.id,
+        data: { notificationsEnabled: response.alert, deviceToken: deviceId },
+      });
+    });
+  }, []);
 
   useEffect(() => {
     if (user) {
