@@ -134,10 +134,13 @@ const Chat = () => {
   useEffect(() => {
     // Request permission for notifications on component mount
     PushNotification.requestPermissions().then(async (response) => {
-      const deviceId = await DeviceInfo.getUniqueId();
+      const token = await AsyncStorage.getItem('deviceToken');
+
+      const deviceToken = session.user.deviceToken ? session.user.deviceToken : token;
+
       await call('POST', 'users/update', {
         userId: session.user.id,
-        data: { notificationsEnabled: response.alert, deviceToken: deviceId },
+        data: { notificationsEnabled: response.alert, deviceToken },
       });
     });
   }, []);

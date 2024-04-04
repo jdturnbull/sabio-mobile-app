@@ -15,6 +15,7 @@ import ActionModal from './components/Journey/components/ActionModal';
 import { useIsFocused } from '@react-navigation/native';
 import call from '../../../utils/call';
 import DeviceInfo from 'react-native-device-info';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HelloContainer = styled.View`
   margin-top: 5px;
@@ -67,12 +68,14 @@ const Home = () => {
   const [selectedAction, setSelectedAction] = useState(null);
 
   useEffect(() => {
-    // Request permission for notifications on component mount
     PushNotification.requestPermissions().then(async (response) => {
-      const deviceId = await DeviceInfo.getUniqueId();
+      const token = AsyncStorage.getItem('deviceToken');
+
+      const deviceToken = user.deviceToken ? user.deviceToken : token;
+
       await call('POST', 'users/update', {
         userId: user.id,
-        data: { notificationsEnabled: response.alert, deviceToken: deviceId },
+        data: { notificationsEnabled: response.alert, deviceToken },
       });
     });
   }, []);
