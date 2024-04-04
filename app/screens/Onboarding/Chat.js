@@ -2,9 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, useWindowDimensions, Animated, ImageBackground, Alert, Appearance } from 'react-native';
 import styled from 'styled-components';
 import { useTheme } from 'styled-components';
-import PushNotification from 'react-native-push-notification';
-import DeviceInfo from 'react-native-device-info';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import PushNotification from 'react-native-push-notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useKeyboard } from '@react-native-community/hooks';
 import { useDispatch, useSelector } from 'react-redux';
@@ -131,20 +130,6 @@ const Chat = () => {
   const [canSend, setCanSend] = useState(false);
   const [userMessage, setUserMessage] = useState('');
 
-  useEffect(() => {
-    // Request permission for notifications on component mount
-    PushNotification.requestPermissions().then(async (response) => {
-      const token = await AsyncStorage.getItem('deviceToken');
-
-      const deviceToken = session.user.deviceToken ? session.user.deviceToken : token;
-
-      await call('POST', 'users/update', {
-        userId: session.user.id,
-        data: { notificationsEnabled: response.alert, deviceToken },
-      });
-    });
-  }, []);
-
   // Maybe use this to show a button if the app doesn't auto redirect?
   const [showNext, setShowNext] = useState(false);
 
@@ -161,7 +146,45 @@ const Chat = () => {
   const Send = getIconFromLabel('send');
 
   useEffect(() => {
+    const run = async () => {
+      console.log('Running');
+      const token = await AsyncStorage.getItem('deviceToken');
+
+      if (token) {
+        console.log('Sending token to backend');
+        await call('POST', 'users/update', {
+          userId: session.user.id,
+          data: { deviceToken: token },
+        });
+      } else {
+        console.log('No token found');
+      }
+    };
+
+    run();
+  }, []);
+
+  useEffect(() => {
+    PushNotification.requestPermissions().then(async (event) => {
+      await call('POST', 'users/update', {
+        userId: session.user.id,
+        data: { notificationsEnabled: event.alert },
+      });
+    });
+  }, []);
+
+  useEffect(() => {
     track('SCREEN_VIEW', { screen: 'Onboarding chat' });
+  }, []);
+
+  useEffect(() => {
+    const run = async () => {
+      console.log('Running home');
+      const token = await AsyncStorage.getItem('deviceToken');
+      console.log(token);
+    };
+
+    run();
   }, []);
 
   useEffect(() => {

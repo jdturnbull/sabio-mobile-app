@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { ImageBackground, View, useColorScheme } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
 import PushNotification from 'react-native-push-notification';
+import { useDispatch, useSelector } from 'react-redux';
 import { FloatingAction } from 'react-native-floating-action';
-import { getPlan, setup, updateState } from '../../../stores/user/userSlice';
+import { getPlan } from '../../../stores/user/userSlice';
 import Journey from './components/Journey';
 import WaitingScreen from './components/WaitingScreen';
 import { getIconFromLabel } from '../../../utils/icon';
@@ -12,9 +12,7 @@ import BackgroundDark from '../../../assets/home-background-dark.png';
 import BackgroundLight from '../../../assets/home-background-light.png';
 import { useMixpanel } from '../../../hooks/useMixpanel';
 import ActionModal from './components/Journey/components/ActionModal';
-import { useIsFocused } from '@react-navigation/native';
 import call from '../../../utils/call';
-import DeviceInfo from 'react-native-device-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HelloContainer = styled.View`
@@ -68,14 +66,29 @@ const Home = () => {
   const [selectedAction, setSelectedAction] = useState(null);
 
   useEffect(() => {
-    PushNotification.requestPermissions().then(async (response) => {
-      const token = AsyncStorage.getItem('deviceToken');
+    const run = async () => {
+      console.log('Running');
+      const token = await AsyncStorage.getItem('deviceToken');
 
-      const deviceToken = user.deviceToken ? user.deviceToken : token;
+      if (token) {
+        console.log('Sending token to backend');
+        await call('POST', 'users/update', {
+          userId: user.id,
+          data: { deviceToken: token },
+        });
+      } else {
+        console.log('No token found');
+      }
+    };
 
+    run();
+  }, []);
+
+  useEffect(() => {
+    PushNotification.requestPermissions().then(async (event) => {
       await call('POST', 'users/update', {
         userId: user.id,
-        data: { notificationsEnabled: response.alert, deviceToken },
+        data: { notificationsEnabled: event.alert },
       });
     });
   }, []);

@@ -22,8 +22,8 @@ createDatabase();
 
 PushNotification.configure({
   // (optional) Called when Token is generated (iOS and Android)
-  onRegister: function (token) {
-    AsyncStorage.setItem('deviceToken', token.token);
+  onRegister: async function (token) {
+    await AsyncStorage.setItem('deviceToken', token.token);
   },
 
   // (required) Called when a remote is received or opened, or local notification is opened
@@ -67,8 +67,6 @@ const App = () => {
   const dispatch = useDispatch();
   const colorScheme = useColorScheme();
   const loaded = useSelector((state) => state.user.loaded);
-
-  // Add a listener to the colorScheme changing
 
   useEffect(() => {
     if (!loaded) {
