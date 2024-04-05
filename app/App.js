@@ -5,6 +5,7 @@ import { Appearance, StatusBar, useColorScheme } from 'react-native';
 import PushNotification from 'react-native-push-notification';
 import { NavigationContainer } from '@react-navigation/native';
 import { Mixpanel } from 'mixpanel-react-native';
+import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import { Provider, useDispatch } from 'react-redux';
 import store from './stores/store';
 import { useSelector } from 'react-redux';
