@@ -67,17 +67,13 @@ const Home = () => {
 
   useEffect(() => {
     const run = async () => {
-      console.log('Running');
       const token = await AsyncStorage.getItem('deviceToken');
 
       if (token) {
-        console.log('Sending token to backend');
         await call('POST', 'users/update', {
           userId: user.id,
           data: { deviceToken: token },
         });
-      } else {
-        console.log('No token found');
       }
     };
 
@@ -104,7 +100,6 @@ const Home = () => {
     dispatch(getPlan());
 
     if (!plannedActivities?.length || plannedActivities?.length === 0) {
-      console.log('No activities found, running the interval');
       intervalRef.current = setInterval(() => {
         console.log('Interval run...');
         dispatch(getPlan());
@@ -113,7 +108,6 @@ const Home = () => {
 
     return () => {
       if (intervalRef.current) {
-        console.log('Clearing interval, component unmounted');
         clearInterval(intervalRef.current);
       }
     };
