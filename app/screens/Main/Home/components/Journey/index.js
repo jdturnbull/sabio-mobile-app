@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, Modal } from 'react-native';
+import { View, Modal, useColorScheme, TouchableOpacity } from 'react-native';
 import moment from 'moment';
 import { debounce } from 'lodash';
 import Top from './components/Top';
-import { FlatList, RefreshControl } from 'react-native-gesture-handler';
+import { FlatList, RefreshControl, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import ListItem from './components/ListItem';
 import Separator from './components/Separator';
@@ -11,13 +11,17 @@ import Footer from './components/Footer';
 import ModalContent from './components/ModalContent';
 import { getPlan } from '../../../../../stores/user/userSlice';
 import { useMixpanel } from '../../../../../hooks/useMixpanel';
-import call from '../../../../../utils/call';
+import Up from '../../../../../components/icons/actions/Up';
+import Down from '../../../../../components/icons/actions/Down';
+import { useTheme } from 'styled-components';
 
 const Journey = ({ setHideButton }) => {
   const dispatch = useDispatch();
   const flatListRef = useRef(null);
 
   const { track } = useMixpanel();
+
+  const colorScheme = useColorScheme();
 
   const intervalRef = useRef(null);
 
@@ -72,6 +76,18 @@ const Journey = ({ setHideButton }) => {
     }
   }, []);
 
+  const scrollTop = () => {
+    flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
+  };
+  const scrollBottom = () => {
+    console.log('here');
+    let idx = plannedActivities.findIndex((activity) => activity.date === today);
+
+    if (idx < 0) idx = 0;
+
+    flatListRef.current?.scrollToIndex({ index: idx, animated: true });
+  };
+
   // Handle scroll to current date failing
   const handleScrollFailed = ({ index, averageItemLength }) => {
     flatListRef.current?.scrollToOffset({
@@ -89,6 +105,24 @@ const Journey = ({ setHideButton }) => {
   return (
     <View style={{ flex: 1 }}>
       <Top viewableItems={viewableItems} setShowPlan={setShowPlan} />
+      <View
+        style={{
+          position: 'absolute',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'column',
+          top: 130,
+          left: 20,
+          zIndex: 10000,
+        }}>
+        <TouchableOpacity style={{ marginBottom: 20 }} onPress={scrollTop}>
+          <Up color={colorScheme === 'dark' ? '#fff' : '#000'} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={scrollBottom}>
+          <Down color={colorScheme === 'dark' ? '#fff' : '#000'} />
+        </TouchableOpacity>
+      </View>
       <FlatList
         ref={flatListRef}
         style={{ marginTop: 4 }}

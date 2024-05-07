@@ -139,6 +139,15 @@ const Payment = () => {
 
     const valid = await call('POST', 'users/restorePurchase', { receipt: latestAvailableReceipt, userId: user.id });
 
+    if (valid === 'EXPIRED') {
+      setLoading(false);
+      Alert.alert(
+        'Subscription expired',
+        'Please restore via your Apple profile, contact support@heysabio.com for help.',
+      );
+      return;
+    }
+
     if (valid) {
       track('USER_ACTION', { action: 'Restored subscription', screen: 'Payment' });
 
@@ -150,7 +159,8 @@ const Payment = () => {
       navigation.navigate('Authed');
     } else {
       setLoading(false);
-      Alert.alert('No subscription found, if you are having issues please contact support@heysabio.com');
+      // TODO: Say restore via AppleId Settings
+      Alert.alert('No subscription found', 'If you are having issues please contact support@heysabio.com');
     }
   };
 

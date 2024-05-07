@@ -27,7 +27,7 @@ const NoReports = () => {
       <Icon />
       <View
         style={{ width: '100%', marginTop: 30, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-        <StyledText>Sabio hasn't made a report for you yet</StyledText>
+        <StyledText>Progress reports are in development</StyledText>
       </View>
     </Container>
   );

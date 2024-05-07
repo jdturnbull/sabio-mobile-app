@@ -188,6 +188,7 @@ const Home = () => {
             }}
           />
         )}
+
         <ActionModal action={selectedAction} visible={isModalVisible} setVisible={setModalVisible} />
       </ImageBackground>
     );
