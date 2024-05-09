@@ -116,10 +116,10 @@ const Payment = () => {
       setLoading(true);
       await initConnection();
       if (connected) {
-        await getSubscriptions({ skus: ['com.heysabio.sabio.product.base'] });
+        await getSubscriptions({ skus: ['base_20'] });
       }
       await requestSubscription({
-        sku: 'com.heysabio.sabio.product.base',
+        sku: 'base_20',
         appAccountToken: user.id,
       });
     } catch (error) {
@@ -206,7 +206,7 @@ const Payment = () => {
     <Container>
       <Logo />
       <Headline>
-        One week <Headline style={{ color: theme.text.colors.primary }}>free trial</Headline> then £9.99 / month
+        One week <Headline style={{ color: theme.text.colors.primary }}>free trial</Headline> then $19.99 / month
       </Headline>
       <View
         style={
@@ -229,7 +229,7 @@ const Payment = () => {
           <Text style={{ color: theme.text.colors.primary }}>Restore subscription</Text>
         </Pressable>
         <Text style={{ color: theme.text.colors.secondary }}>
-          Subscription automatically renews at £9.99 / month. By subscribing you agree to the{' '}
+          Subscription automatically renews at $19.99 / month. By subscribing you agree to the{' '}
           <Text
             onPress={() => Linking.openURL('https://heysabio.com/terms')}
             style={{ textDecorationLine: 'underline', color: theme.text.colors.secondary }}>
