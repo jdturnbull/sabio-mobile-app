@@ -17,7 +17,7 @@ const Content = styled.View`
   width: 100%;
   height: 75%;
   align-items: center;
-  padding-horizontal: 15%;
+  padding-horizontal: 40px;
   background-color: ${(props) => props.theme.colors.background1};
 `;
 
@@ -38,6 +38,7 @@ const BodyText = styled.Text`
   font-weight: ${(props) => props.theme.text.weight.semibold};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
   margin-bottom: 20px;
+  line-height: 25;
 `;
 
 const Bottom = styled.View`
@@ -65,7 +66,7 @@ const GetStartedText = styled.Text`
 
 const Landing = () => {
   const route = useRoute();
-  const colorScheme = Appearance.getColorScheme();
+  const colorScheme = 'dark';
   const { track } = useMixpanel();
   const signedIn = useSelector((state) => state.user.signedIn);
 
@@ -113,10 +114,8 @@ const Landing = () => {
       <Content>
         <Logo />
         <Headline>
-          Welcome to <Headline style={{ color: theme.text.colors.primary }}>Sabio</Headline>
+          I'm your fitness coach <Headline style={{ color: theme.text.colors.primary }}>Sabio</Headline>
         </Headline>
-        <BodyText>To get started we need to learn a little about you.</BodyText>
-        <BodyText>Set aside 5 minutes to chat with Sabio about your needs and goals.</BodyText>
       </Content>
       <Bottom style={colorScheme === 'dark' && { backgroundColor: theme.colors.black }}>
         <Pressable onPress={handlePress}>

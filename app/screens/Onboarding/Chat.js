@@ -113,7 +113,7 @@ const NextText = styled.Text`
 `;
 
 const Chat = () => {
-  const colorScheme = Appearance.getColorScheme();
+  const colorScheme = 'dark';
   const scrollRef = useRef();
   const dispatch = useDispatch();
   const { track } = useMixpanel();

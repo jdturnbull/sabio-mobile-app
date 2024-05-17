@@ -55,7 +55,7 @@ const ButtonRow = styled.View`
 const Footer = ({ data, setModalData, setHideButton }) => {
   const theme = useTheme();
   const { track } = useMixpanel();
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [renderFooter, setRenderFooter] = useState(data !== null);
   const [expanded, setExpanded] = useState(false);

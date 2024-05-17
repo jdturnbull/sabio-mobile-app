@@ -56,7 +56,7 @@ const Home = () => {
   const user = useSelector((state) => state.user?.session?.user);
 
   const theme = useTheme();
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
 
   const StreakIcon = getIconFromLabel('streak');
 

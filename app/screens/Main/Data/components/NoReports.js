@@ -18,7 +18,7 @@ const StyledText = styled.Text`
 `;
 
 const NoReports = () => {
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
 
   const Icon = getIconFromLabel(colorScheme === 'light' ? 'sabioGreyedLight' : 'sabioGreyedDark');
 

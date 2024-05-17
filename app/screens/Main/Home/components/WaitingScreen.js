@@ -25,7 +25,7 @@ const SubTitle = styled.Text`
 
 const WaitingScreen = () => {
   const theme = useTheme();
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
   const { track } = useMixpanel();
   const Logo = getIconFromLabel('logoMedium');
   const WaitingIcon = getIconFromLabel(colorScheme === 'light' ? 'waitingLight' : 'waitingDark');

@@ -66,7 +66,7 @@ const AppContainer = styled.View`
 
 const App = () => {
   const dispatch = useDispatch();
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
   const loaded = useSelector((state) => state.user.loaded);
 
   useEffect(() => {
@@ -77,11 +77,7 @@ const App = () => {
 
   return (
     <AppContainer>
-      <StatusBar
-        barStyle={colorScheme === 'light' ? 'dark-content' : 'light-content'}
-        hidden={false}
-        translucent={false}
-      />
+      <StatusBar barStyle={'light-content'} hidden={false} translucent={false} />
       <UIStateProvider>
         <Root />
         <OverlayPortal />
@@ -101,19 +97,19 @@ const getActiveRouteName = (state) => {
 };
 
 const ConnectedApp = () => {
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
   const [themeData, setThemeData] = useState(theme(colorScheme));
   const [activeRouteName, setActiveRouteName] = useState();
 
-  useEffect(() => {
-    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      setThemeData(theme(colorScheme));
-    });
+  // useEffect(() => {
+  //   const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+  //     setThemeData(theme(colorScheme));
+  //   });
 
-    return () => {
-      subscription.remove();
-    };
-  }, []);
+  //   return () => {
+  //     subscription.remove();
+  //   };
+  // }, []);
 
   const handleNavStateChange = (state) => {
     if (state) {

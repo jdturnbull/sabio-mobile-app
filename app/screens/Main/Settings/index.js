@@ -133,7 +133,7 @@ const Settings = () => {
   const dispatch = useDispatch();
   const { track } = useMixpanel();
   const theme = useTheme();
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
   const [hasConnection, setHasConnection] = useState(false);
   const user = useSelector((state) => state.user.session?.user);
   const activities = useSelector((state) => state.user?.plannedActivities);

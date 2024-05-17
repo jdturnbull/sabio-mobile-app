@@ -21,7 +21,7 @@ const Journey = ({ setHideButton }) => {
 
   const { track } = useMixpanel();
 
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
 
   const intervalRef = useRef(null);
 

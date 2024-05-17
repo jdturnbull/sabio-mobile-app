@@ -39,7 +39,7 @@ const StyledTextBottom = styled.Text`
 `;
 
 const Top = ({ viewableItems, setShowPlan }) => {
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
   const theme = useTheme();
   const user = useSelector((state) => state.user.session?.user);
   const monthlyFocuses = user?.monthlyFocuses || [];

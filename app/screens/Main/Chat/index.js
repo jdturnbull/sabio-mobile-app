@@ -79,7 +79,7 @@ const StyledPressable = styled.Pressable`
 const StyledKeyboardAvoidingView = styled.KeyboardAvoidingView``;
 
 const Chat = () => {
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
 
   const isFocused = useIsFocused();
 

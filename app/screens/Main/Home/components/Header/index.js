@@ -32,7 +32,7 @@ const ItemText = styled.Text`
 
 const Header = () => {
   const theme = useTheme();
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
 
   const user = useSelector((state) => state.user?.session?.user);
 

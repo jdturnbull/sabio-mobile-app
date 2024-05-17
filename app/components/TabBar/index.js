@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 
 const TabBar = ({ state, navigation, width }) => {
   const theme = useTheme();
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
   const Home = getIconFromLabel('home');
   const Settings = getIconFromLabel('settings');
   const Analytics = getIconFromLabel('analytics');

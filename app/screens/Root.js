@@ -10,6 +10,7 @@ import Data from './Main/Data';
 import Settings from './Main/Settings';
 
 import Landing from './Onboarding/Landing';
+import OptionScreen from './Onboarding/OptionScreen';
 import Payment from './Onboarding/Payment';
 import Finalise from './Onboarding/Finalise';
 import OnboardingChat from './Onboarding/Chat';
@@ -56,7 +57,7 @@ const OnboardingApp = () => {
 
   useEffect(() => {
     if (signedIn && !subscribed && !hasOnboardingData) {
-      navigation.navigate('Chat');
+      navigation.navigate('Option');
     }
 
     if (signedIn && hasOnboardingData && !subscribed) {
@@ -77,6 +78,7 @@ const OnboardingApp = () => {
       initialRouteName={'Landing'}
       screenOptions={{ headerShown: false, ...CustomTransition, cardStyle: { backgroundColor: 'transparent' } }}>
       <OnboardingStack.Screen name="Landing" component={Landing} />
+      <OnboardingStack.Screen name="Option" component={OptionScreen} />
       <OnboardingStack.Screen name="Payment" component={Payment} />
       <OnboardingStack.Screen name="Chat" component={OnboardingChat} />
       <OnboardingStack.Screen name="Finalise" component={Finalise} />

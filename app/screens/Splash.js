@@ -12,7 +12,7 @@ const Container = styled.View`
 `;
 
 const Splash = () => {
-  const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
   const { replace } = useNavigation();
   const { loaded } = useSelector((state) => state.user);
 
