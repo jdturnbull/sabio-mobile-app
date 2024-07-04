@@ -1,234 +1,39 @@
-export const theme = (colorTheme) => {
-  if (colorTheme === 'light') {
-    return {
-      spacing: {
-        safeAreaView: '75px',
-        safeAreaViewSmall: '50px',
-      },
-      splash: {
-        background: '#FFF6D4',
-      },
-      chat: {
-        typingIndicatorColor: '#00000090',
-      },
-      finalOnboarding: {
-        dayBorder: '#A2935B',
-        daySelectedBorder: '#FF912D',
-      },
-      editScreen: {
-        inputBackground: '#EADDAF',
-        offsetColor: '#6C6141',
-      },
-      colors: {
-        primary: '#EE6E12',
-        white: '#ffffff',
-        labelColor: '#49548A',
-        black: '#000000',
-        background1: '#FFF6D4',
-        chatBackground: '#FFF6D4',
-        homeHeaderBackground: '#FFF6D4',
-        settingsBackground: '#fff',
-        settingsHeader: '#FFF6D4',
-        progressLabelText: '#3E4B88',
-        progressDropDownBackground: '#FFF6D4',
-        progressDropDownOptionText: '#3E4B88',
-        progressReportTopText: '#3E4B88',
-        darkBrown: '#272620',
-        chartDash: '#EADDAF',
-        tabBarIcon: '#EDE0AF',
-      },
-      waitingScreen: {
-        background: '#FFF6D4',
-        smallText: '#584D30',
-      },
-      barColors: {
-        run: '#EE6E12',
-        swim: '#FFAC0A',
-        ride: '#D4D72B',
-        rest: '#EADDAF',
-        default: '#D4D72B',
-        weighttraining: '#EADDAF',
-        walk: '#EE6E12',
-      },
-      text: {
-        colors: {
-          secondary: '#000000',
-          primary: '#FF912D',
-          secondaryInverse: '#ffffff',
-          highlight: '#A2935B',
-        },
-        chatMessage: {
-          backgroundAssistant: '#EADDAF',
-          backgroundUser: '#FF912D',
-          inputBackground: '#FFFFEB',
-        },
-        weight: {
-          regular: '400',
-          bold: '700',
-          semibold: '600',
-        },
-        family: 'Noto Sans',
-        size: {
-          xs: '12px',
-          sm: '14px',
-          md: '16px',
-          lg: '18px',
-          xl: '24px',
-          xxl: '30px',
-        },
-        letterSpacing: {
-          xs: '-0.24px',
-          sm: '0.75px',
-          md: '1px',
-          lg: '1.5px',
-          xl: '2px',
-          xxl: '3px',
-        },
-      },
-      home: {
-        cards: {
-          borderColorCompleted: '#8F8667',
-          borderColorPending: '#FFF6D4',
-          borderColorMissed: '#EADDAF',
-          rightBackground: '#EADDAF',
-          leftBackgroundFull: '#D4D72B',
-          leftBackgroundPartial: '#FFAC0A',
-          leftBackgroundSmall: '#EE6E12',
-          iconMissedColor: '#F0E5BD',
-          iconCompletedColor: '#fff',
-          iconPendingColor: '#A79B70',
-          missedTextColor: '#F0E5BD',
-          inCompleteTextColor: '#A79B70',
-        },
-        separatorColor: '#A79B70',
-      },
-      tabBar: {
-        backgroundColor: '#fff',
-        shadowColor: '#EDE0AF',
-        iconColor: '#EDE0AF',
-        iconSelectedColor: '#EE6E12',
-      },
-      settings: {
-        topBarColor: '#FFF6D4',
-        optionBoxColor: '#EADDAF',
-        iconColor: '#5A4F31',
-        optionTextColor: '#000000',
-        labelColor: '#49548A',
-      },
-    };
-  } else {
-    return {
-      spacing: {
-        safeAreaView: '75px',
-        safeAreaViewSmall: '50px',
-      },
-      splash: {
-        background: '#272620',
-      },
-      chat: {
-        typingIndicatorColor: '#ffffff90',
-      },
-      finalOnboarding: {
-        dayBorder: '#EADDAF',
-        daySelectedBorder: '#FF912D',
-      },
-      editScreen: {
-        inputBackground: '#5A4F31',
-        offsetColor: '#EADDAF',
-      },
-      colors: {
-        primary: '#EE6E12',
-        labelColor: '#A1AAD3',
-        white: '#ffffff',
-        black: '#000000',
-        background1: '#272620',
-        chatBackground: '#5A4F31',
-        homeHeaderBackground: '#5A4F31',
-        settingsBackground: '#272620',
-        settingsHeader: '#5A4F31',
-        progressLabelText: '#A1AAD3',
-        progressDropDownBackground: '#5A4F31',
-        progressDropDownOptionText: '#A1AAD3',
-        chartDash: '#EADDAF',
-        darkBrown: '#272620',
-        progressReportTopText: '#A1AAD3',
-      },
-      barColors: {
-        run: '#EE6E12',
-        swim: '#FFAC0A',
-        ride: '#D4D72B',
-        rest: '#D4D72B',
-        default: '#D4D72B',
-      },
-      waitingScreen: {
-        background: '#272620',
-        smallText: '#CDBD9E',
-      },
-      text: {
-        colors: {
-          secondary: '#ffffff',
-          secondaryInverse: '#000000',
-          primary: '#FF912D',
-          highlight: '#CBBA7F',
-        },
-        weight: {
-          regular: '400',
-          bold: '700',
-          semibold: '600',
-        },
-        family: 'Noto Sans',
-        chatMessage: {
-          backgroundAssistant: '#272620',
-          backgroundUser: '#FF912D',
-          inputBackground: '#4C4229',
-        },
-        size: {
-          xs: '12px',
-          sm: '14px',
-          md: '16px',
-          lg: '18px',
-          xl: '24px',
-          xxl: '30px',
-        },
-        letterSpacing: {
-          xs: '-0.24px',
-          sm: '0.75px',
-          md: '1px',
-          lg: '1.5px',
-          xl: '2px',
-          xxl: '3px',
-        },
-      },
-      home: {
-        cards: {
-          borderColorCompleted: '#EDE0AF',
-          borderColorPending: '#5A4F31',
-          borderColorMissed: '#5A4F31',
-          rightBackground: '#5A4F31',
-          leftBackgroundFull: '#D4D72B',
-          leftBackgroundPartial: '#FFAC0A',
-          leftBackgroundSmall: '#EE6E12',
-          iconMissedColor: '#584D30',
-          iconCompletedColor: '#000000',
-          iconPendingColor: '#A79B70',
-          missedTextColor: '#584D30',
-          inCompleteTextColor: '#A79B70',
-        },
-        separatorColor: '#A79B70',
-      },
-      tabBar: {
-        backgroundColor: '#000',
-        shadowColor: '#EDE0AF',
-        iconColor: '#584D30',
-        iconSelectedColor: '#EE6E12',
-      },
-      settings: {
-        topBarColor: '#000000',
-        optionBoxColor: '#5A4F31',
-        iconColor: '#EADDAF',
-        optionTextColor: '#FFFFFF',
-        labelColor: '#A1AAD3',
-      },
-    };
-  }
+export const theme = {
+  spacing: {
+    safeAreaView: '75px',
+    safeAreaViewLarge: '110px',
+    safeAreaViewBottom: '35px',
+  },
+  colors: {
+    primary: '#EE6E12',
+    white: '#ffffff',
+  },
+  text: {
+    colors: {
+      white: '#f8f8f8',
+      black: '#000000',
+      highlight: '#A1AAD3',
+    },
+    weight: {
+      regular: '400',
+      bold: '600',
+      semibold: '500',
+    },
+    family: 'Noto Sans',
+    size: {
+      xxs: '12px',
+      xs: '14px',
+      sm: '16px',
+      md: '18px',
+      lg: '24px',
+      xl: '30px',
+    },
+    letterSpacing: {
+      xs: '-0.24px',
+      sm: '0.75px',
+      md: '0.8px',
+      lg: '0.5px',
+      xl: '0.8px',
+    },
+  },
 };
