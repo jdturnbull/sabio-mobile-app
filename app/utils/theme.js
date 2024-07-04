@@ -6,6 +6,9 @@ export const theme = {
   },
   colors: {
     primary: '#EE6E12',
+    background: '#16171B',
+    backgroundLight1: '#A1AAD315',
+    backgroundLight2: '#1F2025',
     white: '#ffffff',
   },
   text: {
@@ -21,17 +24,17 @@ export const theme = {
     },
     family: 'Noto Sans',
     size: {
-      xxs: '12px',
-      xs: '14px',
-      sm: '16px',
-      md: '18px',
+      xxs: '10px',
+      xs: '12px',
+      sm: '14px',
+      md: '16px',
       lg: '24px',
       xl: '30px',
     },
     letterSpacing: {
       xs: '-0.24px',
-      sm: '0.75px',
-      md: '0.8px',
+      sm: '0.2px',
+      md: '0.3px',
       lg: '0.5px',
       xl: '0.8px',
     },

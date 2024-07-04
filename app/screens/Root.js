@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
-import { Easing } from 'react-native';
-import { useSelector } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
+import { Easing, View, ActivityIndicator, StyleSheet } from 'react-native';
 import { withIAPContext } from 'react-native-iap';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSelector } from 'react-redux';
 
 import Onboarding from '../screens/Onboarding';
+import { useNavigation } from '@react-navigation/native';
 
 const fadeTransition = {
   animation: 'timing',
@@ -33,6 +32,15 @@ const CustomTransition = {
 const RootStack = createStackNavigator();
 
 const Root = () => {
+  const navigation = useNavigation();
+  const user = useSelector((state) => state.user.user);
+
+  useEffect(() => {
+    if (user && user.onboarding_status !== 'COMPLETE') {
+      navigation.navigate('Onboarding');
+    }
+  }, [user]);
+
   return (
     <RootStack.Navigator screenOptions={{ headerShown: false, ...CustomTransition }} initialRouteName="Onboarding">
       <RootStack.Screen name="Onboarding" component={Onboarding} />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Dimensions, View } from 'react-native';
 import { GestureHandlerRootView, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
@@ -7,6 +7,9 @@ import wave_right from '../../assets/mascot/wave_right.png';
 import wave_left from '../../assets/mascot/wave_left.png';
 import slight_side_eye from '../../assets/mascot/slight_side_eye.png';
 import existing from '../../assets/mascot/existing.png';
+import { useDispatch, useSelector } from 'react-redux';
+import { continueWithApple } from '../../stores/user/userSlice';
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
@@ -104,6 +107,8 @@ const Dots = ({ totalScreens, screenNumber }) => {
 };
 
 const Welcome = () => {
+  const dispatch = useDispatch();
+
   const totalScreens = 4;
   const [screenNumber, setScreenNumber] = useState(0);
   const scrollViewRef = React.useRef(null);
@@ -114,7 +119,9 @@ const Welcome = () => {
     setScreenNumber(currentPage);
   };
 
-  const handleSignInWithApple = () => {};
+  const handleSignInWithApple = () => {
+    dispatch(continueWithApple());
+  };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

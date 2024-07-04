@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { REACT_APP_MIXPANEL_API_KEY } from '@env';
 import { StatusBar } from 'react-native';
@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Mixpanel } from 'mixpanel-react-native';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import { Provider, useDispatch } from 'react-redux';
+import { ActiveRouteProvider } from './hooks/useActiveRoute';
 import store from './stores/store';
 import { useSelector } from 'react-redux';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -39,6 +40,16 @@ const AppContainer = styled.View`
   background-color: #16171b;
 `;
 
+const getActiveRouteName = (state) => {
+  const route = state.routes[state?.index || 0];
+
+  if (route.state) {
+    return getActiveRouteName(route.state);
+  }
+
+  return route.name;
+};
+
 const App = () => {
   const dispatch = useDispatch();
   const loaded = useSelector((state) => state.user.loaded);
@@ -59,14 +70,24 @@ const App = () => {
 };
 
 const ConnectedApp = () => {
+  const [activeRouteName, setActiveRouteName] = useState();
+
+  const handleNavStateChange = (state) => {
+    if (state) {
+      setActiveRouteName(getActiveRouteName(state));
+    }
+  };
+
   return (
     <MixpanelProvider>
-      <NavigationContainer>
+      <NavigationContainer onStateChange={handleNavStateChange}>
         <ThemeProvider theme={theme}>
           <Provider store={store}>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <App />
-            </GestureHandlerRootView>
+            <ActiveRouteProvider activeRoute={activeRouteName}>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <App />
+              </GestureHandlerRootView>
+            </ActiveRouteProvider>
           </Provider>
         </ThemeProvider>
       </NavigationContainer>
