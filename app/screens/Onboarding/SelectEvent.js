@@ -3,6 +3,7 @@ import { TouchableOpacity, Keyboard, Dimensions, Image, View, StyleSheet } from 
 import { useSelector } from 'react-redux';
 import * as RNLocalize from 'react-native-localize';
 import moment from 'moment';
+import SwipeDown from '../../assets/icons/32x/SwipeDown';
 import LinearGradient from 'react-native-linear-gradient';
 import RenderHtml from 'react-native-render-html';
 import { ActivityIndicator, Text } from 'react-native-paper';
@@ -92,6 +93,17 @@ const DetailContainer = styled.View`
 const DetailText = styled.Text`
   margin-left: 5px;
   color: #fff;
+  font-family: ${(props) => props.theme.text.family};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-weight: ${(props) => props.theme.text.weight.regular};
+  font-size: ${(props) => props.theme.text.size.sm};
+`;
+
+const TouchableText = styled.Text`
+  font-family: ${(props) => props.theme.text.family};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
+  font-weight: ${(props) => props.theme.text.weight.bold};
+  font-size: ${(props) => props.theme.text.size.sm};
 `;
 
 const modal_height = screenHeight * 0.9;
@@ -163,8 +175,6 @@ const SelectEvent = () => {
     paddingBottom: 100,
   }));
 
-  console.log(selectedEvent?.description);
-
   return (
     <Container>
       <Title style={{ marginBottom: 10, marginTop: 10 }}>Find your race</Title>
@@ -192,14 +202,17 @@ const SelectEvent = () => {
       {modalVisible && (
         <PanGestureHandler onGestureEvent={onGestureEvent}>
           <ModalContent style={modalStyle}>
+            <View style={{ position: 'absolute', left: screenWidth / 2 - 16, top: 10, zIndex: 2000 }}>
+              <SwipeDown />
+            </View>
             <View style={styles.shadowContainer}>
               <Image source={{ uri: selectedEvent.image_url }} style={styles.image} />
               {/* Top Shadow */}
-              {/* <LinearGradient
+              <LinearGradient
                 colors={['#0f1013', '#0f101390', '#0f101330', '#0f101320', '#0f101310']}
                 locations={[0, 0.1, 0.4, 0.6, 0.8]}
                 style={[styles.insetShadow, styles.bottomShadow]}
-              /> */}
+              />
               {/* Left Side Shadow */}
               <LinearGradient
                 colors={['#0f1013', '#0f101320', '#0f101330', '#0f101320', '#0f101310']}
@@ -225,7 +238,7 @@ const SelectEvent = () => {
                 end={{ x: 0, y: 0 }}
               />
             </View>
-            <ScrollView style={{ flex: 1, marginTop: 160, paddingHorizontal: 20 }}>
+            <View style={{ flex: 1, marginTop: 160, paddingHorizontal: 20 }}>
               <Title style={{ fontSize: 20 }}>{selectedEvent.name}</Title>
               <DetailContainer>
                 <Distance color={'#A1AAD3'} />
@@ -241,11 +254,27 @@ const SelectEvent = () => {
               </DetailContainer>
               <RenderHtml
                 baseStyle={{ color: '#fff' }}
-                contentWidth={200}
-                style={{ color: '#fff' }}
+                enableExperimentalMarginCollapsing={true}
+                contentWidth={screenWidth}
                 source={{ html: `<p>${selectedEvent.description.split('</p>')[0]}</p>` }}
               />
-            </ScrollView>
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  width: screenWidth - 40,
+                  margin: 'auto',
+                  bottom: 20,
+                  left: 20,
+                  backgroundColor: '#fff',
+                  padding: 10,
+                  borderRadius: 8,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <TouchableText>Select Race</TouchableText>
+              </TouchableOpacity>
+            </View>
           </ModalContent>
         </PanGestureHandler>
       )}
