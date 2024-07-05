@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { TouchableOpacity } from 'react-native';
 import Icon from '../../assets/icons/14x/Calendar';
 import OptionLabel from './OptionLabel';
+import BodyText from './BodyText';
 
 const Container = styled(TouchableOpacity)`
   display: flex;
@@ -31,7 +32,7 @@ const IconOuterRing = styled.View`
   height: 30px;
   width: 30px;
   border-radius: 15px;
-  border: 1px solid #fff;
+  border: 1px solid #f8f8f8;
 `;
 
 const IconInnerRing = styled.View`
@@ -42,14 +43,6 @@ const IconInnerRing = styled.View`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
-
-const Body = styled.Text`
-  font-family: ${(props) => props.theme.text.family};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
-  font-weight: ${(props) => props.theme.text.weight.regular};
-  font-size: ${(props) => props.theme.text.size.sm};
-  color: ${(props) => props.theme.text.colors.white};
 `;
 
 const CustomGoalOption = ({ onPress }) => {
@@ -65,7 +58,7 @@ const CustomGoalOption = ({ onPress }) => {
       </Left>
       <Right>
         <OptionLabel>Enter a custom goal</OptionLabel>
-        <Body>Sabio can train you for anything</Body>
+        <BodyText style={{ color: '#ddd' }}>Sabio can train you for anything</BodyText>
       </Right>
     </Container>
   );

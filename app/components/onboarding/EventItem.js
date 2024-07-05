@@ -12,7 +12,7 @@ const Container = styled.TouchableOpacity`
   min-height: 100px;
   margin-bottom: 12px;
   border-radius: 8px;
-  background-color: ${(props) => props.theme.colors.backgroundLight2};
+  background-color: ${(props) => props.theme.colors.background2};
 `;
 
 const Top = styled.View`
@@ -42,7 +42,7 @@ const LabelText = styled.Text`
   letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
   font-weight: ${(props) => props.theme.text.weight.semibold};
   font-size: ${(props) => props.theme.text.size.sm};
-  color: #fff;
+  color: #f8f8f8;
 `;
 
 const SmallText = styled.Text`

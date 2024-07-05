@@ -9,6 +9,7 @@ const Container = styled.View`
   flex-direction: row;
   align-items: center;
   background-color: ${(props) => props.theme.colors.backgroundLight1};
+  border: ${(props) => `1px solid ${props.theme.colors.borderHighlight}`};
   padding: 15px;
   border-radius: 8px;
 `;
@@ -16,16 +17,11 @@ const Container = styled.View`
 const StyledInput = styled.TextInput`
   flex: 1;
   margin-horizontal: 10px;
-  color: #fff;
+  color: ${(props) => props.theme.text.colors.white};
   font-family: ${(props) => props.theme.text.family};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.md};
   font-weight: ${(props) => props.theme.text.weight.regular};
-  font-size: ${(props) => props.theme.text.size.sm};
-  ::placeholder {
-    color: ${(props) => props.theme.text.colors.highlight};
-    font-size: ${(props) => props.theme.text.size.xs};
-    font-weight: ${(props) => props.theme.text.weight.bold};
-  }
+  font-size: ${(props) => props.theme.text.size.md};
 `;
 
 const SearchBar = ({ style, onSubmit }) => {
@@ -35,7 +31,7 @@ const SearchBar = ({ style, onSubmit }) => {
 
   const handleClear = () => setText('');
 
-  const handleFocus = () => setPlaceholder('');
+  const handleFocus = () => setPlaceholder();
   const handleBlur = () => setPlaceholder('Search');
 
   const handleSubmit = async () => {
@@ -61,19 +57,19 @@ const SearchBar = ({ style, onSubmit }) => {
 
   return (
     <Container style={style}>
-      <SearchIcon color={'#a1aad3'} />
+      <SearchIcon color={'#A1AAD390'} />
       <StyledInput
         onFocus={handleFocus}
         onBlur={handleBlur}
         onChangeText={setText}
         value={text}
         placeholder={placeholder}
-        placeholderTextColor="#ffffff80"
-        selectionColor={'#ffffff80'}
+        placeholderTextColor="#A1AAD350"
+        selectionColor={'#A1AAD390'}
       />
       {text !== '' && (
         <TouchableOpacity onPress={handleClear}>
-          <ClearIcon color={'#16171B'} />
+          <ClearIcon color={'#A1AAD350'} />
         </TouchableOpacity>
       )}
     </Container>

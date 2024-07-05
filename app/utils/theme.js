@@ -8,8 +8,10 @@ export const theme = {
     primary: '#EE6E12',
     background: '#16171B',
     backgroundLight1: '#A1AAD315',
-    backgroundLight2: '#1F2025',
-    white: '#ffffff',
+    highlight: '#A1AAD3',
+    borderHighlight: '#A1AAD340',
+    background2: '#1F2025',
+    white: '#f8f8f8',
   },
   text: {
     colors: {

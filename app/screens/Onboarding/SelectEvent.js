@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { TouchableOpacity, Keyboard, Dimensions, Image, View, StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as RNLocalize from 'react-native-localize';
 import moment from 'moment';
 import SwipeDown from '../../assets/icons/32x/SwipeDown';
@@ -26,28 +26,16 @@ import Animated, {
   runOnJS,
   useAnimatedGestureHandler,
 } from 'react-native-reanimated';
+import { updateState } from '../../stores/onboarding/onboardingSlice';
+import { useNavigation } from '@react-navigation/native';
+import CustomDivider from '../../components/onboarding/CustomDivider';
+import SubHeader from '../../components/onboarding/SubHeader';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const Container = styled.View`
   flex: 1;
   padding-horizontal: 20px;
-`;
-
-const Body = styled.Text`
-  font-family: ${(props) => props.theme.text.family};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
-  font-weight: ${(props) => props.theme.text.weight.regular};
-  font-size: ${(props) => props.theme.text.size.sm};
-  color: ${(props) => props.theme.text.colors.white};
-`;
-
-const Divider = styled.View`
-  height: 1px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-  background-color: #000;
-  width: 100%;
 `;
 
 const BlankView = styled.View`
@@ -57,14 +45,6 @@ const BlankView = styled.View`
   height: 70%;
   margin-top: 50px;
   margin-bottom: 30px;
-`;
-
-const BodyText = styled.Text`
-  font-family: ${(props) => props.theme.text.family};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
-  font-weight: ${(props) => props.theme.text.weight.regular};
-  font-size: ${(props) => props.theme.text.size.sm};
-  color: #a1aad350;
 `;
 
 const ModalContent = styled(Animated.View)`
@@ -92,7 +72,7 @@ const DetailContainer = styled.View`
 
 const DetailText = styled.Text`
   margin-left: 5px;
-  color: #fff;
+  color: #f8f8f8;
   font-family: ${(props) => props.theme.text.family};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
   font-weight: ${(props) => props.theme.text.weight.regular};
@@ -109,6 +89,8 @@ const TouchableText = styled.Text`
 const modal_height = screenHeight * 0.9;
 
 const SelectEvent = () => {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
   const user = useSelector((state) => state.user.user);
 
   const [loading, setLoading] = useState(true);
@@ -175,12 +157,17 @@ const SelectEvent = () => {
     paddingBottom: 100,
   }));
 
+  const handleSelectRace = () => {
+    dispatch(updateState({ race: selectedEvent }));
+    navigation.navigate('RateAbility');
+  };
+
   return (
     <Container>
       <Title style={{ marginBottom: 10, marginTop: 10 }}>Find your race</Title>
-      <Body>Search and select the race you're training for</Body>
+      <SubHeader>Search the race you're training for</SubHeader>
       <SearchBar style={{ marginTop: 20, marginBottom: 10 }} onSubmit={handleSearch} />
-      <Divider />
+      <CustomDivider />
       {loading && (
         <BlankView>
           <ActivityIndicator animating={true} size={30} color={'#a1aad350'} />
@@ -253,19 +240,20 @@ const SelectEvent = () => {
                 <DetailText>{`${city}, ${selectedEvent.country}  ${flag}`}</DetailText>
               </DetailContainer>
               <RenderHtml
-                baseStyle={{ color: '#fff' }}
+                baseStyle={{ color: '#f8f8f8' }}
                 enableExperimentalMarginCollapsing={true}
                 contentWidth={screenWidth}
                 source={{ html: `<p>${selectedEvent.description.split('</p>')[0]}</p>` }}
               />
               <TouchableOpacity
+                onPress={handleSelectRace}
                 style={{
                   position: 'absolute',
                   width: screenWidth - 40,
                   margin: 'auto',
                   bottom: 20,
                   left: 20,
-                  backgroundColor: '#fff',
+                  backgroundColor: '#f8f8f8',
                   padding: 10,
                   borderRadius: 8,
                   display: 'flex',

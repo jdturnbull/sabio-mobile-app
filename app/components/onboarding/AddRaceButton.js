@@ -4,13 +4,14 @@ import { TouchableOpacity } from 'react-native';
 import Icon from '../../assets/icons/14x/Calendar';
 import OptionLabel from './OptionLabel';
 import { useNavigation } from '@react-navigation/native';
+import BodyText from './BodyText';
 
 const Container = styled(TouchableOpacity)`
   display: flex;
   flex-direction: row;
   align-items: center;
-  background-color: ${(props) => props.theme.colors.backgroundLight2};
-  border: 1px solid #a1aad3;
+  background-color: ${(props) => props.theme.colors.background2};
+  border: ${(props) => `1px solid ${props.theme.colors.borderHighlight}`};
   height: 70px;
   border-radius: 8px;
   padding: 15px;
@@ -31,7 +32,7 @@ const IconOuterRing = styled.View`
   height: 30px;
   width: 30px;
   border-radius: 15px;
-  border: 1px solid #fff;
+  border: 1px solid #f8f8f8;
 `;
 
 const IconInnerRing = styled.View`
@@ -42,14 +43,6 @@ const IconInnerRing = styled.View`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
-
-const Body = styled.Text`
-  font-family: ${(props) => props.theme.text.family};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
-  font-weight: ${(props) => props.theme.text.weight.regular};
-  font-size: ${(props) => props.theme.text.size.xs};
-  color: #a1aad3;
 `;
 
 const AddRaceButton = () => {
@@ -67,10 +60,10 @@ const AddRaceButton = () => {
         </IconOuterRing>
       </Left>
       <Right>
-        <OptionLabel style={{ fontSize: 16, fontWeight: 500, color: '#fff', letterSpacing: 0.2 }}>
+        <OptionLabel style={{ fontSize: 16, fontWeight: 500, color: '#f8f8f8', letterSpacing: 0.2 }}>
           Don't see your race?
         </OptionLabel>
-        <Body>Add your race manually</Body>
+        <BodyText style={{ color: '#ddd' }}>Add your race manually</BodyText>
       </Right>
     </Container>
   );

@@ -30,7 +30,7 @@ const IconOuterRing = styled.View`
   height: 30px;
   width: 30px;
   border-radius: 15px;
-  border: 1px solid #fff;
+  border: 1px solid #f8f8f8;
 `;
 
 const IconInnerRing = styled.View`

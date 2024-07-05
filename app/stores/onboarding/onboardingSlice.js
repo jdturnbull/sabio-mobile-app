@@ -8,25 +8,14 @@ export const onboardingSlice = createSlice({
   name: 'onboarding',
   initialState: {
     profile: null,
+    race: null,
   },
   reducers: {
     updateState: (state, action) => {
       state = { ...state, ...action.payload };
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(setup.fulfilled, (state, action) => {
-      state.session = action.payload.session;
-      state.user = action.payload.user;
-      state.loading = false;
-    });
-    builder.addCase(continueWithApple.fulfilled, (state, action) => {
-      if (action.payload) {
-        state.session = action.payload.session;
-        state.user = action.payload.user;
-      }
-    });
-  },
+  extraReducers: (builder) => {},
 });
 
 // Action creators are generated for each case reducer function

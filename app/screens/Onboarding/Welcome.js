@@ -7,9 +7,9 @@ import wave_right from '../../assets/mascot/wave_right.png';
 import wave_left from '../../assets/mascot/wave_left.png';
 import slight_side_eye from '../../assets/mascot/slight_side_eye.png';
 import existing from '../../assets/mascot/existing.png';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { continueWithApple } from '../../stores/user/userSlice';
-import { useNavigation } from '@react-navigation/native';
+import SubHeader from '../../components/onboarding/SubHeader';
 
 const { width } = Dimensions.get('window');
 
@@ -41,15 +41,6 @@ const Header = styled.Text`
   font-size: ${(props) => props.theme.text.size.lg};
   color: ${(props) => props.theme.text.colors.white};
   margin-bottom: 20px;
-`;
-
-const Body = styled.Text`
-  text-align: center;
-  font-family: ${(props) => props.theme.text.family};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.md};
-  font-weight: ${(props) => props.theme.text.weight.regular};
-  font-size: ${(props) => props.theme.text.size.md};
-  color: ${(props) => props.theme.text.colors.white};
 `;
 
 const Button = styled(TouchableOpacity)`
@@ -140,7 +131,9 @@ const Welcome = () => {
               </View>
               <View style={{ height: '50%', justifyContent: 'center' }}>
                 <Header>Your new fitness coach</Header>
-                <Body>Meet Sabio, your fitness coach powered by artificial intelligence</Body>
+                <SubHeader style={{ textAlign: 'center' }}>
+                  Meet Sabio, your fitness coach powered by artificial intelligence
+                </SubHeader>
               </View>
             </SwipeableView>
             <SwipeableView>
@@ -149,7 +142,9 @@ const Welcome = () => {
               </View>
               <View style={{ height: '50%', justifyContent: 'center' }}>
                 <Header>Completely focused on you</Header>
-                <Body>Adaptable to injuries, preferences, illness and schedule limitations</Body>
+                <SubHeader style={{ textAlign: 'center' }}>
+                  Adaptable to injuries, preferences, illness and schedule limitations
+                </SubHeader>
               </View>
             </SwipeableView>
             <SwipeableView>
@@ -158,7 +153,9 @@ const Welcome = () => {
               </View>
               <View style={{ height: '50%', justifyContent: 'center' }}>
                 <Header>Guided by your Strava</Header>
-                <Body>Enrich Sabio with your data by connecting with Strava</Body>
+                <SubHeader style={{ textAlign: 'center' }}>
+                  Enrich Sabio with your data by connecting with Strava
+                </SubHeader>
               </View>
             </SwipeableView>
             <SwipeableView>
@@ -167,7 +164,9 @@ const Welcome = () => {
               </View>
               <View style={{ height: '50%', justifyContent: 'center' }}>
                 <Header>At a 10th of the price</Header>
-                <Body>Our mission is to make intelligent coaching available to everyone</Body>
+                <SubHeader style={{ textAlign: 'center' }}>
+                  Our mission is to make intelligent coaching available to everyone
+                </SubHeader>
               </View>
             </SwipeableView>
           </ScrollView>

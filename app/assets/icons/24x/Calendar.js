@@ -5,7 +5,7 @@ const SvgComponent = (props) => (
     <Path
       fill={props.color || '#f8f8f8'}
       fillRule="evenodd"
-      d="m6.92 19.087 1.827 1.828 8.668-8.668L8.747 3.58 6.92 5.408l6.84 6.84-6.84 6.84Z"
+      d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 5v11H5V8h14Zm-7 2H7v5h5v-5Z"
       clipRule="evenodd"
     />
   </Svg>

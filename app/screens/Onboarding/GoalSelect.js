@@ -12,6 +12,7 @@ import Health from '../../assets/icons/18x/Health';
 import Repeat from '../../assets/icons/18x/Repeat';
 import Triathlon from '../../assets/icons/18x/Triathlon';
 import { useNavigation } from '@react-navigation/native';
+import CustomDivider from '../../components/onboarding/CustomDivider';
 
 const OPTIONS_LIST = [
   { label: 'Run a set distance', id: 'run_set_distance', Icon: Measure },
@@ -25,14 +26,6 @@ const OPTIONS_LIST = [
 const Container = styled.View`
   flex: 1;
   padding-horizontal: 20px;
-`;
-
-const Divider = styled.View`
-  height: 2px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  background-color: #000;
-  width: 100%;
 `;
 
 const GoalSelect = () => {
@@ -53,7 +46,7 @@ const GoalSelect = () => {
       <ScrollView>
         <RaceEventOption onPress={handlePress} />
         <CustomGoalOption onPress={handlePress} />
-        <Divider />
+        <CustomDivider />
         {OPTIONS_LIST.map((option) => (
           <GoalOption key={option.id} option={option} onPress={handlePress} />
         ))}

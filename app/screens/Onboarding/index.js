@@ -10,6 +10,7 @@ import GoalSelect from './GoalSelect';
 import SelectEvent from './SelectEvent';
 import CustomGoal from './CustomGoal';
 import AddRace from './AddRace';
+import RateAbility from './RateAbility';
 
 const OnboardingStack = createStackNavigator();
 
@@ -19,7 +20,7 @@ const Onboarding = () => {
 
   useEffect(() => {
     if (user && user.onboarding_status !== 'COMPLETE') {
-      navigation.navigate('GoalSelect');
+      navigation.navigate('AddRace');
     }
   }, [user]);
 
@@ -37,6 +38,7 @@ const Onboarding = () => {
         <OnboardingStack.Screen name="SelectEvent" component={SelectEvent} />
         <OnboardingStack.Screen name="CustomGoal" component={CustomGoal} />
         <OnboardingStack.Screen name="AddRace" component={AddRace} />
+        <OnboardingStack.Screen name="RateAbility" component={RateAbility} />
       </OnboardingStack.Navigator>
     </View>
   );

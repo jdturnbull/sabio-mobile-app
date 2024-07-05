@@ -7,7 +7,7 @@ import useActiveRoute from '../../hooks/useActiveRoute';
 import BackIcon from '../../assets/icons/24x/Back';
 import { useNavigation } from '@react-navigation/native';
 
-const backable_screens = ['CustomGoal', 'SelectEvent', 'AddRace'];
+const backable_screens = ['CustomGoal', 'SelectEvent', 'AddRace', 'RateAbility'];
 
 const Container = styled(Animated.View)`
   margin-top: ${(props) => props.theme.spacing.safeAreaView};
