@@ -5,7 +5,9 @@ const initial_state = {
   profile: null,
   race: null,
   customGoal: null,
-  completionDate: null,
+  runDistance: null,
+  loseWeight: null,
+  trainTriathlon: null,
 };
 
 export const onboardingSlice = createSlice({

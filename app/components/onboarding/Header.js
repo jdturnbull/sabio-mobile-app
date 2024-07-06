@@ -9,7 +9,18 @@ import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import { clearState } from '../../stores/onboarding/onboardingSlice';
 
-const backable_screens = ['CustomGoal', 'SelectEvent', 'AddRace', 'RateAbility'];
+const backable_screens = [
+  'CustomGoal',
+  'SelectEvent',
+  'AddRace',
+  'RateAbility',
+  'SelectTerrain',
+  'RunDistance',
+  'GeneralHealth',
+  'WhereTrain',
+  'WeightEntry',
+  'TriathlonDistance',
+];
 
 const Container = styled(Animated.View)`
   margin-top: ${(props) => props.theme.spacing.safeAreaView};
@@ -42,6 +53,9 @@ const Header = () => {
 
   const [canBack, setCanBack] = useState(false);
 
+  // 13 screens (max flow length)
+  const increment = 1 / 13;
+
   useEffect(() => {
     if (backable_screens.includes(route)) {
       setCanBack(true);
@@ -49,14 +63,40 @@ const Header = () => {
       setCanBack(false);
     }
 
+    console.log(route);
+
     if (route === 'GoalSelect') {
-      progress.value = withTiming(0.1, { duration: 300 });
+      progress.value = withTiming(increment, { duration: 300 });
+    }
+    if (route === 'GeneralHealth') {
+      progress.value = withTiming(increment * 2, { duration: 300 });
     }
     if (route === 'CustomGoal') {
-      progress.value = withTiming(0.2, { duration: 300 });
+      progress.value = withTiming(increment * 2, { duration: 300 });
+    }
+    if (route === 'WhereTrain') {
+      progress.value = withTiming(increment * 2, { duration: 300 });
     }
     if (route === 'SelectEvent') {
-      progress.value = withTiming(0.2, { duration: 300 });
+      progress.value = withTiming(increment * 2, { duration: 300 });
+    }
+    if (route === 'AddRace') {
+      progress.value = withTiming(increment * 2, { duration: 300 });
+    }
+    if (route === 'RunDistance') {
+      progress.value = withTiming(increment * 2, { duration: 300 });
+    }
+    if (route === 'SelectTerrain') {
+      progress.value = withTiming(increment * 3, { duration: 300 });
+    }
+    if (route === 'RateAbility') {
+      progress.value = withTiming(increment * 4, { duration: 300 });
+    }
+    if (route === 'WeightEntry') {
+      progress.value = withTiming(increment * 3, { duration: 300 });
+    }
+    if (route === 'TriathlonDistance') {
+      progress.value = withTiming(increment * 2, { duration: 300 });
     }
   }, [route]);
 

@@ -41,6 +41,18 @@ const GoalSelect = () => {
     if (option === 'run_set_distance') {
       navigation.navigate('RunDistance');
     }
+    if (option === 'improve_general_health') {
+      navigation.navigate('GeneralHealth');
+    }
+    if (option === 'run_first_5k') {
+      navigation.navigate('RateAbility');
+    }
+    if (option === 'lose_weight') {
+      navigation.navigate('WhereTrain');
+    }
+    if (option === 'train_for_a_triathlon') {
+      navigation.navigate('TriathlonDistance');
+    }
   };
 
   return (

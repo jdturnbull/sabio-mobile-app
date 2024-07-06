@@ -26,7 +26,7 @@ const CATEGORIES = [
   'Custom',
 ];
 
-const TERRAINS = ['Flat', 'Rolling', 'Moderate', 'Hilly', 'Unknown', 'Custom'];
+const TERRAINS = ['Flat', 'Rolling', 'Moderate', 'Hilly', 'All', 'Custom'];
 
 const UNITS = ['Km', 'Miles'];
 

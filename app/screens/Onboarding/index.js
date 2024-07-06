@@ -12,6 +12,11 @@ import CustomGoal from './CustomGoal';
 import AddRace from './AddRace';
 import RateAbility from './RateAbility';
 import RunDistance from './RunDistance';
+import SelectTerrain from './SelectTerrain';
+import GeneralHealth from './GeneralHealth';
+import WhereTrain from './WhereTrain';
+import WeightEntry from './WeightEntry';
+import TriathlonDistance from './TriathlonDistance';
 
 const OnboardingStack = createStackNavigator();
 
@@ -41,6 +46,11 @@ const Onboarding = () => {
         <OnboardingStack.Screen name="AddRace" component={AddRace} />
         <OnboardingStack.Screen name="RateAbility" component={RateAbility} />
         <OnboardingStack.Screen name="RunDistance" component={RunDistance} />
+        <OnboardingStack.Screen name="SelectTerrain" component={SelectTerrain} />
+        <OnboardingStack.Screen name="GeneralHealth" component={GeneralHealth} />
+        <OnboardingStack.Screen name="WhereTrain" component={WhereTrain} />
+        <OnboardingStack.Screen name="WeightEntry" component={WeightEntry} />
+        <OnboardingStack.Screen name="TriathlonDistance" component={TriathlonDistance} />
       </OnboardingStack.Navigator>
     </View>
   );

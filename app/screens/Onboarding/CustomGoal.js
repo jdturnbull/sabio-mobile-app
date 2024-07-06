@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import {
   TouchableWithoutFeedback,
@@ -10,7 +10,6 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import moment from 'moment';
 import Title from '../../components/shared/Title';
 import SubHeader from '../../components/shared/SubHeader';
 import CustomInput from '../../components/shared/CustomInput';
@@ -19,8 +18,7 @@ import Clear from '../../assets/icons/24x/Clear';
 import SmartPrinciples from '../../components/shared/SmartPrinciples';
 import { ScrollView } from 'react-native-gesture-handler';
 import retrieveCompletion from '../../utils/retrieveCompletion';
-import DateInput from '../../components/shared/DateInput';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { useNavigation } from '@react-navigation/native';
 
@@ -83,7 +81,6 @@ const CustomGoal = () => {
   const [loading, setLoading] = useState(false);
   const [goal, setGoal] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
 
   const toggleDropdown = () => setModalVisible(false);
 
@@ -93,23 +90,9 @@ const CustomGoal = () => {
       return;
     }
 
-    const currentDate = moment.utc();
-    const raceDate = moment.utc(date);
-    const daysDifference = raceDate.diff(currentDate, 'days');
-
-    if (daysDifference < 30) {
-      Alert.alert('The race must be a minimum of a month away');
-      return;
-    }
-
-    if (daysDifference > 365) {
-      Alert.alert('The race must be a maximum of a year away');
-      return;
-    }
-
     try {
       setLoading(true);
-      const prompt = `Is this a fitness related goal? if yes then respond 'yes' if no then respond with 'no'\nFitness Goal: ${goal} Goal by Date: ${date}`;
+      const prompt = `Is this a fitness related goal? if yes then respond 'yes' if no then respond with 'no'\nFitness Goal: ${goal}`;
       const isValid = await retrieveCompletion({ prompt, model: 'gpt-3.5-turbo' });
 
       if (isValid.toLowerCase() === 'no') {
@@ -118,12 +101,7 @@ const CustomGoal = () => {
         return;
       }
 
-      dispatch(
-        updateState({
-          customGoal: goal,
-          completionDate: date,
-        }),
-      );
+      dispatch(updateState({ customGoal: { goal } }));
 
       setLoading(false);
 
@@ -137,14 +115,13 @@ const CustomGoal = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <Container>
-        <Title style={{ marginBottom: 12 }}>Enter a custom goal</Title>
-        <TouchableOpacity style={{ paddingVertical: 10, marginBottom: 30 }} onPress={() => setModalVisible(true)}>
+        <Title style={{ marginBottom: 10 }}>Enter a custom goal</Title>
+        <TouchableOpacity style={{ paddingBottom: 10, marginBottom: 30 }} onPress={() => setModalVisible(true)}>
           <SubHeader>
             Help Sabio by using <HighlightText>S.M.A.R.T goals</HighlightText>
           </SubHeader>
         </TouchableOpacity>
         <CustomInput label={'Custom goal'} placeholder={'Your goal'} value={goal} setValue={setGoal} multiline={true} />
-        <DateInput label={'Goal completon date'} value={date} setValue={setDate} />
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           {loading && <ActivityIndicator />}
         </View>

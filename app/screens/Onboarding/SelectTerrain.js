@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import { Alert, Keyboard, TouchableWithoutFeedback, View } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import styled from 'styled-components';
+import { useDispatch, useSelector } from 'react-redux';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useNavigation } from '@react-navigation/native';
 import Title from '../../components/shared/Title';
-import SubHeader from '../../components/shared/SubHeader';
 import SelectableItem from '../../components/shared/SelectableItem';
 import CustomInput from '../../components/shared/CustomInput';
-import DropDownSelector from '../../components/shared/DropDownSelector';
 import NextButton from '../../components/onboarding/NextButton';
-import { useNavigation } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
+import SubHeader from '../../components/shared/SubHeader';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 
-const OPTIONS = ['5km', '10km', '10 Miles', 'Half Marathon', 'Marathon', 'Custom'];
-const UNITS = ['Km', 'Miles'];
+const TERRAINS = ['Flat', 'Rolling', 'Moderate', 'Hilly', 'All', 'Custom'];
 
 const Container = styled.View`
   flex: 1;
@@ -32,13 +30,15 @@ const CustomInputContainer = styled(Animated.View)`
   align-items: flex-start;
 `;
 
-const RunDistance = () => {
+const SelectTerrain = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const [selected, setSelected] = useState('5km');
-  const [distance, setDistance] = useState('');
-  const [unit, setUnit] = useState('Km');
+  const state = useSelector((state) => state.onboarding);
+
+  const [selected, setSelected] = useState('Flat');
+  const [description, setDescription] = useState('');
+
   const heightAnim = useSharedValue(0);
 
   useEffect(() => {
@@ -62,61 +62,42 @@ const RunDistance = () => {
 
   const handleContinue = () => {
     if (!selected) {
-      Alert.alert('Please select a distance');
+      Alert.alert('Please select an option');
       return;
     }
-
-    if (selected === 'Custom' && !distance) {
-      Alert.alert('Please enter a distance');
+    if (selected === 'Custom' && !description) {
+      Alert.alert('Please enter a description');
       return;
     }
+    const terrain = selected === 'Custom' ? description : selected;
+    dispatch(updateState({ runDistance: { ...state.runDistance, terrain } }));
 
-    if (selected === 'Custom' && !unit) {
-      Alert.alert('Please select a unit');
-      return;
-    }
-
-    if (selected === 'Custom' && distance > 60) {
-      Alert.alert('Please enter a distance below 60');
-      return;
-    }
-
-    if (selected === 'Custom' && distance < 5) {
-      Alert.alert('Please select a distance of 5 or more');
-      return;
-    }
-    const _distance = selected === 'Custom' ? `${distance} ${unit}` : selected;
-
-    dispatch(updateState({ runDistance: { distance: _distance } }));
-
-    navigation.navigate('SelectTerrain');
+    navigation.navigate('RateAbility');
   };
 
   return (
     <KeyboardAwareScrollView
-      extraScrollHeight={100}
+      extraScrollHeight={120}
       contentContainerStyle={{ flexGrow: 1 }}
       enableOnAndroid={true}
       keyboardOpeningTime={0}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <Container>
-          <Title style={{ marginBottom: 10 }}>Select a distance</Title>
-          <SubHeader>Select the distance you'd like to train for</SubHeader>
+          <Title style={{ marginBottom: 10 }}>Terrain selection</Title>
+          <SubHeader>Choose the terrain for your training</SubHeader>
           <OptionsContainer>
-            {OPTIONS.map((opt) => {
+            {TERRAINS.map((opt) => {
               return <SelectableItem key={opt} label={opt} onPress={handlePress} selected={selected === opt} />;
             })}
           </OptionsContainer>
           <CustomInputContainer style={animatedStyle}>
             <CustomInput
-              style={{ flex: 1, marginRight: 15 }}
-              label={'Distance'}
-              placeholder={'5 - 60'}
-              value={distance}
-              setValue={setDistance}
-              keyboardType={'numeric'}
+              style={{ flex: 1 }}
+              label={'Custom Terrain'}
+              placeholder={'Describe the terrain'}
+              value={description}
+              setValue={setDescription}
             />
-            <DropDownSelector items={UNITS} value={unit} setValue={setUnit} label={'Units'} />
           </CustomInputContainer>
           <View style={{ flex: 1 }} />
           <NextButton onPress={handleContinue} style={{ marginBottom: 20 }}>
@@ -128,4 +109,4 @@ const RunDistance = () => {
   );
 };
 
-export default RunDistance;
+export default SelectTerrain;
