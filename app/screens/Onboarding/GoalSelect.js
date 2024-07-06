@@ -38,6 +38,9 @@ const GoalSelect = () => {
     if (option === 'custom_goal') {
       navigation.navigate('CustomGoal');
     }
+    if (option === 'run_set_distance') {
+      navigation.navigate('RunDistance');
+    }
   };
 
   return (

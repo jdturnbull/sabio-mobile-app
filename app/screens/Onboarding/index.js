@@ -11,6 +11,7 @@ import SelectEvent from './SelectEvent';
 import CustomGoal from './CustomGoal';
 import AddRace from './AddRace';
 import RateAbility from './RateAbility';
+import RunDistance from './RunDistance';
 
 const OnboardingStack = createStackNavigator();
 
@@ -39,6 +40,7 @@ const Onboarding = () => {
         <OnboardingStack.Screen name="CustomGoal" component={CustomGoal} />
         <OnboardingStack.Screen name="AddRace" component={AddRace} />
         <OnboardingStack.Screen name="RateAbility" component={RateAbility} />
+        <OnboardingStack.Screen name="RunDistance" component={RunDistance} />
       </OnboardingStack.Navigator>
     </View>
   );

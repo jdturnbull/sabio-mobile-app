@@ -165,7 +165,7 @@ const DateInput = ({ placeholder, value, setValue, label }) => {
 
   useEffect(() => {
     const newMonth = moment().startOf('month').add(currentMonthIndex, 'months').format('YYYY-MM-DD');
-    setValue(newMonth);
+    setValue((prevValue) => moment(prevValue).month(moment(newMonth).month()).format('YYYY-MM-DD'));
     if (scrollRef.current) {
       scrollRef.current.scrollTo({ x: currentMonthIndex * screenWidth, animated: false });
     }

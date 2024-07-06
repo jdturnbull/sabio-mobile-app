@@ -71,6 +71,11 @@ const AddRace = () => {
       return;
     }
 
+    if (daysDifference > 365) {
+      Alert.alert('The race must be a maximum of a year away');
+      return;
+    }
+
     if (!category) {
       Alert.alert('Missing a race category');
       return;

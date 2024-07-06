@@ -6,7 +6,7 @@ const Container = styled.View`
   border: ${(props) => `1px solid ${props.theme.colors.borderHighlight}`};
   padding: 10px;
   border-radius: 8px;
-  height: 70px;
+  height: ${(props) => (props.multiline ? '140px' : '70px')};
   margin-bottom: 10px;
 `;
 
@@ -24,11 +24,12 @@ const StyledInput = styled.TextInput`
   color: ${(props) => props.theme.text.colors.white};
   font-family: ${(props) => props.theme.text.family};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.md};
-  height: 50px;
+  height: ${(props) => (props.multiline ? '120px' : '50px')};
   font-size: ${(props) => props.theme.text.size.sm};
+  text-align-vertical: ${(props) => (props.multiline ? 'top' : 'center')};
 `;
 
-const CustomInput = ({ placeholder, value, setValue, label, style, keyboardType, onFocus }) => {
+const CustomInput = ({ placeholder, value, setValue, label, style, keyboardType, onFocus, multiline }) => {
   const [_placeholder, _setPlaceholder] = useState(placeholder);
 
   const handleFocus = () => {
@@ -41,17 +42,18 @@ const CustomInput = ({ placeholder, value, setValue, label, style, keyboardType,
   };
 
   return (
-    <Container style={style}>
+    <Container style={style} multiline={multiline}>
       <Label>{label.toUpperCase()}</Label>
       <StyledInput
         keyboardType={keyboardType}
         value={value}
-        onChange={setValue}
+        onChangeText={setValue}
         onFocus={handleFocus}
         onBlur={handleBlur}
         placeholder={_placeholder}
         placeholderTextColor="#A1AAD350"
         selectionColor={'#A1AAD390'}
+        multiline={multiline}
       />
     </Container>
   );

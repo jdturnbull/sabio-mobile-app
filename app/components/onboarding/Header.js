@@ -6,6 +6,8 @@ import Animated from 'react-native-reanimated';
 import useActiveRoute from '../../hooks/useActiveRoute';
 import BackIcon from '../../assets/icons/24x/Back';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import { clearState } from '../../stores/onboarding/onboardingSlice';
 
 const backable_screens = ['CustomGoal', 'SelectEvent', 'AddRace', 'RateAbility'];
 
@@ -33,6 +35,7 @@ const ProgressBarInner = styled(Animated.View)`
 `;
 
 const Header = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const route = useActiveRoute();
   const progress = useSharedValue(0.1);
@@ -63,7 +66,13 @@ const Header = () => {
     };
   });
 
-  const handleBack = () => navigation.goBack();
+  const handleBack = () => {
+    console.log(route);
+    if (route === 'RateAbility') {
+      dispatch(clearState());
+    }
+    navigation.goBack();
+  };
 
   return (
     <Container>

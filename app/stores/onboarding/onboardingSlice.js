@@ -1,21 +1,28 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import call from '../../utils/call';
 
+const initial_state = {
+  profile: null,
+  race: null,
+  customGoal: null,
+  completionDate: null,
+};
+
 export const onboardingSlice = createSlice({
   name: 'onboarding',
-  initialState: {
-    profile: null,
-    race: null, // Won't neccesarily include unit or terrain
-  },
+  initialState: initial_state,
   reducers: {
     updateState: (state, action) => {
       state = { ...state, ...action.payload };
+    },
+    clearState: (state, action) => {
+      state = initial_state;
     },
   },
   extraReducers: (builder) => {},
 });
 
 // Action creators are generated for each case reducer function
-export const { updateState } = onboardingSlice.actions;
+export const { updateState, clearState } = onboardingSlice.actions;
 
 export default onboardingSlice.reducer;

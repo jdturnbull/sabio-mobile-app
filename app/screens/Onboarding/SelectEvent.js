@@ -70,7 +70,7 @@ const SelectEvent = () => {
     navigation.navigate('RateAbility');
   };
 
-  const handleAddRace = (event) => {
+  const handleAddRace = () => {
     navigation.navigate('AddRace');
   };
 
