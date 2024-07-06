@@ -53,6 +53,9 @@ const GoalSelect = () => {
     if (option === 'train_for_a_triathlon') {
       navigation.navigate('TriathlonDistance');
     }
+    if (option === 'general_fitness') {
+      navigation.navigate('GeneralFitness');
+    }
   };
 
   return (

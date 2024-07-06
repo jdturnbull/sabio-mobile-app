@@ -20,6 +20,7 @@ const backable_screens = [
   'WhereTrain',
   'WeightEntry',
   'TriathlonDistance',
+  'GeneralFitness',
 ];
 
 const Container = styled(Animated.View)`
@@ -63,8 +64,6 @@ const Header = () => {
       setCanBack(false);
     }
 
-    console.log(route);
-
     if (route === 'GoalSelect') {
       progress.value = withTiming(increment, { duration: 300 });
     }
@@ -96,6 +95,9 @@ const Header = () => {
       progress.value = withTiming(increment * 3, { duration: 300 });
     }
     if (route === 'TriathlonDistance') {
+      progress.value = withTiming(increment * 2, { duration: 300 });
+    }
+    if (route === 'GeneralFitness') {
       progress.value = withTiming(increment * 2, { duration: 300 });
     }
   }, [route]);
