@@ -1,21 +1,29 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import Calendar from '../../assets/icons/24x/Calendar';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import moment from 'moment';
 import ArrowRight from '../../assets/icons/18x/ArrowRight';
 import ArrowLeft from '../../assets/icons/18x/ArrowLeft';
-import { Text, TouchableOpacity, TouchableWithoutFeedback, Dimensions, ScrollView } from 'react-native';
+import { Text, TouchableOpacity, TouchableWithoutFeedback, Dimensions, ScrollView, Keyboard } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
 
-const calculateDates = (value) => {
-  const daysInMonth = moment(value, 'YYYY-MM-DD').daysInMonth();
-  return Array.from({ length: daysInMonth }, (_, i) =>
-    moment(value, 'YYYY-MM-DD')
-      .date(i + 1)
-      .format('YYYY-MM-DD'),
-  );
+const calculateDates = (months) => {
+  let dates = [];
+
+  for (let i = 0; i < months.length; i++) {
+    const month = months[i];
+
+    const daysInMonth = month.daysInMonth();
+    const _dates = Array.from({ length: daysInMonth }, (_, i) => month.date(i + 1).format('YYYY-MM-DD'));
+
+    const days = _dates.slice(0, 8).map((d) => moment(d, 'YYYY-MM-DD').format('ddd'));
+
+    dates.push({ month, dates: _dates, days });
+  }
+
+  return dates;
 };
 
 const Touchable = Animated.createAnimatedComponent(TouchableWithoutFeedback);
@@ -29,7 +37,7 @@ const Container = styled(Animated.View)`
 `;
 
 const Label = styled.Text`
-  color: #ffffff90;
+  color: #f8f8f850;
   font-size: ${(props) => props.theme.text.size.xs};
   font-family: ${(props) => props.theme.text.family};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
@@ -66,7 +74,7 @@ const MonthYearText = styled.Text`
   color: ${(props) => props.theme.text.colors.white};
   font-weight: ${(props) => props.theme.text.weight.bold};
   font-size: ${(props) => props.theme.text.size.md};
-  margin-left: 7px;
+  margin-left: 1px;
 `;
 
 const MonthYearButtonsContainer = styled.View`
@@ -83,14 +91,14 @@ const DatesContainer = styled(ScrollView)`
 
 const MonthContainer = styled.View`
   flex: 1;
-  flex-direction: row;
-  flex-wrap: wrap;
+  width: ${() => `${screenWidth}px`};
+  zindex: 1000px;
 `;
 
-const DateRow = styled.View`
+const MonthInner = styled.View`
   flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 5px;
+  flex-wrap: wrap;
+  width: ${() => `${screenWidth - 70}px`};
 `;
 
 const DateTouchable = styled.TouchableOpacity`
@@ -103,6 +111,16 @@ const DateTouchable = styled.TouchableOpacity`
   align-items: center;
 `;
 
+const DayLabelContainer = styled.View`
+  flex-direction: row;
+  width: ${() => `${screenWidth - 70}px`};
+  margin-bottom: 10px;
+`;
+
+const DayLabel = ({ day }) => {
+  return <Text style={{ width: 40, textAlign: 'center', color: '#f8f8f850' }}>{day}</Text>;
+};
+
 const DateItem = ({ date, onPress, selected }) => {
   const dateString = moment(date, 'YYYY-MM-DD').format('DD');
   return (
@@ -113,7 +131,18 @@ const DateItem = ({ date, onPress, selected }) => {
 };
 
 const DateInput = ({ placeholder, value, setValue, label }) => {
-  const months = Array.from({ length: 12 }, (_, i) => moment().add(i, 'months'));
+  const scrollRef = useRef();
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(() => {
+    const initialMonth = moment(value, 'YYYY-MM-DD').startOf('month');
+    return moment().startOf('month').diff(initialMonth, 'months');
+  });
+
+  const months = useMemo(() => {
+    const now = moment();
+    return Array.from({ length: 12 }, (_, i) => now.clone().add(i, 'months'));
+  }, []);
+
+  const dates = useMemo(() => calculateDates(months), [months]);
 
   const height = useSharedValue(70);
 
@@ -122,23 +151,37 @@ const DateInput = ({ placeholder, value, setValue, label }) => {
   }));
 
   const handlePress = () => {
-    height.value = height.value === 70 ? 370 : 70;
+    Keyboard.dismiss();
+    height.value = height.value === 70 ? 320 : 70;
   };
 
-  const handleAddMonth = () => {
-    const newValue = moment(value, 'YYYY-MM-DD').add(1, 'month').format('YYYY-MM-DD');
-    setValue(newValue);
-  };
+  const handleAddMonth = useCallback(() => {
+    setCurrentMonthIndex((prevIndex) => Math.min(prevIndex + 1, 11)); // Limit to 11 months (0-11 index)
+  }, []);
 
-  const handleSubtractMonth = () => {
-    const newValue = moment(value, 'YYYY-MM-DD').subtract(1, 'month').format('YYYY-MM-DD');
-    setValue(newValue);
-  };
+  const handleSubtractMonth = useCallback(() => {
+    setCurrentMonthIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+  }, []);
+
+  useEffect(() => {
+    const newMonth = moment().startOf('month').add(currentMonthIndex, 'months').format('YYYY-MM-DD');
+    setValue(newMonth);
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ x: currentMonthIndex * screenWidth, animated: false });
+    }
+  }, [currentMonthIndex, setValue]);
 
   const handleDatePress = (date) => {
     setValue(date);
   };
 
+  const handleMomentumScrollEnd = (e) => {
+    const offsetX = e.nativeEvent.contentOffset.x;
+    const newIndex = Math.round(offsetX / screenWidth);
+    setCurrentMonthIndex(newIndex);
+  };
+
+  // TODO: The main touchable gets triggered unless you swipe a date item
   return (
     <Touchable onPress={handlePress}>
       <Container style={animatedStyle}>
@@ -160,13 +203,30 @@ const DateInput = ({ placeholder, value, setValue, label }) => {
             </MonthYearButtonsContainer>
           </MonthYearContainer>
           <DatesContainer
+            ref={scrollRef}
+            onMomentumScrollEnd={handleMomentumScrollEnd}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             snapToInterval={screenWidth}
             decelerationRate="fast">
-            {months.map((month) => {
-              return <MonthContainer></MonthContainer>;
+            {months.map((month, monthIndex) => {
+              const data = dates.find((d) => d.month.isSame(month, 'month'));
+
+              return (
+                <MonthContainer key={month.format('YYYY-MM')}>
+                  <DayLabelContainer>
+                    {data.days.map((day, i) => (
+                      <DayLabel day={day} key={i} />
+                    ))}
+                  </DayLabelContainer>
+                  <MonthInner>
+                    {data.dates.map((date, i) => (
+                      <DateItem key={i} date={date} onPress={handleDatePress} selected={date === value} />
+                    ))}
+                  </MonthInner>
+                </MonthContainer>
+              );
             })}
           </DatesContainer>
         </SelectorContainer>

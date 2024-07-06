@@ -11,8 +11,8 @@ import getUnicodeFlagIcon from 'country-flag-icons/unicode';
 import getEvents from '../../utils/getEvents';
 import styled from 'styled-components';
 import AddRaceButton from '../../components/onboarding/AddRaceButton';
-import Title from '../../components/onboarding/Title';
-import SearchBar from '../../components/onboarding/SearchBar';
+import Title from '../../components/shared/Title';
+import SearchBar from '../../components/shared/SearchBar';
 import Location from '../../assets/icons/18x/Location';
 import Distance from '../../assets/icons/18x/Course';
 import Calendar from '../../assets/icons/18x/Calendar';
@@ -28,8 +28,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { useNavigation } from '@react-navigation/native';
-import CustomDivider from '../../components/onboarding/CustomDivider';
-import SubHeader from '../../components/onboarding/SubHeader';
+import CustomDivider from '../../components/shared/CustomDivider';
+import SubHeader from '../../components/shared/SubHeader';
+import Add from '../../assets/icons/24x/Add';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -50,8 +51,6 @@ const BlankView = styled.View`
 const ModalContent = styled(Animated.View)`
   height: ${() => `${screenHeight - 130}px`};
   background-color: #0f1013;
-  border-top-right-radius: 8px;
-  border-top-left-radius: 8px;
   shadow-opacity: 0.3;
   shadow-radius: 4px;
   shadow-color: black;
@@ -162,9 +161,16 @@ const SelectEvent = () => {
     navigation.navigate('RateAbility');
   };
 
+  const handleAddRace = () => navigation.navigate('AddRace');
+
   return (
     <Container>
-      <Title style={{ marginBottom: 10, marginTop: 10 }}>Find your race</Title>
+      <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <Title style={{ marginBottom: 10, marginTop: 10, flex: 1 }}>Find your race</Title>
+        <TouchableOpacity onPress={handleAddRace}>
+          <Add color={'#EE6E12'} />
+        </TouchableOpacity>
+      </View>
       <SubHeader>Search the race you're training for</SubHeader>
       <SearchBar style={{ marginTop: 20, marginBottom: 10 }} onSubmit={handleSearch} />
       <CustomDivider />

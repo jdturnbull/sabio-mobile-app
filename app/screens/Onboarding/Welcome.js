@@ -9,13 +9,13 @@ import slight_side_eye from '../../assets/mascot/slight_side_eye.png';
 import existing from '../../assets/mascot/existing.png';
 import { useDispatch } from 'react-redux';
 import { continueWithApple } from '../../stores/user/userSlice';
-import SubHeader from '../../components/onboarding/SubHeader';
+import SubHeader from '../../components/shared/SubHeader';
 
 const { width } = Dimensions.get('window');
 
 const Container = styled.View`
   flex: 1;
-  padding-top: ${(props) => props.theme.spacing.safeAreaViewLarge};
+  padding-top: ${(props) => props.theme.spacing.safeAreaView};
   padding-bottom: ${(props) => props.theme.spacing.safeAreaViewBottom};
 `;
 
@@ -62,7 +62,7 @@ const ButtonLabel = styled.Text`
 
 const Dots = ({ totalScreens, screenNumber }) => {
   return (
-    <View style={{ flexDirection: 'row', marginTop: 20 }}>
+    <View style={{ flexDirection: 'row' }}>
       {Array.from({ length: totalScreens }).map((_, index) => {
         const animatedWidth = useSharedValue(index === screenNumber ? 40 : 8);
 
@@ -126,10 +126,10 @@ const Welcome = () => {
             onScroll={handleScroll}
             scrollEventThrottle={16}>
             <SwipeableView>
-              <View style={{ height: '50%', justifyContent: 'center' }}>
+              <View style={{ height: '40%', justifyContent: 'center' }}>
                 <Mascot source={wave_right} style={{ width: 220, height: 202 }} />
               </View>
-              <View style={{ height: '50%', justifyContent: 'center' }}>
+              <View style={{ height: '60%', justifyContent: 'center' }}>
                 <Header>Your new fitness coach</Header>
                 <SubHeader style={{ textAlign: 'center' }}>
                   Meet Sabio, your fitness coach powered by artificial intelligence
@@ -137,10 +137,10 @@ const Welcome = () => {
               </View>
             </SwipeableView>
             <SwipeableView>
-              <View style={{ height: '50%', justifyContent: 'center' }}>
+              <View style={{ height: '40%', justifyContent: 'center' }}>
                 <Mascot source={existing} style={{ width: 220, height: 202 }} />
               </View>
-              <View style={{ height: '50%', justifyContent: 'center' }}>
+              <View style={{ height: '60%', justifyContent: 'center' }}>
                 <Header>Completely focused on you</Header>
                 <SubHeader style={{ textAlign: 'center' }}>
                   Adaptable to injuries, preferences, illness and schedule limitations
@@ -148,10 +148,10 @@ const Welcome = () => {
               </View>
             </SwipeableView>
             <SwipeableView>
-              <View style={{ height: '50%', justifyContent: 'center' }}>
+              <View style={{ height: '40%', justifyContent: 'center' }}>
                 <Mascot source={wave_left} style={{ width: 230, height: 202 }} />
               </View>
-              <View style={{ height: '50%', justifyContent: 'center' }}>
+              <View style={{ height: '60%', justifyContent: 'center' }}>
                 <Header>Guided by your Strava</Header>
                 <SubHeader style={{ textAlign: 'center' }}>
                   Enrich Sabio with your data by connecting with Strava
@@ -159,10 +159,10 @@ const Welcome = () => {
               </View>
             </SwipeableView>
             <SwipeableView>
-              <View style={{ height: '50%', justifyContent: 'center' }}>
+              <View style={{ height: '40%', justifyContent: 'center' }}>
                 <Mascot source={slight_side_eye} style={{ width: 220, height: 202 }} />
               </View>
-              <View style={{ height: '50%', justifyContent: 'center' }}>
+              <View style={{ height: '60%', justifyContent: 'center' }}>
                 <Header>At a 10th of the price</Header>
                 <SubHeader style={{ textAlign: 'center' }}>
                   Our mission is to make intelligent coaching available to everyone
@@ -176,7 +176,7 @@ const Welcome = () => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            height: '15%',
+            height: '20%',
           }}>
           <View style={{ width: '100%', alignItems: 'center' }}>
             <Dots screenNumber={screenNumber} totalScreens={totalScreens} />

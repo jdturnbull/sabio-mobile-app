@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ScrollView } from 'react-native-gesture-handler';
-import Title from '../../components/onboarding/Title';
+import Title from '../../components/shared/Title';
 import RaceEventOption from '../../components/onboarding/RaceEventOption';
 import CustomGoalOption from '../../components/onboarding/CustomGoalOption';
 import GoalOption from '../../components/onboarding/GoalOption';
@@ -12,7 +12,7 @@ import Health from '../../assets/icons/18x/Health';
 import Repeat from '../../assets/icons/18x/Repeat';
 import Triathlon from '../../assets/icons/18x/Triathlon';
 import { useNavigation } from '@react-navigation/native';
-import CustomDivider from '../../components/onboarding/CustomDivider';
+import CustomDivider from '../../components/shared/CustomDivider';
 
 const OPTIONS_LIST = [
   { label: 'Run a set distance', id: 'run_set_distance', Icon: Measure },

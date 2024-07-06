@@ -1,7 +1,7 @@
 export const theme = {
   spacing: {
     safeAreaView: '75px',
-    safeAreaViewLarge: '110px',
+    safeAreaViewLarge: '90px',
     safeAreaViewBottom: '35px',
   },
   colors: {

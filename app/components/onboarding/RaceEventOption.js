@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { TouchableOpacity } from 'react-native';
 import Icon from '../../assets/icons/14x/Calendar';
 import OptionLabel from './OptionLabel';
-import BodyText from './BodyText';
+import BodyText from '../shared/BodyText';
 
 const Container = styled(TouchableOpacity)`
   display: flex;

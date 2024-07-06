@@ -47,6 +47,7 @@
     "react-native-haptic": "^1.0.1",
     "react-native-iap": "^12.12.1",
     "react-native-keyboard-accessory": "^0.1.16",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-localize": "^3.0.2",
     "react-native-notifications": "^5.1.0",

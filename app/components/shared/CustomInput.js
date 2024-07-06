@@ -11,7 +11,7 @@ const Container = styled.View`
 `;
 
 const Label = styled.Text`
-  color: #ffffff90;
+  color: #f8f8f850;
   font-size: ${(props) => props.theme.text.size.xs};
   font-family: ${(props) => props.theme.text.family};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
@@ -28,10 +28,11 @@ const StyledInput = styled.TextInput`
   font-size: ${(props) => props.theme.text.size.sm};
 `;
 
-const CustomInput = ({ placeholder, value, setValue, label, style }) => {
+const CustomInput = ({ placeholder, value, setValue, label, style, keyboardType, onFocus }) => {
   const [_placeholder, _setPlaceholder] = useState(placeholder);
 
   const handleFocus = () => {
+    if (onFocus) onFocus();
     _setPlaceholder();
   };
 
@@ -43,6 +44,7 @@ const CustomInput = ({ placeholder, value, setValue, label, style }) => {
     <Container style={style}>
       <Label>{label.toUpperCase()}</Label>
       <StyledInput
+        keyboardType={keyboardType}
         value={value}
         onChange={setValue}
         onFocus={handleFocus}

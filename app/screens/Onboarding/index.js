@@ -20,7 +20,7 @@ const Onboarding = () => {
 
   useEffect(() => {
     if (user && user.onboarding_status !== 'COMPLETE') {
-      navigation.navigate('AddRace');
+      navigation.navigate('GoalSelect');
     }
   }, [user]);
 

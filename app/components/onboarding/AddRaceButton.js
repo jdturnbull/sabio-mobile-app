@@ -4,7 +4,7 @@ import { TouchableOpacity } from 'react-native';
 import Icon from '../../assets/icons/14x/Calendar';
 import OptionLabel from './OptionLabel';
 import { useNavigation } from '@react-navigation/native';
-import BodyText from './BodyText';
+import BodyText from '../shared/BodyText';
 
 const Container = styled(TouchableOpacity)`
   display: flex;
