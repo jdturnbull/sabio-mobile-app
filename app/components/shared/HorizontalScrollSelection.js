@@ -28,11 +28,11 @@ const ScrollItem = ({ item, selected, onPress, index }) => {
       onPress={handlePress}
       style={
         selected && index === 0
-          ? { backgroundColor: '#EE6E12', marginLeft: 0 }
+          ? { backgroundColor: '#EE6E12', marginLeft: 20 }
           : selected
           ? { backgroundColor: '#EE6E12' }
           : index === 0
-          ? { marginLeft: 0 }
+          ? { marginLeft: 20 }
           : {}
       }>
       <ScrollItemText>{item}</ScrollItemText>
@@ -54,6 +54,7 @@ const HorizontalScrollSelection = ({
   customLabel,
   customPlaceholder,
   onFocus,
+  customInputStyle,
 }) => {
   const [selected, setSelected] = useState(value);
   const [expanded, setExpanded] = useState(false);
@@ -77,19 +78,14 @@ const HorizontalScrollSelection = ({
 
   return (
     <Container style={[style]}>
-      {label && <Title style={{ marginBottom: 10, marginTop: 10, fontSize: 20 }}>{label}</Title>}
-      <ScrollView
-        ref={scrollRef}
-        style={{ marginTop: 10 }}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        decelerationRate="slow">
+      {label && <Title style={{ marginBottom: 10, marginTop: 10, fontSize: 20, paddingHorizontal: 20 }}>{label}</Title>}
+      <ScrollView ref={scrollRef} style={{ marginTop: 10 }} horizontal showsHorizontalScrollIndicator={false}>
         {items.map((item, i) => (
           <ScrollItem key={i} index={i} item={item} selected={selected === item} onPress={handleItemPress} />
         ))}
       </ScrollView>
       {expanded && (
-        <CustomSection>
+        <CustomSection style={customInputStyle}>
           <CustomInput
             onFocus={handleFocus}
             label={customLabel}

@@ -8,17 +8,12 @@ import CustomInput from '../../components/shared/CustomInput';
 import SubHeader from '../../components/shared/SubHeader';
 import DateInput from '../../components/shared/DateInput';
 import HorizontalScrollSelection from '../../components/shared/HorizontalScrollSelection';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
-  View,
-  TouchableOpacity,
-} from 'react-native';
+import { TouchableWithoutFeedback, Keyboard, View, TouchableOpacity, Alert } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import DropDownSelector from '../../components/shared/DropDownSelector';
+import { useDispatch } from 'react-redux';
+import { updateState } from '../../stores/onboarding/onboardingSlice';
 
 const CATEGORIES = [
   'Run',
@@ -31,13 +26,12 @@ const CATEGORIES = [
   'Custom',
 ];
 
-const TERRAINS = ['Flat', 'Rolling', 'Moderate', 'Hilly', 'Custom'];
+const TERRAINS = ['Flat', 'Rolling', 'Moderate', 'Hilly', 'Unknown', 'Custom'];
 
 const UNITS = ['Km', 'Miles'];
 
 const Container = styled.View`
   flex: 1;
-  padding: 0 20px;
 `;
 
 const distance_categories = ['Run', 'Swim', 'Cycle', 'Custom'];
@@ -51,6 +45,7 @@ const TouchableText = styled.Text`
 
 const AddRace = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const [name, setName] = useState('');
   const [date, setDate] = useState(moment.utc().format('YYYY-MM-DD'));
@@ -62,7 +57,43 @@ const AddRace = () => {
   const [distanceShown, setDistanceShown] = useState(true);
   const distanceHeight = useSharedValue(70); // initial height of the CustomInput component
 
-  const handleSubmit = () => navigation.navigate('RateAbility');
+  const handleSubmit = () => {
+    if (!name) {
+      Alert.alert('Missing a race name');
+    }
+
+    const currentDate = moment.utc();
+    const raceDate = moment.utc(date);
+    const daysDifference = raceDate.diff(currentDate, 'days');
+
+    if (daysDifference < 30) {
+      Alert.alert('The race must be a minimum of a month away');
+      return;
+    }
+
+    if (!category) {
+      Alert.alert('Missing a race category');
+      return;
+    }
+
+    if (distanceShown && !distance) {
+      Alert.alert('Missing a race distance');
+      return;
+    }
+
+    if (!terrain) {
+      Alert.alert('Please provide a terrain');
+      return;
+    }
+
+    if (distanceShown && !unit) {
+      Alert.alert('Missing distance units');
+      return;
+    }
+
+    dispatch(updateState({ race: { name, date, category, distance, terrain, unit } }));
+    navigation.navigate('RateAbility');
+  };
 
   useEffect(() => {
     if (distance_categories.includes(category)) {
@@ -89,11 +120,14 @@ const AddRace = () => {
         enableOnAndroid={true}
         keyboardOpeningTime={0}>
         <Container>
-          <Title style={{ marginBottom: 10, marginTop: 10 }}>Add a new race</Title>
-          <SubHeader>Enter the race details below</SubHeader>
-          <CustomDivider />
-          <CustomInput label={'Race name'} placeholder={'The name of your race'} value={name} setValue={setName} />
-          <DateInput label={'Race date'} value={date} setValue={setDate} />
+          <Title style={{ marginBottom: 10, marginTop: 10, paddingHorizontal: 20 }}>Add a new race</Title>
+          <SubHeader style={{ paddingHorizontal: 20, marginBottom: 30 }}>Enter the race details below</SubHeader>
+          <View style={{ paddingHorizontal: 20 }}>
+            <CustomInput label={'Race name'} placeholder={'The name of your race'} value={name} setValue={setName} />
+          </View>
+          <View style={{ paddingHorizontal: 20 }}>
+            <DateInput label={'Race date'} value={date} setValue={setDate} />
+          </View>
           <HorizontalScrollSelection
             label={'Category'}
             items={CATEGORIES}
@@ -101,8 +135,9 @@ const AddRace = () => {
             setValue={setCategory}
             customLabel={'Custom Category'}
             customPlaceholder={'Race category'}
+            customInputStyle={{ paddingHorizontal: 20 }}
           />
-          <Animated.View style={[animatedStyle, { marginTop: distanceShown ? 30 : 20 }]}>
+          <Animated.View style={[animatedStyle, { marginTop: distanceShown ? 30 : 20, paddingHorizontal: 20 }]}>
             {distanceShown && (
               <View style={{ marginBottom: 20, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <CustomInput
@@ -124,6 +159,7 @@ const AddRace = () => {
             setValue={setTerrain}
             customLabel={'Custom Terrain'}
             customPlaceholder={'Terrain description'}
+            customInputStyle={{ paddingHorizontal: 20 }}
           />
         </Container>
         <View style={{ marginBottom: 30, paddingHorizontal: 20 }}>

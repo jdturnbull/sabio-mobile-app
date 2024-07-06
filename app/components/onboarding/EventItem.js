@@ -62,7 +62,7 @@ const EventItem = ({ event, onPress }) => {
   const city = event.city.charAt(0).toUpperCase() + event.city.slice(1).toLowerCase();
   const flag = getUnicodeFlagIcon(event.country_code);
 
-  const handlePress = () => onPress(event.id);
+  const handlePress = () => onPress(event);
 
   return (
     <Container onPress={handlePress}>

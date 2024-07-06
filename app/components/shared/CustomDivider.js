@@ -9,8 +9,8 @@ const Container = styled.View`
   width: 100%;
 `;
 
-const CustomDivider = () => {
-  return <Container />;
+const CustomDivider = ({ style }) => {
+  return <Container style={style} />;
 };
 
 export default CustomDivider;
