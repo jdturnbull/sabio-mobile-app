@@ -24,7 +24,7 @@ const GeneralFitness = () => {
     navigation.navigate('RateAbility');
 
     if (specifics) {
-      dispatch(updateState({ generalHealth: { specifics } }));
+      dispatch(updateState({ generalFitness: { specifics } }));
     }
   };
 

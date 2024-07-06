@@ -8,6 +8,7 @@ const initial_state = {
   runDistance: null,
   loseWeight: null,
   trainTriathlon: null,
+  generalFitness: null,
 };
 
 export const onboardingSlice = createSlice({
