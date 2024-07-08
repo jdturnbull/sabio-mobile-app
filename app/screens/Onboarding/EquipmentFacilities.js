@@ -44,7 +44,7 @@ const EquipmentFacilities = () => {
 
   const handleSubmit = async () => {
     dispatch(updateState({ profile: { ...state.profile, EquipmentFacilities: selected } }));
-    navigation.navigate('creatingPlan');
+    navigation.navigate('CreatingPlan');
   };
 
   const handleSelect = (opt) => {

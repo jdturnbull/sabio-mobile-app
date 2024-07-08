@@ -37,7 +37,7 @@ const Onboarding = () => {
 
   useEffect(() => {
     if (user && user.onboarding_status !== 'COMPLETE') {
-      navigation.navigate('EquipmentFacilities');
+      navigation.navigate('GoalSelect');
     }
   }, [user]);
 
