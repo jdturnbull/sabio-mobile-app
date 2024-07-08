@@ -8,28 +8,6 @@ import BackIcon from '../../assets/icons/24x/Back';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 
-const backable_screens = [
-  'CustomGoal',
-  'SelectEvent',
-  'AddRace',
-  'RateAbility',
-  'SelectTerrain',
-  'RunDistance',
-  'GeneralHealth',
-  'WhereTrain',
-  'WeightEntry',
-  'TriathlonDistance',
-  'GeneralFitness',
-  'PreferredExercises',
-  'PlanLength',
-  'WhenTrain',
-  'LongerActivityDay',
-  'WhenStart',
-  'WhichUnits',
-  'CurrentInjuries',
-  'ChronicIllness',
-];
-
 const Container = styled(Animated.View)`
   margin-top: ${(props) => props.theme.spacing.safeAreaView};
   display: flex;
@@ -65,7 +43,7 @@ const Header = () => {
   const increment = 1 / 13;
 
   useEffect(() => {
-    if (backable_screens.includes(route)) {
+    if (route !== 'GoalSelect' && route !== 'CreatingPlan') {
       setCanBack(true);
     } else {
       setCanBack(false);
@@ -121,6 +99,11 @@ const Header = () => {
     }
     if (route === 'ChronicIllness') {
       progress.value = withTiming(increment * 11, { duration: 300 });
+    }
+    if (route === 'EquipmentFacilities') {
+    }
+    if (route === 'CreatingPlan') {
+      progress.value = withTiming(increment * 13, { duration: 300 });
     }
     if (route === 'WeightEntry') {
       progress.value = withTiming(increment * 3, { duration: 300 });

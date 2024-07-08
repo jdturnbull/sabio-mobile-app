@@ -33,7 +33,7 @@ const ChronicIllness = () => {
 
   const handleSubmit = async () => {
     dispatch(updateState({ profile: { ...state.profile, chronicConditions: { conditions: selected, details } } }));
-    navigation.navigate('');
+    navigation.navigate('EquipmentFacilities');
   };
 
   const handleSelect = (opt) => {

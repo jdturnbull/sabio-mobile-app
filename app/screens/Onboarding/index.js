@@ -26,6 +26,8 @@ import WhenStart from './WhenStart';
 import WhichUnits from './WhichUnits';
 import CurrentInjuries from './CurrentInjuries';
 import ChronicIllness from './ChronicIllness';
+import EquipmentFacilities from './EquipmentFacilities';
+import CreatingPlan from './CreatingPlan';
 
 const OnboardingStack = createStackNavigator();
 
@@ -35,7 +37,7 @@ const Onboarding = () => {
 
   useEffect(() => {
     if (user && user.onboarding_status !== 'COMPLETE') {
-      navigation.navigate('ChronicIllness');
+      navigation.navigate('EquipmentFacilities');
     }
   }, [user]);
 
@@ -69,6 +71,8 @@ const Onboarding = () => {
         <OnboardingStack.Screen name="WhichUnits" component={WhichUnits} />
         <OnboardingStack.Screen name="CurrentInjuries" component={CurrentInjuries} />
         <OnboardingStack.Screen name="ChronicIllness" component={ChronicIllness} />
+        <OnboardingStack.Screen name="EquipmentFacilities" component={EquipmentFacilities} />
+        <OnboardingStack.Screen name="CreatingPlan" component={CreatingPlan} />
       </OnboardingStack.Navigator>
     </View>
   );
