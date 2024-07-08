@@ -58,7 +58,7 @@ export const userSlice = createSlice({
   },
   reducers: {
     updateState: (state, action) => {
-      state = { ...state, ...action.payload };
+      Object.assign(state, action.payload);
     },
   },
   extraReducers: (builder) => {

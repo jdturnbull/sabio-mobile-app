@@ -13,6 +13,8 @@ import Repeat from '../../assets/icons/18x/Repeat';
 import Triathlon from '../../assets/icons/18x/Triathlon';
 import { useNavigation } from '@react-navigation/native';
 import CustomDivider from '../../components/shared/CustomDivider';
+import { useDispatch } from 'react-redux';
+import { clearState, updateState } from '../../stores/onboarding/onboardingSlice';
 
 const OPTIONS_LIST = [
   { label: 'Run a set distance', id: 'run_set_distance', Icon: Measure },
@@ -29,9 +31,12 @@ const Container = styled.View`
 `;
 
 const GoalSelect = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
 
   const handlePress = (option) => {
+    dispatch(clearState());
+
     if (option === 'race_an_event') {
       navigation.navigate('SelectEvent');
     }

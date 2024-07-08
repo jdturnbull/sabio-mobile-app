@@ -7,7 +7,6 @@ import useActiveRoute from '../../hooks/useActiveRoute';
 import BackIcon from '../../assets/icons/24x/Back';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
-import { clearState } from '../../stores/onboarding/onboardingSlice';
 
 const backable_screens = [
   'CustomGoal',
@@ -21,6 +20,8 @@ const backable_screens = [
   'WeightEntry',
   'TriathlonDistance',
   'GeneralFitness',
+  'PreferredExercises',
+  'PlanLength',
 ];
 
 const Container = styled(Animated.View)`
@@ -91,6 +92,12 @@ const Header = () => {
     if (route === 'RateAbility') {
       progress.value = withTiming(increment * 4, { duration: 300 });
     }
+    if (route === 'preferredExercises') {
+      progress.value = withTiming(increment * 5, { duration: 300 });
+    }
+    if (route === 'PlanLength') {
+      progress.value = withTiming(increment * 6, { duration: 300 });
+    }
     if (route === 'WeightEntry') {
       progress.value = withTiming(increment * 3, { duration: 300 });
     }
@@ -109,10 +116,6 @@ const Header = () => {
   });
 
   const handleBack = () => {
-    console.log(route);
-    if (route === 'RateAbility') {
-      dispatch(clearState());
-    }
     navigation.goBack();
   };
 

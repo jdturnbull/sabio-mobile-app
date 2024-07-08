@@ -70,7 +70,12 @@ const SelectTerrain = () => {
       return;
     }
     const terrain = selected === 'Custom' ? description : selected;
-    dispatch(updateState({ runDistance: { ...state.runDistance, terrain } }));
+
+    if (state.race) {
+      dispatch(updateState({ race: { ...state.race, terrain } }));
+    } else {
+      dispatch(updateState({ runDistance: { ...state.runDistance, terrain } }));
+    }
 
     navigation.navigate('RateAbility');
   };

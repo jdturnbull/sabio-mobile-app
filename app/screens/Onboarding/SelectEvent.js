@@ -67,7 +67,7 @@ const SelectEvent = () => {
       }),
     );
 
-    navigation.navigate('RateAbility');
+    navigation.navigate('SelectTerrain');
   };
 
   const handleAddRace = () => {

@@ -18,6 +18,8 @@ import WhereTrain from './WhereTrain';
 import WeightEntry from './WeightEntry';
 import TriathlonDistance from './TriathlonDistance';
 import GeneralFitness from './GeneralFitness';
+import PreferredExercises from './PreferredExercises';
+import PlanLength from './PlanLength';
 
 const OnboardingStack = createStackNavigator();
 
@@ -53,6 +55,8 @@ const Onboarding = () => {
         <OnboardingStack.Screen name="WeightEntry" component={WeightEntry} />
         <OnboardingStack.Screen name="TriathlonDistance" component={TriathlonDistance} />
         <OnboardingStack.Screen name="GeneralFitness" component={GeneralFitness} />
+        <OnboardingStack.Screen name="PreferredExercises" component={PreferredExercises} />
+        <OnboardingStack.Screen name="PlanLength" component={PlanLength} />
       </OnboardingStack.Navigator>
     </View>
   );

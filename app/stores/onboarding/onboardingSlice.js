@@ -1,14 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import call from '../../utils/call';
+
+// race, customGoal, runDistance, loseWeight, trainTriathlon, generalFitness
 
 const initial_state = {
   profile: null,
-  race: null,
-  customGoal: null,
-  runDistance: null,
-  loseWeight: null,
-  trainTriathlon: null,
-  generalFitness: null,
 };
 
 export const onboardingSlice = createSlice({
@@ -16,10 +11,10 @@ export const onboardingSlice = createSlice({
   initialState: initial_state,
   reducers: {
     updateState: (state, action) => {
-      state = { ...state, ...action.payload };
+      Object.assign(state, action.payload);
     },
     clearState: (state, action) => {
-      state = initial_state;
+      return initial_state;
     },
   },
   extraReducers: (builder) => {},

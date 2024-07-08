@@ -5,7 +5,7 @@ import Title from '../../components/shared/Title';
 import SubHeader from '../../components/shared/SubHeader';
 import CustomInput from '../../components/shared/CustomInput';
 import NextButton from '../../components/onboarding/NextButton';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { useNavigation } from '@react-navigation/native';
 
@@ -14,29 +14,30 @@ const Container = styled.View`
   padding: 20px;
 `;
 
-const GeneralHealth = () => {
+const PreferredExercises = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const state = useSelector((state) => state.onboarding);
 
-  const [specifics, setSpecifics] = useState('');
+  const [exercises, setExercises] = useState('');
 
   const handleSubmit = async () => {
-    if (specifics) {
-      dispatch(updateState({ generalHealth: { specifics } }));
+    if (exercises) {
+      dispatch(updateState({ profile: { ...state.profile, preferredExercises: exercises } }));
     }
-    navigation.navigate('RateAbility');
+    navigation.navigate('PlanLength');
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <Container>
-        <Title style={{ marginBottom: 10 }}>Anything specific?</Title>
-        <SubHeader style={{ marginBottom: 30 }}>What would you like to improve?</SubHeader>
+        <Title style={{ marginBottom: 10 }}>Do you have any preferred activities or exercises?</Title>
+        <SubHeader style={{ marginBottom: 30 }}>You can enter details below or skip</SubHeader>
         <CustomInput
           label={'Optional'}
-          placeholder={"Anything you'd like to share"}
-          value={specifics}
-          setValue={setSpecifics}
+          placeholder={'Any preferred exercises you have'}
+          value={exercises}
+          setValue={setExercises}
           multiline={true}
         />
         <View style={{ flex: 1 }} />
@@ -46,4 +47,4 @@ const GeneralHealth = () => {
   );
 };
 
-export default GeneralHealth;
+export default PreferredExercises;

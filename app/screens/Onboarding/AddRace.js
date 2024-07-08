@@ -96,7 +96,7 @@ const AddRace = () => {
       return;
     }
 
-    dispatch(updateState({ race: { name, date, category, distance, terrain, unit } }));
+    updateState({ race: { name, date, category, distance, terrain } });
     navigation.navigate('RateAbility');
   };
 
