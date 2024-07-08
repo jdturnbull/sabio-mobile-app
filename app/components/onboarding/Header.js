@@ -22,6 +22,12 @@ const backable_screens = [
   'GeneralFitness',
   'PreferredExercises',
   'PlanLength',
+  'WhenTrain',
+  'LongerActivityDay',
+  'WhenStart',
+  'WhichUnits',
+  'CurrentInjuries',
+  'ChronicIllness',
 ];
 
 const Container = styled(Animated.View)`
@@ -97,6 +103,24 @@ const Header = () => {
     }
     if (route === 'PlanLength') {
       progress.value = withTiming(increment * 6, { duration: 300 });
+    }
+    if (route === 'WhenTrain') {
+      progress.value = withTiming(increment * 7, { duration: 300 });
+    }
+    if (route === 'LongerActivityDay') {
+      progress.value = withTiming(increment * 8, { duration: 300 });
+    }
+    if (route === 'WhenStart') {
+      progress.value = withTiming(increment * 8, { duration: 300 });
+    }
+    if (route === 'WhichUnits') {
+      progress.value = withTiming(increment * 9, { duration: 300 });
+    }
+    if (route === 'CurrentInjuries') {
+      progress.value = withTiming(increment * 10, { duration: 300 });
+    }
+    if (route === 'ChronicIllness') {
+      progress.value = withTiming(increment * 11, { duration: 300 });
     }
     if (route === 'WeightEntry') {
       progress.value = withTiming(increment * 3, { duration: 300 });

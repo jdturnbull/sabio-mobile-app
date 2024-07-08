@@ -130,7 +130,7 @@ const DateItem = ({ date, onPress, selected }) => {
   );
 };
 
-const DateInput = ({ placeholder, value, setValue, label }) => {
+const DateInput = ({ placeholder, value, setValue, label, alwaysOpen }) => {
   const scrollRef = useRef();
   const [currentMonthIndex, setCurrentMonthIndex] = useState(() => {
     const initialMonth = moment(value, 'YYYY-MM-DD').startOf('month');
@@ -144,15 +144,17 @@ const DateInput = ({ placeholder, value, setValue, label }) => {
 
   const dates = useMemo(() => calculateDates(months), [months]);
 
-  const height = useSharedValue(70);
+  const height = useSharedValue(alwaysOpen ? 320 : 70);
 
   const animatedStyle = useAnimatedStyle(() => ({
     height: withTiming(height.value, { duration: 300 }),
   }));
 
   const handlePress = () => {
-    Keyboard.dismiss();
-    height.value = height.value === 70 ? 320 : 70;
+    if (!alwaysOpen) {
+      Keyboard.dismiss();
+      height.value = height.value === 70 ? 320 : 70;
+    }
   };
 
   const handleAddMonth = useCallback(() => {
@@ -190,7 +192,7 @@ const DateInput = ({ placeholder, value, setValue, label }) => {
           <StyledValue>{value || placeholder}</StyledValue>
           <Calendar />
         </ValueContainer>
-        <SelectorContainer>
+        <SelectorContainer alwaysOpen={alwaysOpen}>
           <MonthYearContainer>
             <MonthYearText>{moment(value, 'YYYY-MM-DD').format('MMMM YYYY')}</MonthYearText>
             <MonthYearButtonsContainer>

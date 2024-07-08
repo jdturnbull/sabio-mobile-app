@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import styled from 'styled-components';
+import moment from 'moment';
 import CustomSlider from '../shared/CustomSlider';
+import DateInput from '../shared/DateInput';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 const Container = styled(TouchableOpacity)`
   background-color: ${(props) => props.theme.colors.backgroundLight1};
@@ -49,19 +52,31 @@ const EndDateText = styled.Text`
   font-family: ${(props) => props.theme.text.family};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
   font-weight: ${(props) => props.theme.text.weight.semibold};
-  font-size: ${(props) => props.theme.text.size.md};
+  font-size: ${(props) => props.theme.text.size.sm};
   color: ${(props) => props.theme.text.colors.grey};
 `;
 
-const PlanLengthSelectionBox = ({ item, selected, setSelected }) => {
-  // We return two types of selection box depending on the item
-  const [weekLength, setWeekLength] = useState(12);
+const PlanLengthSelectionBox = ({ item, selected, setSelected, date, setDate, weeks, setWeeks }) => {
+  const height = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: withTiming(height.value, { duration: 300 }),
+    opacity: withTiming(height.value > 0 ? 1 : 0, { duration: 300 }),
+  }));
 
   const handlePress = () => {
     setSelected(item.label);
+
+    if (item.label === 'Custom Length') {
+      height.value = selected ? 0 : 100;
+    }
+
+    if (item.label === 'Custom Date') {
+      height.value = selected ? 0 : 300;
+    }
   };
 
-  if (item.label === 'Custom Plan Length') {
+  if (item.label === 'Custom Length') {
     return (
       <View>
         <Container onPress={handlePress}>
@@ -73,13 +88,34 @@ const PlanLengthSelectionBox = ({ item, selected, setSelected }) => {
             <RingInner selected={selected} />
           </RingOuter>
         </Container>
-        {selected && <CustomSlider value={weekLength} setValue={setWeekLength} max={52} min={0} step={1} />}
+        {selected && (
+          <Animated.View style={animatedStyle}>
+            <CustomSlider label={'Weeks'} value={weeks} setValue={setWeeks} max={52} min={4} step={1} />
+          </Animated.View>
+        )}
       </View>
     );
   }
 
-  if (item.label === 'Custom End Date') {
-    return <Container />;
+  if (item.label === 'Custom Date') {
+    return (
+      <View>
+        <Container onPress={handlePress}>
+          <Left>
+            <LabelText>{item.label}</LabelText>
+            <EndDateText>{item.subLabel}</EndDateText>
+          </Left>
+          <RingOuter selected={selected}>
+            <RingInner selected={selected} />
+          </RingOuter>
+        </Container>
+        {selected && (
+          <Animated.View style={animatedStyle}>
+            <DateInput value={date} setValue={setDate} placeholder={'End date'} label={'Plan end date'} />
+          </Animated.View>
+        )}
+      </View>
+    );
   }
 
   return (

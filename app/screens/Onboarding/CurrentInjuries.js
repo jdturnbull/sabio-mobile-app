@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { TouchableWithoutFeedback, Keyboard, View, TouchableOpacity } from 'react-native';
+import { TouchableWithoutFeedback, Keyboard, View } from 'react-native';
 import Title from '../../components/shared/Title';
 import SubHeader from '../../components/shared/SubHeader';
 import CustomInput from '../../components/shared/CustomInput';
@@ -14,35 +14,32 @@ const Container = styled.View`
   padding: 20px;
 `;
 
-const PreferredExercises = () => {
+const CurrentInjuries = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+
   const state = useSelector((state) => state.onboarding);
 
-  const [exercises, setExercises] = useState('');
+  const [specifics, setSpecifics] = useState('');
 
   const handleSubmit = async () => {
-    if (exercises) {
-      dispatch(updateState({ profile: { ...state.profile, preferredExercises: exercises } }));
+    if (specifics) {
+      dispatch(updateState({ profile: { ...state.profile, currentInjuries: specifics } }));
     }
 
-    if (state.race) {
-      navigation.navigate('WhenTrain');
-    } else {
-      navigation.navigate('PlanLength');
-    }
+    navigation.navigate('ChronicIllness');
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <Container>
-        <Title style={{ marginBottom: 10 }}>Do you have any preferred activities or exercises?</Title>
-        <SubHeader style={{ marginBottom: 30 }}>You can enter details below or skip</SubHeader>
+        <Title style={{ marginBottom: 10 }}>Do you have any current injuries?</Title>
+        <SubHeader style={{ marginBottom: 30 }}>Press continue to skip</SubHeader>
         <CustomInput
           label={'Optional'}
-          placeholder={'Any preferred exercises you have'}
-          value={exercises}
-          setValue={setExercises}
+          placeholder={'Description of injury'}
+          value={specifics}
+          setValue={setSpecifics}
           multiline={true}
         />
         <View style={{ flex: 1 }} />
@@ -52,4 +49,4 @@ const PreferredExercises = () => {
   );
 };
 
-export default PreferredExercises;
+export default CurrentInjuries;
