@@ -103,7 +103,12 @@ const RateAbility = () => {
     }
 
     dispatch(updateState({ profile: { ...state.profile, ability: selected } }));
-    navigation.navigate('PreferredExercises');
+
+    if (state.race) {
+      navigation.navigate('WhenTrain');
+    } else {
+      navigation.navigate('PlanLength');
+    }
   };
 
   return (

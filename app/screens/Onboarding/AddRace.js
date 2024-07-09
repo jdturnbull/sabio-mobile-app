@@ -96,7 +96,12 @@ const AddRace = () => {
       return;
     }
 
-    updateState({ race: { name, date, category, distance, terrain } });
+    if (distance) {
+      dispatch(updateState({ race: { name, date, category, distance, unit, terrain } }));
+    } else {
+      dispatch(updateState({ race: { name, date, category, terrain } }));
+    }
+
     navigation.navigate('RateAbility');
   };
 
@@ -167,7 +172,7 @@ const AddRace = () => {
             customInputStyle={{ paddingHorizontal: 20 }}
           />
         </Container>
-        <View style={{ marginBottom: 30, paddingHorizontal: 20 }}>
+        <View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
           <TouchableOpacity
             onPress={handleSubmit}
             style={{

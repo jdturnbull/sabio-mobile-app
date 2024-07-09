@@ -12,6 +12,7 @@ import SelectableItem from '../../components/shared/SelectableItem';
 import SubHeader from '../../components/shared/SubHeader';
 
 const OPTIONS = [
+  'All',
   'Free weights',
   'Swimming pool',
   'Treadmill',
@@ -43,22 +44,32 @@ const EquipmentFacilities = () => {
   const state = useSelector((state) => state.onboarding);
 
   const handleSubmit = async () => {
-    dispatch(updateState({ profile: { ...state.profile, EquipmentFacilities: selected } }));
+    dispatch(updateState({ profile: { ...state.profile, equipmentFacilities: selected } }));
     navigation.navigate('CreatingPlan');
   };
 
   const handleSelect = (opt) => {
     if (selected.includes(opt)) {
-      setSelected([...selected.filter((s) => s !== opt)]);
+      if (opt === 'All') {
+        setSelected([]);
+      } else {
+        setSelected([...selected.filter((s) => s !== opt)]);
+      }
     } else {
-      setSelected([...selected, opt]);
+      if (opt === 'All') {
+        setSelected(OPTIONS);
+      } else {
+        setSelected([...selected, opt]);
+      }
     }
   };
 
   return (
     <Container>
-      <Title style={{ marginBottom: 10 }}>Equipment and facilities access</Title>
-      <SubHeader style={{ marginBottom: 20 }}>Select all that are available to you</SubHeader>
+      <Title style={{ marginBottom: 10 }}>Equipment and facilities</Title>
+      <SubHeader style={{ marginBottom: 20 }}>
+        Sabio will assume you have the basics, here you can specify anything extra
+      </SubHeader>
       <OptionsContainer>
         {OPTIONS.map((opt) => (
           <SelectableItem key={opt} onPress={handleSelect} label={opt} selected={selected.includes(opt)} />

@@ -26,7 +26,7 @@ const WeightEntry = () => {
   const state = useSelector((state) => state.onboarding);
 
   const [currentWeight, setCurrentWeight] = useState('');
-  const [tagretWeight, setTargetWeight] = useState('');
+  const [targetWeight, setTargetWeight] = useState('');
   const [unit, setUnit] = useState('lbs');
 
   const handleContinue = () => {
@@ -34,7 +34,7 @@ const WeightEntry = () => {
       Alert.alert('Please set your current weight');
       return;
     }
-    if (!tagretWeight) {
+    if (!targetWeight) {
       Alert.alert('Please set your target weight');
       return;
     }
@@ -43,7 +43,7 @@ const WeightEntry = () => {
       return;
     }
 
-    dispatch(updateState({ loseWeight: { ...state.loseWeight, currentWeight, tagretWeight, unit } }));
+    dispatch(updateState({ loseWeight: { ...state.loseWeight, currentWeight, targetWeight, unit } }));
     navigation.navigate('RateAbility');
   };
 
@@ -62,7 +62,7 @@ const WeightEntry = () => {
           />
           <CustomInput
             placeholder={'Weight'}
-            value={tagretWeight}
+            value={targetWeight}
             setValue={setTargetWeight}
             label={'Goal weight'}
             keyboardType={'numeric'}

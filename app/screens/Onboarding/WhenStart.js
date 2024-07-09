@@ -142,7 +142,12 @@ const WhenStart = () => {
     }
 
     dispatch(updateState({ profile: { ...state.profile, startDate: date } }));
-    navigation.navigate('WhichUnits');
+
+    if (state.race?.unit) {
+      navigation.navigate('CurrentInjuries');
+    } else {
+      navigation.navigate('WhichUnits');
+    }
   };
 
   return (

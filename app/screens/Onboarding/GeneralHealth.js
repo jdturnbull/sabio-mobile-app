@@ -21,9 +21,7 @@ const GeneralHealth = () => {
   const [specifics, setSpecifics] = useState('');
 
   const handleSubmit = async () => {
-    if (specifics) {
-      dispatch(updateState({ generalHealth: { specifics } }));
-    }
+    dispatch(updateState({ generalHealth: { specifics } }));
     navigation.navigate('RateAbility');
   };
 

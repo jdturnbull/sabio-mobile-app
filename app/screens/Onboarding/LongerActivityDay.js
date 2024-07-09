@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import SelectableItem from '../../components/shared/SelectableItem';
 import NextButton from '../../components/onboarding/NextButton';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
+import { Alert } from 'react-native';
 
 const OPTIONS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 

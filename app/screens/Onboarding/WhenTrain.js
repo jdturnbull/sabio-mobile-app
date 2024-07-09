@@ -4,21 +4,20 @@ import Title from '../../components/shared/Title';
 import SubHeader from '../../components/shared/SubHeader';
 import SelectableItem from '../../components/shared/SelectableItem';
 import NextButton from '../../components/onboarding/NextButton';
-import { Alert } from 'react-native';
+import { Alert, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 
 const OPTIONS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-const Container = styled.ScrollView`
+const Container = styled.View`
   flex: 1;
   padding: 20px;
 `;
 
 const OptionsContainer = styled.View`
   margin-top: 30px;
-  margin-bottom: 40px;
 `;
 
 const WhenTrain = () => {
@@ -55,7 +54,8 @@ const WhenTrain = () => {
           <SelectableItem key={opt} label={opt} selected={selected.includes(opt)} onPress={handlePress} />
         ))}
       </OptionsContainer>
-      <NextButton onPress={handleNext} style={{ marginBottom: 40 }}>
+      <View style={{ flex: 1 }} />
+      <NextButton onPress={handleNext} style={{ marginBottom: 20 }}>
         Continue
       </NextButton>
     </Container>

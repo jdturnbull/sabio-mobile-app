@@ -76,17 +76,14 @@ const Header = () => {
     if (route === 'RateAbility') {
       progress.value = withTiming(increment * 4, { duration: 300 });
     }
-    if (route === 'preferredExercises') {
+    if (route === 'PlanLength') {
       progress.value = withTiming(increment * 5, { duration: 300 });
     }
-    if (route === 'PlanLength') {
+    if (route === 'WhenTrain') {
       progress.value = withTiming(increment * 6, { duration: 300 });
     }
-    if (route === 'WhenTrain') {
-      progress.value = withTiming(increment * 7, { duration: 300 });
-    }
     if (route === 'LongerActivityDay') {
-      progress.value = withTiming(increment * 8, { duration: 300 });
+      progress.value = withTiming(increment * 7, { duration: 300 });
     }
     if (route === 'WhenStart') {
       progress.value = withTiming(increment * 8, { duration: 300 });
@@ -101,6 +98,7 @@ const Header = () => {
       progress.value = withTiming(increment * 11, { duration: 300 });
     }
     if (route === 'EquipmentFacilities') {
+      progress.value = withTiming(increment * 12, { duration: 300 });
     }
     if (route === 'CreatingPlan') {
       progress.value = withTiming(increment * 13, { duration: 300 });

@@ -1,48 +1,25 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { View, Text } from 'react-native';
+import { save } from '../../stores/onboarding/onboardingSlice';
 
 const Container = styled.View`
   padding: 20px;
 `;
 
-const KeyValueContainer = styled.View`
-  margin-bottom: 10px;
-`;
-
-const KeyText = styled.Text`
-  font-weight: bold;
-  color: #ee6e12;
-`;
-
-const ValueText = styled.Text`
-  margin-left: 10px;
-  color: white;
-`;
-
 const CreatingPlan = () => {
+  const dispatch = useDispatch();
   const state = useSelector((state) => state.onboarding);
+  const user = useSelector((state) => state.user.user);
 
-  const renderKeyValue = (key, value) => {
-    if (typeof value === 'object' && value !== null) {
-      return (
-        <KeyValueContainer key={key}>
-          <KeyText>{key}:</KeyText>
-          <ValueText>{JSON.stringify(value)}</ValueText>
-        </KeyValueContainer>
-      );
-    } else {
-      return (
-        <KeyValueContainer key={key}>
-          <KeyText>{key}:</KeyText>
-          <ValueText>{value.toString()}</ValueText>
-        </KeyValueContainer>
-      );
-    }
-  };
+  useEffect(() => {
+    dispatch(save({ state, user }));
+    // then from the backend unify the data and save it in the db
+    // then it's picked up by a engine that creates the plan
+    // While all this is happening, I want a screen that is explaining how the app works to the user
+  }, []);
 
-  return <Container>{Object.entries(state).map(([key, value]) => renderKeyValue(key, value))}</Container>;
+  return <Container />;
 };
 
 export default CreatingPlan;
