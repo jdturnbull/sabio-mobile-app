@@ -10,6 +10,6 @@ const CONFIG_NGROK = {
   API_BASE: 'https://48f4-2a00-23c7-b280-9801-51de-5b8f-f3ca-e7ff.ngrok-free.app',
 };
 
-const CONFIG = process.env.NODE_ENV === 'production' ? CONFIG_PROD : CONFIG_NGROK;
+const CONFIG = process.env.NODE_ENV === 'production' ? CONFIG_PROD : CONFIG_DEV;
 
 export const apiBase = CONFIG.API_BASE;

@@ -14,7 +14,21 @@ export const setup = createAsyncThunk('user/setup', async () => {
   // We do, let's get the id and check if it's still active
   try {
     const { id } = JSON.parse(session);
-    const { updated_session, user } = await call('GET', `users/session/${id}`);
+    const {
+      updated_session,
+      user,
+      profile,
+      injuries,
+      medications,
+      training_plan,
+      chronic_conditions,
+      preferences,
+      schedules,
+      progress_reports,
+      conversations,
+      connections,
+      activities,
+    } = await call('GET', `users/session/${id}`);
 
     // If the session is not active then clear storage and return null
     if (!updated_session?.active) {
@@ -24,7 +38,21 @@ export const setup = createAsyncThunk('user/setup', async () => {
 
     // The session is still active, set the updated session in storage and return
     await AsyncStorage.setItem('session', JSON.stringify(updated_session));
-    return { session: updated_session, user };
+    return {
+      session: updated_session,
+      user,
+      profile,
+      injuries,
+      medications,
+      training_plan,
+      chronic_conditions,
+      preferences,
+      schedules,
+      progress_reports,
+      conversations,
+      connections,
+      activities,
+    };
   } catch (error) {
     console.log(error);
   }
@@ -55,6 +83,16 @@ export const userSlice = createSlice({
     session: null,
     user: null,
     profile: null,
+    injuries: null,
+    medications: null,
+    training_plan: null,
+    chronic_conditions: null,
+    preferences: null,
+    schedules: null,
+    progress_reports: null,
+    conversations: null,
+    connections: null,
+    activities: null,
   },
   reducers: {
     updateState: (state, action) => {
@@ -65,6 +103,17 @@ export const userSlice = createSlice({
     builder.addCase(setup.fulfilled, (state, action) => {
       state.session = action.payload.session;
       state.user = action.payload.user;
+      state.profile = action.payload.profile;
+      state.injuries = action.payload.injuries;
+      state.medications = action.payload.medications;
+      state.training_plan = action.payload.training_plan;
+      state.chronic_conditions = action.payload.chronic_conditions;
+      state.preferences = action.payload.preferences;
+      state.schedules = action.payload.schedules;
+      state.progress_reports = action.payload.progress_reports;
+      state.conversations = action.payload.conversations;
+      state.connections = action.payload.connections;
+      state.activities = action.payload.activities;
       state.loading = false;
     });
     builder.addCase(continueWithApple.fulfilled, (state, action) => {

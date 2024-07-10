@@ -32,13 +32,21 @@ const OnboardingStack = createStackNavigator();
 
 const Onboarding = () => {
   const navigation = useNavigation();
-  const user = useSelector((state) => state.user.user);
+  const user_state = useSelector((state) => state.user);
 
   useEffect(() => {
-    if (user && user.onboarding_status !== 'COMPLETE') {
+    if (user_state.user && user_state.user.onboarding_status === 'NOT_STARTED') {
       navigation.navigate('GoalSelect');
+      return;
     }
-  }, [user]);
+    if (user_state.user && user_state.user.onboarding_status === 'CREATING_PLAN') {
+      navigation.navigate('CreatingPlan');
+      return;
+    }
+    if (user_state.user && user_state.user.onboarding_status === 'COMPLETE') {
+      // Navigate to Main
+    }
+  }, [user_state]);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#16171B' }}>
