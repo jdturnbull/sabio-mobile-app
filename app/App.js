@@ -52,13 +52,6 @@ const getActiveRouteName = (state) => {
 
 const App = () => {
   const dispatch = useDispatch();
-  const loaded = useSelector((state) => state.user.loaded);
-
-  useEffect(() => {
-    if (!loaded) {
-      dispatch(setup());
-    }
-  }, [loaded]);
 
   return (
     <AppContainer>

@@ -30,6 +30,8 @@ import CreatingPlan from './CreatingPlan';
 
 const OnboardingStack = createStackNavigator();
 
+const HIDE_HEADER_STATUSES = ['ANALYSING_DATA', 'GENERATED_HOLISTIC', 'GENERATED_ACTIVITIES', 'COMPLETE'];
+
 const Onboarding = () => {
   const navigation = useNavigation();
   const user_state = useSelector((state) => state.user);
@@ -39,18 +41,18 @@ const Onboarding = () => {
       navigation.navigate('GoalSelect');
       return;
     }
-    if (user_state.user && user_state.user.onboarding_status === 'CREATING_PLAN') {
-      navigation.navigate('CreatingPlan');
+    if (user_state.user && user_state.user.onboarding_status === 'COMPLETE') {
+      navigation.navigate('Main');
       return;
     }
-    if (user_state.user && user_state.user.onboarding_status === 'COMPLETE') {
-      // Navigate to Main
-    }
-  }, [user_state]);
+
+    // If we get here then the onboarding_status is being used to indicate a plan step change
+    navigation.navigate('CreatingPlan');
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#16171B' }}>
-      <Header />
+      {!HIDE_HEADER_STATUSES.includes(user_state?.user?.onboarding_status) && <Header />}
       <OnboardingStack.Navigator
         initialRouteName="Welcome"
         screenOptions={{

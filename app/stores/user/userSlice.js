@@ -4,7 +4,8 @@ import { appleAuth } from '@invertase/react-native-apple-authentication';
 import * as RNLocalize from 'react-native-localize';
 import call from '../../utils/call';
 
-export const setup = createAsyncThunk('user/setup', async () => {
+export const setup = createAsyncThunk('user/setup', async (location) => {
+  console.log(location);
   // Do we have an existing session?
   const session = await AsyncStorage.getItem('session');
 
@@ -14,6 +15,9 @@ export const setup = createAsyncThunk('user/setup', async () => {
   // We do, let's get the id and check if it's still active
   try {
     const { id } = JSON.parse(session);
+
+    const response = await call('GET', `users/session/${id}`);
+
     const {
       updated_session,
       user,
@@ -28,7 +32,7 @@ export const setup = createAsyncThunk('user/setup', async () => {
       conversations,
       connections,
       activities,
-    } = await call('GET', `users/session/${id}`);
+    } = response;
 
     // If the session is not active then clear storage and return null
     if (!updated_session?.active) {
@@ -38,6 +42,7 @@ export const setup = createAsyncThunk('user/setup', async () => {
 
     // The session is still active, set the updated session in storage and return
     await AsyncStorage.setItem('session', JSON.stringify(updated_session));
+
     return {
       session: updated_session,
       user,
@@ -54,7 +59,8 @@ export const setup = createAsyncThunk('user/setup', async () => {
       activities,
     };
   } catch (error) {
-    console.log(error);
+    console.log('here!');
+    console.log(error.message);
   }
 });
 

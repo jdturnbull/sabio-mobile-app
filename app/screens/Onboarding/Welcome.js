@@ -7,9 +7,10 @@ import wave_right from '../../assets/mascot/wave_right.png';
 import wave_left from '../../assets/mascot/wave_left.png';
 import slight_side_eye from '../../assets/mascot/slight_side_eye.png';
 import existing from '../../assets/mascot/existing.png';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { continueWithApple } from '../../stores/user/userSlice';
 import SubHeader from '../../components/shared/SubHeader';
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
@@ -17,6 +18,7 @@ const Container = styled.View`
   flex: 1;
   padding-top: ${(props) => props.theme.spacing.safeAreaView};
   padding-bottom: ${(props) => props.theme.spacing.safeAreaViewBottom};
+  margin-top: 50px;
 `;
 
 const SwipeableContainer = styled.View`
@@ -99,6 +101,8 @@ const Dots = ({ totalScreens, screenNumber }) => {
 
 const Welcome = () => {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user?.user);
+  const navigation = useNavigation();
 
   const totalScreens = 4;
   const [screenNumber, setScreenNumber] = useState(0);
@@ -113,6 +117,12 @@ const Welcome = () => {
   const handleSignInWithApple = () => {
     dispatch(continueWithApple());
   };
+
+  useEffect(() => {
+    if (user) {
+      navigation.navigate('GoalSelect');
+    }
+  }, [user]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

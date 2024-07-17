@@ -1,11 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import call from '../../utils/call';
 
-// race, customGoal, runDistance, loseWeight, trainTriathlon, generalFitness, generalHealth
-
 export const save = createAsyncThunk('onboarding/save', async (props) => {
   try {
-    const response = await call('POST', 'users/saveOnboardingData', props);
+    await call('POST', 'users/saveOnboardingData', props);
   } catch (error) {
     console.log(error);
   }

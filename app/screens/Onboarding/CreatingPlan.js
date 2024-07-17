@@ -1,11 +1,68 @@
-import React, { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { Image, Animated, Easing } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import { save } from '../../stores/onboarding/onboardingSlice';
 import { setup } from '../../stores/user/userSlice';
+import mascot from '../../assets/mascot/wave_right.png';
+import { useNavigation } from '@react-navigation/native';
+import call from '../../utils/call';
+
+const guidance = [
+  'Connect Strava to enhance Sabio',
+  'Notifications help you stay consistent',
+  'Sabio can plan around chronic conditions',
+  'Chat with Sabio for additional guidance',
+  'Switch between schedules when needed',
+  'Sabio adjusts plans based on your feedback',
+];
 
 const Container = styled.View`
+  flex: 1;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const PercentageLabel = styled(Animated.Text)`
+  font-size: 20px;
+  color: ${(props) => props.theme.text.colors.white};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.xl};
+  font-weight: ${(props) => props.theme.text.weight.bold};
+  margin-top: 40px;
+`;
+
+const ProgressBarContainer = styled.View`
+  width: 60%;
+  height: 8px;
+  background-color: ${(props) => props.theme.colors.backgroundLight1};
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 40px;
+`;
+
+const ProgressBarInner = styled(Animated.View)`
+  height: 100%;
+  background-color: ${(props) => props.theme.colors.primary};
+  border-radius: 10px;
+`;
+
+const GuidanceContainer = styled.View`
+  margin-top: 10px;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const GuidanceText = styled(Animated.Text)`
+  color: ${(props) => props.theme.text.colors.white};
+  font-weight: ${(props) => props.theme.text.weight.regular};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.md};
+  font-size: ${(props) => props.theme.text.size.md};
 `;
 
 const CreatingPlan = () => {
@@ -13,23 +70,43 @@ const CreatingPlan = () => {
   const state = useSelector((state) => state.onboarding);
   const user_state = useSelector((state) => state.user);
 
+  const navigation = useNavigation();
+
   const intervalRef = useRef(null);
+  const progress = useRef(new Animated.Value(0)).current;
+  const [guidanceIndex, setGuidanceIndex] = useState(0);
+  const [initialDelayPassed, setInitialDelayPassed] = useState(false);
+  const guidanceOpacity = useRef(new Animated.Value(0)).current; // Start with opacity 0
+
+  const [stage, setStage] = useState('NOT_STARTED');
 
   // Checks to see if it should send data to backend
   useEffect(() => {
-    if (user_state.user.onboarding_status === 'NOT_STARTED' && state.profile) {
-      dispatch(save(state));
+    if (user_state?.user?.onboarding_status === 'NOT_STARTED' && state.profile) {
+      dispatch(save({ state, user: user_state.user }));
     }
   }, []);
 
   useEffect(() => {
-    dispatch(setup());
+    const fetchData = async () => {
+      try {
+        let updatedUser = await call('GET', `users/${user_state.user.id}`);
+        setStage(updatedUser?.onboarding_status);
 
-    if (user_state.user.onboarding_status !== 'COMPLETE') {
-      intervalRef.current = setInterval(() => {
-        dispatch(setup());
-      }, 5000);
-    }
+        if (updatedUser?.onboarding_status !== 'COMPLETE') {
+          intervalRef.current = setInterval(async () => {
+            updatedUser = await call('GET', `users/${user_state.user.id}`);
+            setStage(updatedUser?.onboarding_status);
+          }, 5000);
+        } else {
+          dispatch(setup());
+          navigation.navigate('Main');
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
 
     return () => {
       if (intervalRef.current) {
@@ -38,7 +115,95 @@ const CreatingPlan = () => {
     };
   }, []);
 
-  return <Container />;
+  useEffect(() => {
+    let progressValue = 0;
+    switch (stage) {
+      case 'NOT_STARTED':
+        progressValue = 0;
+        break;
+      case 'ANALYSING_DATA':
+        progressValue = 25;
+        break;
+      case 'GENERATED_HOLISTIC':
+        progressValue = 50;
+        break;
+      case 'GENERATED_ACTIVITIES':
+        progressValue = 75;
+        break;
+      case 'COMPLETE':
+        progressValue = 100;
+        break;
+      default:
+        progressValue = 0;
+    }
+    Animated.timing(progress, {
+      toValue: progressValue,
+      duration: 500,
+      easing: Easing.linear,
+      useNativeDriver: false,
+    }).start();
+  }, [stage]);
+
+  useEffect(() => {
+    const initialTimeout = setTimeout(() => {
+      setInitialDelayPassed(true);
+      Animated.timing(guidanceOpacity, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    }, 5000);
+
+    return () => clearTimeout(initialTimeout);
+  }, []);
+
+  useEffect(() => {
+    if (!initialDelayPassed) return;
+
+    const interval = setInterval(() => {
+      Animated.timing(guidanceOpacity, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => {
+        setGuidanceIndex((prevIndex) => {
+          const nextIndex = (prevIndex + 1) % guidance.length;
+          Animated.timing(guidanceOpacity, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }).start();
+          return nextIndex;
+        });
+      });
+    }, 7000); // Change guidance text every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [initialDelayPassed]);
+
+  const animatedStyle = {
+    width: progress.interpolate({
+      inputRange: [0, 100],
+      outputRange: ['0%', '100%'],
+    }),
+  };
+
+  const guidanceAnimatedStyle = {
+    opacity: guidanceOpacity,
+  };
+
+  return (
+    <Container>
+      <Image source={mascot} style={{ width: 220, height: 202 }} />
+      <PercentageLabel>Building your plan</PercentageLabel>
+      <ProgressBarContainer>
+        <ProgressBarInner style={animatedStyle} />
+      </ProgressBarContainer>
+      <GuidanceContainer>
+        {initialDelayPassed && <GuidanceText style={guidanceAnimatedStyle}>{guidance[guidanceIndex]}</GuidanceText>}
+      </GuidanceContainer>
+    </Container>
+  );
 };
 
 export default CreatingPlan;

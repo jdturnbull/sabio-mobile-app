@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
 import useActiveRoute from '../../hooks/useActiveRoute';
@@ -10,7 +10,7 @@ import { useDispatch } from 'react-redux';
 
 const Container = styled(Animated.View)`
   margin-top: ${(props) => props.theme.spacing.safeAreaView};
-  display: flex;
+  display: ${(props) => (props.hide ? 'none' : 'flex')};
   flex-direction: row;
   align-items: center;
   margin-bottom: 20px;
@@ -37,12 +37,20 @@ const Header = () => {
   const route = useActiveRoute();
   const progress = useSharedValue(0.1);
 
+  const [shouldHide, setShouldHide] = useState(false);
+
   const [canBack, setCanBack] = useState(false);
 
   // 13 screens (max flow length)
   const increment = 1 / 13;
 
   useEffect(() => {
+    if (route === 'CreatingPlan' || route === 'Welcome') {
+      setShouldHide(true);
+    } else {
+      setShouldHide(false);
+    }
+
     if (route !== 'GoalSelect' && route !== 'CreatingPlan') {
       setCanBack(true);
     } else {
@@ -125,7 +133,7 @@ const Header = () => {
   };
 
   return (
-    <Container>
+    <Container hide={shouldHide}>
       <View style={{ flex: 1 }}>
         {canBack && (
           <TouchableOpacity onPress={handleBack}>
