@@ -17,8 +17,6 @@ const FocusText = styled.Text`
 const WeekView = ({ week }) => {
   const activities = useSelector((state) => state.user.activities);
 
-  console.log(activities[0]);
-
   return (
     <Container>
       <FocusContainer>

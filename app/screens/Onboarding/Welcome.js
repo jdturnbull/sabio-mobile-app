@@ -120,7 +120,9 @@ const Welcome = () => {
 
   useEffect(() => {
     if (user) {
-      navigation.navigate('GoalSelect');
+      if (user.onboarding_status === 'NOT_STARTED' || user.onboarding_status === 'RESETTING_PLAN') {
+        navigation.navigate('GoalSelect');
+      }
     }
   }, [user]);
 

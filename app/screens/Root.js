@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Easing, View, ActivityIndicator, StyleSheet } from 'react-native';
+import { Easing, View, Modal, Dimensions } from 'react-native';
 import { withIAPContext } from 'react-native-iap';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,7 +8,14 @@ import Main from '../screens/Main';
 import Notifications from './Notifications';
 import Account from './Account';
 import { useNavigation } from '@react-navigation/native';
-import { setup } from '../stores/user/userSlice';
+import { setup, updateState } from '../stores/user/userSlice';
+import useActiveRoute from '../hooks/useActiveRoute';
+import NotificationSettings from './Main/NotificationSettings';
+import ManagePlan from './Main/ManagePlan';
+import Privacy from './Privacy';
+import SubscriptionModalContent from '../components/authed/SubscriptionModalContent';
+
+const MAIN_SCREENS = ['Slider', 'Account', 'Notifications', 'Reports', 'Feed', 'View'];
 
 const slideFromRightTransition = {
   animation: 'timing',
@@ -67,30 +74,58 @@ const Root = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const user = useSelector((state) => state.user.user);
+  const session = useSelector((state) => state.user.session);
+
+  const route = useActiveRoute();
 
   useEffect(() => {
-    dispatch(setup('Root'));
-  }, []);
+    if (!user) {
+      dispatch(setup('Root'));
+    }
+  }, [user]);
+
 
   useEffect(() => {
     if (!user) {
       navigation.navigate('Onboarding', { screen: 'Welcome' });
       return;
     }
+    if (user?.onboarding_status === 'COMPLETE' && !MAIN_SCREENS.includes(route)) {
+      navigation.navigate('Main');
+      return;
+    }
     if (user && user.onboarding_status !== 'COMPLETE') {
       navigation.navigate('Onboarding');
-    } else {
-      navigation.navigate('Main');
     }
-  }, [user]);
+  }, [user, session, navigation]);
+
+  const showSubscribeModal = useSelector((state) => state.user.showSubscribeModal);
+
+  const handleRequestClose = () => {
+    dispatch(updateState({ showSubscribeModal: false }));
+  };
 
   return (
-    <RootStack.Navigator screenOptions={{ headerShown: false, ...CustomTransition }} initialRouteName="Onboarding">
-      <RootStack.Screen name="Onboarding" component={Onboarding} />
-      <RootStack.Screen name="Main" component={Main} options={{ gestureEnabled: false }} />
-      <RootStack.Screen name="Notifications" component={Notifications} options={SlideFromRightTransition} />
-      <RootStack.Screen name="Account" component={Account} options={SlideFromRightTransition} />
-    </RootStack.Navigator>
+    <View style={{ flex: 1, backgroundColor: '#16171B' }}>
+      <RootStack.Navigator screenOptions={{ headerShown: false, ...CustomTransition }} initialRouteName="Onboarding">
+        <RootStack.Screen name="Onboarding" component={Onboarding} />
+        <RootStack.Screen name="Main" component={Main} options={{ gestureEnabled: false }} />
+        <RootStack.Screen name="Notifications" component={Notifications} options={SlideFromRightTransition} />
+        <RootStack.Screen name="Account" component={Account} options={SlideFromRightTransition} />
+        <RootStack.Screen name="NotificationSettings" component={NotificationSettings} options={SlideFromRightTransition} />
+        <RootStack.Screen name="ManagePlan" component={ManagePlan} options={SlideFromRightTransition} />
+        <RootStack.Screen name="Privacy" component={Privacy} options={SlideFromRightTransition} />
+      </RootStack.Navigator>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showSubscribeModal}
+        onRequestClose={handleRequestClose}
+      >
+        <SubscriptionModalContent />
+      </Modal>
+    </View>
+
   );
 };
 

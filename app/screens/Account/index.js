@@ -1,8 +1,18 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
-import { TouchableOpacity, View } from 'react-native';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
+import Top from './components/Top';
+import SubscribePrompt from './components/SubscribePrompt';
+import NotificationPrompt from './components/NotificationPrompt';
+import { useSelector } from 'react-redux';
+import Course from '../../assets/icons/24x/Course';
+import Bell from '../../assets/icons/24x/Bell';
+import Privacy from '../../assets/icons/24x/Privacy';
+import OptionBox from '../../components/authed/OptionBox';
+import ConnectStrava from './components/ConnectStrava';
+
 
 const Container = styled.View`
   flex: 1;
@@ -25,10 +35,37 @@ const HeaderText = styled.Text`
   color: ${(props) => props.theme.text.colors.white};
 `;
 
+const Main = styled(ScrollView)`
+  flex: 1;
+  margin-top: 30px;
+`;
+
 const Account = () => {
   const navigation = useNavigation();
+  const connections = useSelector((state) => state.user.connections);
 
   const handleBack = () => navigation.goBack();
+
+  const user = useSelector((state) => state.user.user);
+
+  const [hideSubscribe, setHideSubscribe] = useState(user?.subscription_status === 'UNSUBSCRIBED')
+  const [hideSetNotif, setHideSetNotif] = useState(user?.notifications_enabled && user?.notification_settings?.hide_prompt);
+
+  useEffect(() => {
+    if (user) setHideSetNotif(user.notifications_enabled || user.notification_settings?.hide_prompt);
+    if (user) setHideSubscribe(user.subscription_status === 'SUBSCRIBED');
+  }, [user, connections])
+
+  const handleOptionPress = (opt) => {
+    if (opt === 'Manage your plans') {
+      navigation.navigate('ManagePlan');
+    } else if (opt === 'Notification settings') {
+      navigation.navigate('NotificationSettings');
+    } else if (opt === 'Privacy settings') {
+      navigation.navigate('Privacy');
+    }
+  }
+
 
   return (
     <Container>
@@ -45,6 +82,17 @@ const Account = () => {
           <HeaderText>Account</HeaderText>
         </View>
       </Header>
+      <Main showsVerticalScrollIndicator={false}>
+        <Top />
+        {!hideSetNotif && <NotificationPrompt />}
+        {!hideSubscribe && <SubscribePrompt />}
+        <View style={{ marginVertical: 10 }}>
+          <OptionBox label="Manage your plans" Icon={Course} onPress={handleOptionPress} />
+          <OptionBox label="Notification settings" Icon={Bell} onPress={handleOptionPress} />
+          <OptionBox label="Privacy settings" Icon={Privacy} onPress={handleOptionPress} />
+          <ConnectStrava />
+        </View>
+      </Main>
     </Container>
   );
 };

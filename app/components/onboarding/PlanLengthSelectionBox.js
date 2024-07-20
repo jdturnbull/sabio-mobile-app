@@ -68,11 +68,11 @@ const PlanLengthSelectionBox = ({ item, selected, setSelected, date, setDate, we
     setSelected(item.label);
 
     if (item.label === 'Custom Length') {
-      height.value = selected ? 0 : 100;
+      height.value = height.value === 100 ? 0 : 100;
     }
 
     if (item.label === 'Custom Date') {
-      height.value = selected ? 0 : 300;
+      height.value = height.value === 300 ? 0 : 300;
     }
   };
 

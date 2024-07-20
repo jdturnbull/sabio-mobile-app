@@ -37,15 +37,12 @@ const Onboarding = () => {
   const user_state = useSelector((state) => state.user);
 
   useEffect(() => {
-    if (user_state.user && user_state.user.onboarding_status === 'NOT_STARTED') {
-      navigation.navigate('GoalSelect');
-      return;
+    if (user_state.user) {
+      if (user_state.user.onboarding_status === 'NOT_STARTED' || user_state.user.onboarding_status === 'RESETTING_PLAN') {
+        navigation.navigate('GoalSelect');
+        return;
+      }
     }
-    if (user_state.user && user_state.user.onboarding_status === 'COMPLETE') {
-      navigation.navigate('Main');
-      return;
-    }
-
     // If we get here then the onboarding_status is being used to indicate a plan step change
     navigation.navigate('CreatingPlan');
   }, []);

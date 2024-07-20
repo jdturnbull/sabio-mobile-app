@@ -18,6 +18,7 @@ const ScrollItemText = styled.Text`
   color: #f8f8f8;
   font-weight: ${(props) => props.theme.text.weight.semibold};
   font-size: ${(props) => props.theme.text.size.md};
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const ScrollItem = ({ item, selected, onPress, index }) => {
@@ -30,10 +31,10 @@ const ScrollItem = ({ item, selected, onPress, index }) => {
         selected && index === 0
           ? { backgroundColor: '#EE6E12', marginLeft: 20 }
           : selected
-          ? { backgroundColor: '#EE6E12' }
-          : index === 0
-          ? { marginLeft: 20 }
-          : {}
+            ? { backgroundColor: '#EE6E12' }
+            : index === 0
+              ? { marginLeft: 20 }
+              : {}
       }>
       <ScrollItemText>{item}</ScrollItemText>
     </ScrollItemContainer>

@@ -11,6 +11,7 @@ export const theme = {
     highlight: '#A1AAD3',
     borderHighlight: '#A1AAD340',
     background2: '#1F2025',
+    background3: '#A1AAD315',
     white: '#f8f8f8',
   },
   text: {

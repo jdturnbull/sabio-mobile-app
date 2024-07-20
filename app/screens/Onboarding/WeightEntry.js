@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 
-const UNITS = ['lbs', 'kg'];
+const UNITS = ['Pounds', 'Kilograms', 'Stones'];
 
 const Container = styled.View`
   flex: 1;
@@ -27,7 +27,7 @@ const WeightEntry = () => {
 
   const [currentWeight, setCurrentWeight] = useState('');
   const [targetWeight, setTargetWeight] = useState('');
-  const [unit, setUnit] = useState('lbs');
+  const [unit, setUnit] = useState('Pounds');
 
   const handleContinue = () => {
     if (!currentWeight) {

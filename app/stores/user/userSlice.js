@@ -5,7 +5,7 @@ import * as RNLocalize from 'react-native-localize';
 import call from '../../utils/call';
 
 export const setup = createAsyncThunk('user/setup', async (location) => {
-  console.log(location);
+  console.log(location)
   // Do we have an existing session?
   const session = await AsyncStorage.getItem('session');
 
@@ -24,7 +24,7 @@ export const setup = createAsyncThunk('user/setup', async (location) => {
       profile,
       injuries,
       medications,
-      training_plan,
+      training_plans,
       chronic_conditions,
       preferences,
       schedules,
@@ -49,7 +49,7 @@ export const setup = createAsyncThunk('user/setup', async (location) => {
       profile,
       injuries,
       medications,
-      training_plan,
+      training_plans,
       chronic_conditions,
       preferences,
       schedules,
@@ -59,7 +59,7 @@ export const setup = createAsyncThunk('user/setup', async (location) => {
       activities,
     };
   } catch (error) {
-    console.log('here!');
+    console.log('Setup failed')
     console.log(error.message);
   }
 });
@@ -82,6 +82,42 @@ export const continueWithApple = createAsyncThunk('user/continueWithApple', asyn
   }
 });
 
+export const update = createAsyncThunk('users/update', async ({ data, userId }) => {
+  try {
+    await call('POST', 'users/update', { userId, data });
+    return data;
+  } catch (error) {
+
+  }
+});
+
+export const updateProfile = createAsyncThunk('users/updateProfile', async ({ data, userId }) => {
+  try {
+    await call('POST', 'users/updateProfile', { userId, data });
+    return data;
+  } catch (error) {
+
+  }
+});
+
+export const addNewPlan = createAsyncThunk('users/addNewPlan', async ({ userId, planId }) => {
+  try {
+    const response = await call('POST', 'users/addNewPlan', { userId, planId });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+export const activatePlan = createAsyncThunk('users/activatePlan', async ({ userId, planId }) => {
+  try {
+    const response = await call('POST', 'users/activatePlan', { userId, planId });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
@@ -89,16 +125,17 @@ export const userSlice = createSlice({
     session: null,
     user: null,
     profile: null,
-    injuries: null,
-    medications: null,
-    training_plan: null,
-    chronic_conditions: null,
-    preferences: null,
-    schedules: null,
-    progress_reports: null,
-    conversations: null,
-    connections: null,
-    activities: null,
+    injuries: [],
+    medications: [],
+    training_plans: [],
+    chronic_conditions: [],
+    preferences: [],
+    schedules: [],
+    progress_reports: [],
+    conversations: [],
+    connections: [],
+    activities: [],
+    showSubscribeModal: false,
   },
   reducers: {
     updateState: (state, action) => {
@@ -112,7 +149,7 @@ export const userSlice = createSlice({
       state.profile = action.payload.profile;
       state.injuries = action.payload.injuries;
       state.medications = action.payload.medications;
-      state.training_plan = action.payload.training_plan;
+      state.training_plans = action.payload.training_plans;
       state.chronic_conditions = action.payload.chronic_conditions;
       state.preferences = action.payload.preferences;
       state.schedules = action.payload.schedules;
@@ -127,6 +164,36 @@ export const userSlice = createSlice({
         state.session = action.payload.session;
         state.user = action.payload.user;
       }
+    });
+    builder.addCase(update.fulfilled, (state, action) => {
+      Object.assign(state.user, action.payload);
+    });
+    builder.addCase(addNewPlan.fulfilled, (state, action) => {
+      state.user = action.payload;
+      state.profile = null;
+      state.injuries = [];
+      state.medications = [];
+      state.training_plans = [];
+      state.chronic_conditions = [];
+      state.preferences = [];
+      state.schedules = [];
+      state.progress_reports = [];
+      state.conversations = [];
+      state.connections = [];
+      state.activities = [];
+    });
+    builder.addCase(activatePlan.fulfilled, (state, action) => {
+      state.profile = action.payload.profile;
+      state.injuries = action.payload.injuries;
+      state.medications = action.payload.medications;
+      state.training_plans = action.payload.training_plans;
+      state.chronic_conditions = action.payload.chronic_conditions;
+      state.preferences = action.payload.preferences;
+      state.schedules = action.payload.schedules;
+      state.progress_reports = action.payload.progress_reports;
+      state.conversations = action.payload.conversations;
+      state.connections = action.payload.connections;
+      state.activities = action.payload.activities;
     });
   },
 });

@@ -27,6 +27,7 @@ const SelectorButton = styled(TouchableOpacity)`
 const SelectorText = styled.Text`
   color: ${(props) => props.theme.text.colors.white};
   font-size: ${(props) => props.theme.text.size.md};
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const DropDownItem = styled(TouchableOpacity)`
@@ -38,6 +39,7 @@ const DropDownItem = styled(TouchableOpacity)`
 const DropDownItemText = styled.Text`
   color: ${(props) => props.theme.text.colors.white};
   font-size: ${(props) => props.theme.text.size.md};
+  font-family: ${(props) => props.theme.text.family};
 `;
 
 const IconContainer = styled.View`

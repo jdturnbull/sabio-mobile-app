@@ -47,6 +47,7 @@ const Label = styled.Text`
 
 const StyledValue = styled.Text`
   flex: 1;
+  font-family: ${(props) => props.theme.text.family};
   color: ${(props) => props.theme.text.colors.white};
   font-size: ${(props) => props.theme.text.size.md};
 `;
@@ -74,6 +75,7 @@ const MonthYearText = styled.Text`
   color: ${(props) => props.theme.text.colors.white};
   font-weight: ${(props) => props.theme.text.weight.bold};
   font-size: ${(props) => props.theme.text.size.md};
+  font-family: ${(props) => props.theme.text.family};
   margin-left: 1px;
 `;
 

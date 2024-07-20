@@ -69,6 +69,7 @@ const CreatingPlan = () => {
   const dispatch = useDispatch();
   const state = useSelector((state) => state.onboarding);
   const user_state = useSelector((state) => state.user);
+  const profile = useSelector((state) => state.user.profile);
 
   const navigation = useNavigation();
 
@@ -82,10 +83,19 @@ const CreatingPlan = () => {
 
   // Checks to see if it should send data to backend
   useEffect(() => {
-    if (user_state?.user?.onboarding_status === 'NOT_STARTED' && state.profile) {
-      dispatch(save({ state, user: user_state.user }));
+    if (state.profile) {
+      const status = user_state?.user?.onboarding_status;
+      if (status === 'NOT_STARTED' || status === 'RESETTING_PLAN') {
+        dispatch(save({ state, user: user_state.user }));
+      }
     }
   }, []);
+
+  useEffect(() => {
+    if (profile) {
+      navigation.navigate('Main');
+    }
+  }, [profile])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,10 +107,13 @@ const CreatingPlan = () => {
           intervalRef.current = setInterval(async () => {
             updatedUser = await call('GET', `users/${user_state.user.id}`);
             setStage(updatedUser?.onboarding_status);
+            if (updatedUser?.onboarding_status === 'COMPLETE') {
+              clearInterval(intervalRef.current);
+              dispatch(setup('CreatingPlan'));
+            }
           }, 5000);
         } else {
-          dispatch(setup());
-          navigation.navigate('Main');
+          dispatch(setup('CreatingPlan'));
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -119,6 +132,9 @@ const CreatingPlan = () => {
     let progressValue = 0;
     switch (stage) {
       case 'NOT_STARTED':
+        progressValue = 0;
+        break;
+      case 'RESETTING_PLAN':
         progressValue = 0;
         break;
       case 'ANALYSING_DATA':

@@ -44,8 +44,12 @@ const WeekContainer = styled.View`
 `;
 
 const Slider = () => {
-  const { plan } = useSelector((state) => state.user.training_plan);
-  const weeks = [...plan.training_plan].sort((a, b) => (a.week > b.week ? 1 : -1));
+  const training_plans = useSelector((state) => state.user.training_plans);
+  const training_plan = training_plans?.find(plan => plan.status === "ACTIVE");
+
+  const plan = training_plan?.plan;
+
+  const weeks = plan ? [...plan.training_plan].sort((a, b) => (a.week > b.week ? 1 : -1)) : [];
 
   const [visibleIndex, setVisibleIndex] = useState(0);
 
@@ -72,7 +76,7 @@ const Slider = () => {
         <HeaderTouchable onPress={handlePrev}>
           <ArrowLeft style={visibleIndex === 0 ? { display: 'none' } : {}} />
         </HeaderTouchable>
-        <HeaderText>{`Week ${weeks[visibleIndex].week}`}</HeaderText>
+        <HeaderText>{`Week ${weeks[visibleIndex]?.week}`}</HeaderText>
         <HeaderTouchable onPress={handleNext}>
           <ArrowRight style={visibleIndex === weeks.length - 1 ? { display: 'none' } : {}} />
         </HeaderTouchable>
