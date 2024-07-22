@@ -93,7 +93,7 @@ const CreatingPlan = () => {
 
   useEffect(() => {
     if (profile) {
-      navigation.navigate('Main');
+      navigation.navigate('Main', { screen: 'Plan', params: { screen: 'Slider' } });
     }
   }, [profile])
 

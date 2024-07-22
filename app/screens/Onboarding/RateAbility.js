@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, TouchableOpacity, View } from 'react-native';
 import styled from 'styled-components';
 import Title from '../../components/shared/Title';
 import SubHeader from '../../components/shared/SubHeader';
@@ -9,10 +9,13 @@ import CircularProgress from 'react-native-circular-progress-indicator';
 import NextButton from '../../components/onboarding/NextButton';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { useNavigation } from '@react-navigation/native';
+import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
+import { updateProfile } from '../../stores/user/userSlice';
 
 const Container = styled.View`
   flex: 1;
   padding: 20px;
+  background-color: ${(props) => props.theme.colors.background};
 `;
 
 const OptionsContainer = styled.View`
@@ -22,8 +25,8 @@ const OptionsContainer = styled.View`
 const BeginnerRing = () => (
   <CircularProgress
     value={100 / 4}
-    radius={22.5}
-    activeStrokeWidth={12}
+    radius={18}
+    activeStrokeWidth={8}
     progressValueColor={'transparent'}
     inActiveStrokeColor={'#16171B'}
     activeStrokeColor={'#EE6E12'}
@@ -33,8 +36,8 @@ const BeginnerRing = () => (
 const IntermediateRing = () => (
   <CircularProgress
     value={(100 / 4) * 2}
-    radius={22.5}
-    activeStrokeWidth={12}
+    radius={18}
+    activeStrokeWidth={8}
     progressValueColor={'transparent'}
     inActiveStrokeColor={'#16171B'}
     activeStrokeColor={'#EE6E12'}
@@ -44,8 +47,8 @@ const IntermediateRing = () => (
 const AdvancedRing = () => (
   <CircularProgress
     value={(100 / 4) * 3}
-    radius={22.5}
-    activeStrokeWidth={12}
+    radius={18}
+    activeStrokeWidth={8}
     progressValueColor={'transparent'}
     inActiveStrokeColor={'#16171B'}
     activeStrokeColor={'#EE6E12'}
@@ -55,8 +58,8 @@ const AdvancedRing = () => (
 const EliteRing = () => (
   <CircularProgress
     value={100}
-    radius={22.5}
-    activeStrokeWidth={12}
+    radius={18}
+    activeStrokeWidth={8}
     progressValueColor={'transparent'}
     inActiveStrokeColor={'#16171B'}
     activeStrokeColor={'#EE6E12'}
@@ -86,11 +89,16 @@ const OPTIONS = [
   },
 ];
 
-const RateAbility = () => {
+const RateAbility = ({ editMode }) => {
   const state = useSelector((state) => state.onboarding);
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const [selected, setSelected] = useState('Beginner');
+
+  const user_state = useSelector((state) => state.user);
+
+  const pre_selected = OPTIONS.find((opt) => opt.body === user_state?.profile?.past_experience)?.label || 'Beginner';
+
+  const [selected, setSelected] = useState(pre_selected);
 
   const handlePress = (label) => {
     setSelected(label);
@@ -102,19 +110,29 @@ const RateAbility = () => {
       return;
     }
 
-    dispatch(updateState({ profile: { ...state.profile, ability: selected } }));
-
-    if (state.race) {
-      navigation.navigate('WhenTrain');
+    if (editMode) {
+      dispatch(updateProfile({ userId: user_state.user.id, data: { past_experience: OPTIONS.find((opt) => opt.label === selected).body } }));
+      navigation.goBack();
+      return;
     } else {
-      navigation.navigate('PlanLength');
+      dispatch(updateState({ profile: { ...state.profile, ability: selected } }));
+
+      if (state.race) {
+        navigation.navigate('WhenTrain');
+      } else {
+        navigation.navigate('PlanLength');
+      }
     }
   };
 
   return (
     <Container>
-      <Title style={{ marginBottom: 10 }}>Rate your current ability</Title>
-      <SubHeader>This can be changed later</SubHeader>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        {editMode && <TouchableOpacity onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>}
+        <Title style={{ marginBottom: 0, marginLeft: editMode ? 10 : 0 }}>Rate your current ability</Title>
+      </View>
+
+      {!editMode && <SubHeader>This can be changed later</SubHeader>}
       <OptionsContainer>
         {OPTIONS.map((opt) => (
           <LargeSelectionBox
@@ -128,9 +146,7 @@ const RateAbility = () => {
         ))}
       </OptionsContainer>
       <View style={{ flex: 1 }} />
-      <NextButton style={{ marginBottom: 20 }} onPress={handleNext}>
-        Continue
-      </NextButton>
+      <NextButton onPress={handleNext} editMode={editMode} />
     </Container>
   );
 };

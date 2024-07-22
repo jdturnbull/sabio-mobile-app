@@ -168,6 +168,9 @@ export const userSlice = createSlice({
     builder.addCase(update.fulfilled, (state, action) => {
       Object.assign(state.user, action.payload);
     });
+    builder.addCase(updateProfile.fulfilled, (state, action) => {
+      Object.assign(state.profile, action.payload);
+    });
     builder.addCase(addNewPlan.fulfilled, (state, action) => {
       state.user = action.payload;
       state.profile = null;

@@ -82,7 +82,7 @@ const TrainingPlanCard = ({ plan, handleActivate }) => {
                 </StatusBox>}
             </Top>
             <Mid>
-                <MidText>{goal}</MidText>
+                <MidText>{plan.name}</MidText>
             </Mid>
             <ButtonContainer>
                 {status === 'ARCHIVED' || status === 'INACTIVE' ? <Touchable onPress={handlePress}>

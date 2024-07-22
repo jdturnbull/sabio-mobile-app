@@ -6,22 +6,22 @@ const Container = styled(TouchableOpacity)`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 50px;
+  height: 45px;
   border-radius: 8px;
   background-color: ${(props) => props.theme.colors.white};
 `;
 
 const Text = styled.Text`
   font-family: ${(props) => props.theme.text.family};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.md};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
   font-weight: ${(props) => props.theme.text.weight.bold};
-  font-size: ${(props) => props.theme.text.size.md};
+  font-size: ${(props) => props.theme.text.size.sm};
 `;
 
-const NextButton = ({ style, onPress }) => {
+const NextButton = ({ style, onPress, editMode }) => {
   return (
     <Container onPress={onPress} style={style}>
-      <Text>Continue</Text>
+      <Text>{editMode ? 'Update' : 'Continue'}</Text>
     </Container>
   );
 };

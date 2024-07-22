@@ -91,7 +91,7 @@ const Root = () => {
       return;
     }
     if (user?.onboarding_status === 'COMPLETE' && !MAIN_SCREENS.includes(route)) {
-      navigation.navigate('Main');
+      navigation.navigate('Main', { screen: 'Plan', params: { screen: 'Slider' } });
       return;
     }
     if (user && user.onboarding_status !== 'COMPLETE') {

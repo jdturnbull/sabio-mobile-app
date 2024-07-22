@@ -53,19 +53,12 @@ const ManagePlan = () => {
     const user = useSelector((state) => state.user.user);
     const training_plans = useSelector((state) => state.user.training_plans);
     const training_plan = training_plans.find(plan => plan.status === "ACTIVE");
-    const [prevActive, setPrevActive] = useState(training_plan);
 
-    const [date, setDate] = useState(training_plan?.start_date);
-    const [showDateInput, setShowDateInput] = useState(false);
+    const [prevActive, setPrevActive] = useState(training_plan);
     const [modalVisible, setModalVisible] = useState(false);
     const [modalContent, setModalContent] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const height = useSharedValue(0);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        height: withTiming(height.value, { duration: 300 }),
-    }));
 
     const handleBack = () => {
         navigation.goBack();
@@ -76,17 +69,17 @@ const ManagePlan = () => {
             setModalContent(<NewPlanConfirm handleClose={() => setModalVisible(false)} />);
             setModalVisible(true);
         }
-        if (opt === 'Change plan duration') {
-            setShowDateInput((prev) => !prev);
-            height.value = showDateInput ? 0 : 320;
-        }
     }
 
     const handleActivate = (planId) => {
         if (user.subscription_status === 'SUBSCRIBED') {
             setLoading(true);
             setModalVisible(false);
-            dispatch(activatePlan({ userId: user.id, planId }));
+            setTimeout(() => {
+                setLoading(false);
+                dispatch(activatePlan({ userId: user.id, planId }));
+                navigation.navigate('Plan');
+            }, 500);
         } else {
             dispatch(updateState({ showSubscribeModal: true }));
         }
@@ -120,14 +113,9 @@ const ManagePlan = () => {
                 </View>
             ) : (
                 <Main>
-                    <HeaderText style={{ fontWeight: 400, marginBottom: 20 }}>Currently Active Plan</HeaderText>
-                    {training_plan && <View style={{ marginBottom: 30 }}><TrainingPlanCard plan={training_plan} handleActivate={handleActivate} /></View>}
+                    {training_plan && <View style={{ marginVertical: 20 }}><TrainingPlanCard plan={training_plan} handleActivate={handleActivate} /></View>}
                     <OptionBox label={'Add a new plan'} onPress={handlePress} Icon={AddOutlined} hideEndIcon />
-                    <OptionBox label={'Change plan duration'} onPress={handlePress} Icon={Clock} hideEndIcon />
-                    <Animated.View style={[{ overflow: 'hidden', marginTop: 10 }, animatedStyle]}>
-                        <DateInput placeholder={'Start date'} value={date} setValue={setDate} label={'Start date'} alwaysOpen />
-                    </Animated.View>
-                    <TrainingPlanList>
+                    {training_plans.length > 1 && <TrainingPlanList>
                         <HeaderText style={{ fontWeight: 400 }}>Switchable Plans</HeaderText>
                         {training_plans.filter(plan => plan.status === "INACTIVE").map((plan) => (
                             <TrainingPlanCard key={plan.id} plan={plan} handleActivate={handleActivate} />
@@ -135,7 +123,7 @@ const ManagePlan = () => {
                         {training_plans.filter(plan => plan.status === "ARCHIVED").map((plan) => (
                             <TrainingPlanCard key={plan.id} plan={plan} handleActivate={handleActivate} />
                         ))}
-                    </TrainingPlanList>
+                    </TrainingPlanList>}
                 </Main>
             )}
             <Modal

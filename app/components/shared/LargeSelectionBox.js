@@ -1,15 +1,13 @@
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import styled from 'styled-components';
-import CircularProgress from 'react-native-circular-progress-indicator';
-import BodyText from './BodyText';
 
 const Container = styled(TouchableOpacity)`
-  background-color: ${(props) => props.theme.colors.backgroundLight1};
-  border: ${(props) => (props.selected ? '2px solid #EE6E12' : `2px solid transparent`)};
-  padding: 15px;
-  border-radius: 17px;
-  margin-bottom: 12px;
+  background-color: ${(props) => props.theme.colors.background2};
+  border: ${(props) => (props.selected ? '1px solid #EE6E12' : `1px solid transparent`)};
+  padding: 12px;
+  border-radius: 12px;
+  margin-vertical: 5px;
   display: flex;
   flex-direction: row;
   align-items: center;

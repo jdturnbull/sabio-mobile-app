@@ -29,7 +29,7 @@ const calculateDates = (months) => {
 const Touchable = Animated.createAnimatedComponent(TouchableWithoutFeedback);
 
 const Container = styled(Animated.View)`
-  background-color: ${(props) => props.theme.colors.backgroundLight1};
+background-color: ${(props) => props.theme.colors.background2};
   border: ${(props) => `1px solid ${props.theme.colors.borderHighlight}`};
   padding: 10px;
   border-radius: 8px;

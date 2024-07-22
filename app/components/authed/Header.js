@@ -5,13 +5,7 @@ import Bell from '../../assets/icons/24x/Bell';
 import Account from '../../assets/icons/24x/Account';
 import { useNavigation } from '@react-navigation/native';
 import { hapticImpact } from '../../utils/haptics';
-
-const ROUTE_LABEL_MAP = {
-  Plan: 'Your Plan',
-  Progress: 'Your Progress',
-  Community: 'Community',
-  Profile: 'Profile',
-};
+import { useSelector } from 'react-redux';
 
 const Container = styled.View`
   padding: 20px;
@@ -37,6 +31,8 @@ const Title = styled.Text`
 
 const Header = () => {
   const navigation = useNavigation();
+  const training_plans = useSelector(state => state.user.training_plans);
+  const training_plan = training_plans?.find(plan => plan.status === 'ACTIVE');
 
   const handleBellPress = () => {
     hapticImpact();
@@ -50,6 +46,15 @@ const Header = () => {
 
   const parentRoute = navigation.getState().routes[navigation.getState().index];
   const route = parentRoute.state ? parentRoute.state.routes[parentRoute.state.index].name : parentRoute.name;
+
+  const ROUTE_LABEL_MAP = {
+    Plan: training_plan?.name || 'Your Plan',
+    Main: training_plan?.name || 'Your Plan',
+    Progress: 'Your Progress',
+    Community: 'Community',
+    Profile: 'Profile',
+  };
+
 
   return (
     <Container>
