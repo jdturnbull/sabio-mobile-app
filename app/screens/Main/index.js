@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dimensions, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useNavigationState } from '@react-navigation/native';
 import Header from '../../components/authed/Header';
 import TabBar from '../../components/authed/TabBar';
 
@@ -14,9 +15,13 @@ const width = Dimensions.get('window').width;
 const TabStack = createBottomTabNavigator();
 
 const Main = () => {
+  const navigationState = useNavigationState(state => state);
+  const activeRoute = navigationState.routes[navigationState.index];
+  const activeTab = activeRoute.state ? activeRoute.state.routes[activeRoute.state.index].name : activeRoute.name;
+
   return (
     <View style={{ flex: 1, backgroundColor: '#16171B' }}>
-      <Header />
+      {activeTab !== 'Profile' && <Header />}
       <TabStack.Navigator
         initialRouteName="Plan"
         screenOptions={{ tabBarShowLabel: false, headerShown: false }}

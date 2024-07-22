@@ -30,7 +30,7 @@ const OptionBox = ({ label, onPress, Icon }) => {
     return (
         <Container onPress={handlePress}>
             <LabelText>{label}</LabelText>
-            <ArrowRight />
+            {!Icon ? <ArrowRight /> : <Icon />}
         </Container>
     )
 }

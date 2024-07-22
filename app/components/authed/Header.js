@@ -13,6 +13,7 @@ const Container = styled.View`
   display: flex;
   flex-direction: row;
   align-items: center;
+  height: 60px;
 `;
 
 const TitleContainer = styled.View`

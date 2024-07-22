@@ -118,6 +118,70 @@ export const activatePlan = createAsyncThunk('users/activatePlan', async ({ user
   }
 });
 
+export const addInjury = createAsyncThunk('users/addInjury', async ({ userId, injury }) => {
+  try {
+    const newInjury = await call('POST', 'users/addInjury', { userId, injury });
+    return newInjury;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+export const updateInjury = createAsyncThunk('users/updateInjury', async ({ injuryId, data }) => {
+  try {
+    const updatedInjury = await call('POST', 'users/updateInjury', { injuryId, data });
+    return updatedInjury;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+export const addMedication = createAsyncThunk('users/addMedication', async ({ userId, medication }) => {
+  try {
+    const newMedication = await call('POST', 'users/addMedication', { userId, medication });
+    return newMedication;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+export const updateMedication = createAsyncThunk('users/updateMedication', async ({ medicationId, data }) => {
+  try {
+    const updatedMedication = await call('POST', 'users/updateMedication', { medicationId, data });
+    return updatedMedication;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+export const updateChronicConditions = createAsyncThunk('users/updateChronicConditions', async ({ userId, chronic_conditions, details }) => {
+  try {
+    const updatedChronicConditions = await call('POST', 'users/updateChronicConditions', { userId, chronic_conditions, details });
+    return updatedChronicConditions;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+export const addPreference = createAsyncThunk('users/addPreference', async ({ userId, preference }) => {
+  try {
+    const newPreference = await call('POST', 'users/addPreference', { userId, preference });
+    return newPreference;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+export const updatePreference = createAsyncThunk('users/updatePreference', async ({ preferenceId, data }) => {
+  try {
+    const updatedPreference = await call('POST', 'users/updatePreference', { preferenceId, data });
+    return updatedPreference;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
@@ -197,6 +261,23 @@ export const userSlice = createSlice({
       state.conversations = action.payload.conversations;
       state.connections = action.payload.connections;
       state.activities = action.payload.activities;
+    });
+    builder.addCase(addInjury.fulfilled, (state, action) => {
+      state.injuries.push(action.payload);
+    });
+    builder.addCase(updateInjury.fulfilled, (state, action) => {
+      state.injuries = state.injuries.filter(injury => injury.id !== action.payload.id);
+      state.injuries.push(action.payload);
+    });
+    builder.addCase(addMedication.fulfilled, (state, action) => {
+      state.medications.push(action.payload);
+    });
+    builder.addCase(updateMedication.fulfilled, (state, action) => {
+      state.medications = state.medications.filter(medication => medication.id !== action.payload.id);
+      state.medications.push(action.payload);
+    });
+    builder.addCase(updateChronicConditions.fulfilled, (state, action) => {
+      state.chronic_conditions = action.payload;
     });
   },
 });

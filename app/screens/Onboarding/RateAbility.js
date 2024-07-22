@@ -129,7 +129,7 @@ const RateAbility = ({ editMode }) => {
     <Container>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         {editMode && <TouchableOpacity onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>}
-        <Title style={{ marginBottom: 0, marginLeft: editMode ? 10 : 0 }}>Rate your current ability</Title>
+        <Title style={{ marginBottom: 0, marginLeft: editMode ? 10 : 0 }}>{editMode ? 'Update current ability' : 'Rate your current ability'}</Title>
       </View>
 
       {!editMode && <SubHeader>This can be changed later</SubHeader>}

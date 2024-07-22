@@ -12,10 +12,9 @@ const navigationMap = {
   'Current ability': 'PastExperience',
   'Injuries': 'Injuries',
   'Medications': 'Medications',
-  'Chronic conditions': 'ChronicConditions',
-  'Training preferences': 'TrainingPreferences',
-  'Training schedules': 'TrainingSchedules',
-  'Training locations': 'TrainingLocations',
+  'Chronic conditions': 'ChronicIllness',
+  'Training preferences': 'Preferences',
+  'Training schedules': 'Schedules',
 };
 
 const Container = styled(ScrollView)`
@@ -51,7 +50,6 @@ const View = () => {
         <OptionBox label={'Chronic conditions'} onPress={handlePress} value={''} />
         <OptionBox label={'Training preferences'} onPress={handlePress} value={''} />
         <OptionBox label={'Training schedules'} onPress={handlePress} value={''} />
-        <OptionBox label={'Training locations'} onPress={handlePress} value={''} />
       </OptionsContainer>
     </Container>
   );
