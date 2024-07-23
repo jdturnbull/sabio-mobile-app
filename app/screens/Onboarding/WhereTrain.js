@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import Title from '../../components/shared/Title';
 import SelectableItem from '../../components/shared/SelectableItem';
 import CustomInput from '../../components/shared/CustomInput';
-import NextButton from '../../components/onboarding/NextButton';
+import NextButton from '../../components/shared/NextButton';
 import SubHeader from '../../components/shared/SubHeader';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 

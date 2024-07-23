@@ -122,6 +122,8 @@ const Welcome = () => {
     if (user) {
       if (user.onboarding_status === 'NOT_STARTED' || user.onboarding_status === 'RESETTING_PLAN') {
         navigation.navigate('GoalSelect');
+      } else if (user.onboarding_status === 'COMPLETE') {
+        navigation.navigate('Main');
       }
     }
   }, [user]);

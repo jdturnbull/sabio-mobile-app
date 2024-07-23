@@ -1,11 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import SubHeader from '../../../../components/shared/SubHeader';
-import { useSelector } from 'react-redux';
 import { ScrollView } from 'react-native';
 import OptionBox from '../components/OptionBox';
 import { useNavigation } from '@react-navigation/native';
 import Title from '../../../../components/shared/Title';
+import Premium from '../../../../assets/icons/24x/Premium';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateState } from '../../../../stores/user/userSlice';
 
 const navigationMap = {
   'Equipment and facilities': 'EquipmentAndFacilities',
@@ -23,15 +25,29 @@ const Container = styled(ScrollView)`
   padding: 20px;
 `;
 
+const Top = styled.View`
+  flex-direction: row;
+  align-items: center;
+  marginBottom: 20px;
+`;
+
 const OptionsContainer = styled.View`
-  margin-top: 20px;
+  margin-top: 30px;
 `;
 
 const View = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
+  const user = useSelector((state) => state.user.user);
 
   const handlePress = (label) => {
+    if (user.subscription_status === 'UNSUBSCRIBED') {
+      dispatch(updateState({ showSubscribeModal: true }))
+      return;
+    }
+
     const route = navigationMap[label];
+
     if (route) {
       navigation.navigate(route);
     }
@@ -40,7 +56,10 @@ const View = () => {
 
   return (
     <Container>
-      <Title>Profile Information</Title>
+      <Top>
+        {user.subscription_status === 'UNSUBSCRIBED' && <Premium />}
+        <Title style={{ marginBottom: 2, marginLeft: 10 }}>Profile Information</Title>
+      </Top>
       <SubHeader>Update information to customise your plan</SubHeader>
       <OptionsContainer>
         <OptionBox label={'Equipment and facilities'} onPress={handlePress} value={''} />

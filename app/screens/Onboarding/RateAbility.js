@@ -6,7 +6,7 @@ import SubHeader from '../../components/shared/SubHeader';
 import LargeSelectionBox from '../../components/shared/LargeSelectionBox';
 import { useDispatch, useSelector } from 'react-redux';
 import CircularProgress from 'react-native-circular-progress-indicator';
-import NextButton from '../../components/onboarding/NextButton';
+import NextButton from '../../components/shared/NextButton';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { useNavigation } from '@react-navigation/native';
 import ArrowLeft from '../../assets/icons/24x/ArrowLeft';

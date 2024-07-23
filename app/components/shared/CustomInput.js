@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const Container = styled.View`
-background-color: ${(props) => props.theme.colors.background2};
+  background-color: ${(props) => props.theme.colors.background2};
   border: ${(props) => `1px solid ${props.theme.colors.borderHighlight}`};
   padding: 10px;
   border-radius: 8px;
-  height: ${(props) => (props.multiline ? '140px' : '70px')};
+  height: ${(props) => (props.multiline ? '140px' : props.hideLabel ? '50px' : '70px')};
   margin-bottom: 10px;
 `;
 
@@ -29,7 +29,7 @@ const StyledInput = styled.TextInput`
   text-align-vertical: ${(props) => (props.multiline ? 'top' : 'center')};
 `;
 
-const CustomInput = ({ placeholder, value, setValue, label, style, keyboardType, onFocus, multiline }) => {
+const CustomInput = ({ placeholder, value, setValue, label, style, keyboardType, onFocus, multiline, hideLabel }) => {
   const [_placeholder, _setPlaceholder] = useState(placeholder);
 
   const handleFocus = () => {
@@ -42,8 +42,8 @@ const CustomInput = ({ placeholder, value, setValue, label, style, keyboardType,
   };
 
   return (
-    <Container style={style} multiline={multiline}>
-      <Label>{label.toUpperCase()}</Label>
+    <Container style={style} multiline={multiline} hideLabel={hideLabel}>
+      {!hideLabel && <Label>{label.toUpperCase()}</Label>}
       <StyledInput
         keyboardType={keyboardType}
         value={value}

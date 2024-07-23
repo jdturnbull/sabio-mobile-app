@@ -4,7 +4,7 @@ import { TouchableWithoutFeedback, Keyboard, View, TouchableOpacity } from 'reac
 import Title from '../../components/shared/Title';
 import SubHeader from '../../components/shared/SubHeader';
 import CustomInput from '../../components/shared/CustomInput';
-import NextButton from '../../components/onboarding/NextButton';
+import NextButton from '../../components/shared/NextButton';
 import { useDispatch } from 'react-redux';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { useNavigation } from '@react-navigation/native';

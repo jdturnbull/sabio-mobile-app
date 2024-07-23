@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigationState } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import Injuries from './screens/Injuries';
 import Medications from './screens/Medications';
 import ChronicIllness from '../../Onboarding/ChronicIllness';
 import Preferences from './screens/Preferences';
+import Schedules from './screens/Schedules';
 
 const Container = styled.View`
   flex: 1;
@@ -32,9 +33,11 @@ const Profile = () => {
   const activeRoute = navigationState.routes[navigationState.index];
   const activeStackRoute = activeRoute.state ? activeRoute.state.routes[activeRoute.state.index].name : activeRoute.name;
 
+
+
   return (
     <Container>
-      <HeaderView></HeaderView>
+      <HeaderView />
       <ProfileStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="View">
         <ProfileStack.Screen name="View" component={View} />
         <ProfileStack.Screen name="EquipmentAndFacilities">
@@ -55,21 +58,12 @@ const Profile = () => {
         <ProfileStack.Screen name="Preferences">
           {(props) => <Preferences {...props} editMode={true} />}
         </ProfileStack.Screen>
+        <ProfileStack.Screen name="Schedules">
+          {(props) => <Schedules {...props} editMode={true} />}
+        </ProfileStack.Screen>
       </ProfileStack.Navigator>
-
     </Container>
   );
 };
 
 export default Profile;
-
-
-const navigationMap = {
-  'Equipment and facilities': 'EquipmentAndFacilities',
-  'Past experience': 'PastExperience',
-  'Injuries': 'Injuries',
-  'Medications': 'Medications',
-  'Chronic conditions': 'ChronicIllness',
-  'Training preferences': 'Preferences',
-  'Training schedules': 'Schedules',
-};

@@ -5,7 +5,7 @@ import Title from '../../components/shared/Title';
 import SubHeader from '../../components/shared/SubHeader';
 import DropDownSelector from '../../components/shared/DropDownSelector';
 import CustomInput from '../../components/shared/CustomInput';
-import NextButton from '../../components/onboarding/NextButton';
+import NextButton from '../../components/shared/NextButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { updateState } from '../../stores/onboarding/onboardingSlice';

@@ -4,7 +4,7 @@ import Title from '../../components/shared/Title';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import SelectableItem from '../../components/shared/SelectableItem';
-import NextButton from '../../components/onboarding/NextButton';
+import NextButton from '../../components/shared/NextButton';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { Alert } from 'react-native';
 

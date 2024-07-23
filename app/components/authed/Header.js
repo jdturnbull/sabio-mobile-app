@@ -35,6 +35,7 @@ const Header = () => {
   const training_plans = useSelector(state => state.user.training_plans);
   const training_plan = training_plans?.find(plan => plan.status === 'ACTIVE');
 
+
   const handleBellPress = () => {
     hapticImpact();
     navigation.navigate('Notifications');

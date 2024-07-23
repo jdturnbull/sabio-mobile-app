@@ -18,10 +18,10 @@ const Text = styled.Text`
   font-size: ${(props) => props.theme.text.size.sm};
 `;
 
-const NextButton = ({ style, onPress, editMode }) => {
+const NextButton = ({ style, onPress, editMode, text }) => {
   return (
     <Container onPress={onPress} style={style}>
-      <Text>{editMode ? 'Update' : 'Continue'}</Text>
+      <Text>{text ? text : editMode ? 'Update' : 'Continue'}</Text>
     </Container>
   );
 };

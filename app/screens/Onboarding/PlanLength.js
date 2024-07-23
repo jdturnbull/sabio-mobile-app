@@ -7,7 +7,7 @@ import Title from '../../components/shared/Title';
 import SubHeader from '../../components/shared/SubHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import PlanLengthSelectionBox from '../../components/onboarding/PlanLengthSelectionBox';
-import NextButton from '../../components/onboarding/NextButton';
+import NextButton from '../../components/shared/NextButton';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 
 const Container = styled.ScrollView`

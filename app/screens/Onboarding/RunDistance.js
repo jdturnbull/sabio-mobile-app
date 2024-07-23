@@ -8,7 +8,7 @@ import SubHeader from '../../components/shared/SubHeader';
 import SelectableItem from '../../components/shared/SelectableItem';
 import CustomInput from '../../components/shared/CustomInput';
 import DropDownSelector from '../../components/shared/DropDownSelector';
-import NextButton from '../../components/onboarding/NextButton';
+import NextButton from '../../components/shared/NextButton';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import { updateState } from '../../stores/onboarding/onboardingSlice';

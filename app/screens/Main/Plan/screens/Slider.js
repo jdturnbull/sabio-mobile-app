@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -40,28 +40,24 @@ const Scrollable = styled(ScrollView)`
 
 const WeekContainer = styled.View`
   width: ${Dimensions.get('window').width}px;
-  padding: 20px;
+  padding-horizontal: 20px;
 `;
 
-const Slider = () => {
-  const training_plans = useSelector((state) => state.user.training_plans);
-  const training_plan = training_plans?.find(plan => plan.status === "ACTIVE");
-
-  const plan = training_plan?.plan;
-
-  const weeks = plan ? [...plan.training_plan].sort((a, b) => (a.week > b.week ? 1 : -1)) : [];
-
+const Slider = ({ weeks }) => {
+  const scrollViewRef = useRef(null);
   const [visibleIndex, setVisibleIndex] = useState(0);
 
   const handlePrev = () => {
     if (visibleIndex > 0) {
       setVisibleIndex((prev) => prev - 1);
+      scrollViewRef.current.scrollTo({ x: (visibleIndex - 1) * Dimensions.get('window').width, animated: true });
     }
   };
 
   const handleNext = () => {
     if (visibleIndex !== weeks.length - 1) {
       setVisibleIndex((prev) => prev + 1);
+      scrollViewRef.current.scrollTo({ x: (visibleIndex + 1) * Dimensions.get('window').width, animated: true });
     }
   };
 
@@ -76,12 +72,13 @@ const Slider = () => {
         <HeaderTouchable onPress={handlePrev}>
           <ArrowLeft style={visibleIndex === 0 ? { display: 'none' } : {}} />
         </HeaderTouchable>
-        <HeaderText>{`Week ${weeks[visibleIndex]?.week}`}</HeaderText>
+        <HeaderText>{`Week ${weeks[visibleIndex]?.week || ''}`}</HeaderText>
         <HeaderTouchable onPress={handleNext}>
           <ArrowRight style={visibleIndex === weeks.length - 1 ? { display: 'none' } : {}} />
         </HeaderTouchable>
       </Header>
       <Scrollable
+        ref={scrollViewRef}
         horizontal
         pagingEnabled
         snapToAlignment="center"

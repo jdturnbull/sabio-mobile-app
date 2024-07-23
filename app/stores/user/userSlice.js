@@ -31,11 +31,11 @@ export const setup = createAsyncThunk('user/setup', async (location) => {
       progress_reports,
       conversations,
       connections,
-      activities,
     } = response;
 
     // If the session is not active then clear storage and return null
     if (!updated_session?.active) {
+      console.log('here');
       await AsyncStorage.removeItem('session');
       return { session: null, user: null };
     }
@@ -56,7 +56,6 @@ export const setup = createAsyncThunk('user/setup', async (location) => {
       progress_reports,
       conversations,
       connections,
-      activities,
     };
   } catch (error) {
     console.log('Setup failed')
@@ -181,6 +180,33 @@ export const updatePreference = createAsyncThunk('users/updatePreference', async
   }
 });
 
+export const addSchedule = createAsyncThunk('users/addSchedule', async ({ userId, schedule }) => {
+  try {
+    const newSchedule = await call('POST', 'users/addSchedule', { userId, schedule });
+    return newSchedule;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+export const updateSchedule = createAsyncThunk('users/updateSchedule', async ({ scheduleId, data }) => {
+  try {
+    const updatedSchedule = await call('POST', 'users/updateSchedule', { scheduleId, data });
+    return updatedSchedule;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+export const updateActiveSchedule = createAsyncThunk('users/updateActiveSchedule', async ({ scheduleId }) => {
+  try {
+    const updatedSchedules = await call('POST', 'users/updateActiveSchedule', { scheduleId });
+    return updatedSchedules;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 
 export const userSlice = createSlice({
   name: 'user',
@@ -198,7 +224,6 @@ export const userSlice = createSlice({
     progress_reports: [],
     conversations: [],
     connections: [],
-    activities: [],
     showSubscribeModal: false,
   },
   reducers: {
@@ -220,7 +245,6 @@ export const userSlice = createSlice({
       state.progress_reports = action.payload.progress_reports;
       state.conversations = action.payload.conversations;
       state.connections = action.payload.connections;
-      state.activities = action.payload.activities;
       state.loading = false;
     });
     builder.addCase(continueWithApple.fulfilled, (state, action) => {
@@ -247,7 +271,6 @@ export const userSlice = createSlice({
       state.progress_reports = [];
       state.conversations = [];
       state.connections = [];
-      state.activities = [];
     });
     builder.addCase(activatePlan.fulfilled, (state, action) => {
       state.profile = action.payload.profile;
@@ -260,7 +283,6 @@ export const userSlice = createSlice({
       state.progress_reports = action.payload.progress_reports;
       state.conversations = action.payload.conversations;
       state.connections = action.payload.connections;
-      state.activities = action.payload.activities;
     });
     builder.addCase(addInjury.fulfilled, (state, action) => {
       state.injuries.push(action.payload);
@@ -278,6 +300,16 @@ export const userSlice = createSlice({
     });
     builder.addCase(updateChronicConditions.fulfilled, (state, action) => {
       state.chronic_conditions = action.payload;
+    });
+    builder.addCase(updateSchedule.fulfilled, (state, action) => {
+      state.schedules = state.schedules.filter(schedule => schedule.id !== action.payload.id);
+      state.schedules.push(action.payload);
+    });
+    builder.addCase(addSchedule.fulfilled, (state, action) => {
+      state.schedules.push(action.payload);
+    });
+    builder.addCase(updateActiveSchedule.fulfilled, (state, action) => {
+      state.schedules = action.payload;
     });
   },
 });

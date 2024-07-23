@@ -3,7 +3,7 @@ import { TouchableOpacity } from 'react-native';
 import styled from 'styled-components';
 
 const Container = styled(TouchableOpacity)`
-background-color: ${(props) => props.theme.colors.background2};
+  background-color: ${(props) => (props.light ? props.theme.colors.background3 : props.theme.colors.background2)};
   padding: 12px;
   border-radius: 8px;
   margin-vertical: 5px;
@@ -39,11 +39,11 @@ const RingInner = styled.View`
   background-color: ${(props) => (props.selected ? '#000' : 'transparent')};
 `;
 
-const SelectableItem = ({ label, onPress, selected }) => {
+const SelectableItem = ({ label, onPress, selected, light }) => {
   const handlePress = () => onPress(label);
 
   return (
-    <Container onPress={handlePress}>
+    <Container light={light} onPress={handlePress}>
       <LabelText>{label}</LabelText>
       <RingOuter selected={selected}>
         <RingInner selected={selected} />

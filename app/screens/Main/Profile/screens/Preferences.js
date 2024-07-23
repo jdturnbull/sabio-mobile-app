@@ -66,6 +66,7 @@ const Preferences = () => {
     const [newPreference, setNewPreference] = useState("");
 
     useEffect(() => {
+        // This doesn't seem to cause a rerender when new preferences are added
         setPreferences(_preferences.filter(preference => preference.status !== "ARCHIVED").sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)));
         setArchivedPreferences(_preferences.filter(preference => preference.status === "ARCHIVED").sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)));
     }, [_preferences]);

@@ -8,7 +8,7 @@ import moment from 'moment-timezone';
 import { useDispatch, useSelector } from 'react-redux';
 import DateInput from '../../components/shared/DateInput';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import NextButton from '../../components/onboarding/NextButton';
+import NextButton from '../../components/shared/NextButton';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { useNavigation } from '@react-navigation/native';
 

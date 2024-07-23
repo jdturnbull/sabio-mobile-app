@@ -4,7 +4,7 @@ import { TouchableWithoutFeedback, Keyboard, TouchableOpacity, View } from 'reac
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Title from '../../components/shared/Title';
 import CustomInput from '../../components/shared/CustomInput';
-import NextButton from '../../components/onboarding/NextButton';
+import NextButton from '../../components/shared/NextButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { updateChronicConditions } from '../../stores/user/userSlice';
@@ -32,11 +32,11 @@ const ChronicIllness = ({ editMode }) => {
   const user_state = useSelector((state) => state.user);
   const existing_conditions = useSelector((state) => state.user.chronic_conditions);
 
-  const pre_selected = existing_conditions.map((c) => {
+  const pre_selected = existing_conditions?.map((c) => {
     if (OPTIONS.includes(c.name)) {
       return c.name;
     }
-  });
+  }) || [];
 
   const [selected, setSelected] = useState(pre_selected || []);
 
