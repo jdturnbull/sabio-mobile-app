@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
 import { useRoute } from '@react-navigation/native';
-import { ScrollView, ActivityIndicator, View } from 'react-native';
+import { ScrollView, ActivityIndicator, View, TouchableOpacity } from 'react-native';
 import call from '../../../../utils/call';
 import getIconFromActivity from '../../../../utils/getIconFromActivity';
+import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
 
 const Container = styled(ScrollView)`
   flex: 1;
@@ -16,35 +17,37 @@ const Container = styled(ScrollView)`
 const DayTitle = styled.Text`
   font-size: ${(props) => props.theme.text.size.lg};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.lg};
+  font-family: ${(props) => props.theme.text.family};
   font-weight: ${(props) => props.theme.text.weight.bold};
   color: ${(props) => props.theme.colors.white};
-  margin-bottom: 40px;
+  margin-left: 10px;
 `;
 
 const ActivityContainer = styled.View`
+  background-color: ${(props) => props.theme.colors.background2};
+  padding: 10px;
+  border-radius: 10px;
   margin-bottom: 20px;
 `;
 
-const ActivityTop = styled.View`
-`;
-
-const ActivityBottom = styled.View``;
-
 const ActivityName = styled.Text`
-  margin-top: 10px;
+  flex: 1;
   color: ${(props) => props.theme.colors.white};
+  font-family: ${(props) => props.theme.text.family};
   font-size: ${(props) => props.theme.text.size.md};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.md};
   font-weight: ${(props) => props.theme.text.weight.semibold};
-  margin-bottom: 20px;
+  line-height: 25px;
+  margin-left: 10px;
 `;
 
-const ActivityBody = styled.Text``;
-
-const CenteredActivityIndicator = styled(ActivityIndicator)`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
+const ActivityBody = styled.Text`
+  font-family: ${(props) => props.theme.text.family};
+  color: ${(props) => props.theme.colors.white};
+  font-size: ${(props) => props.theme.text.size.sm};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
+  font-weight: ${(props) => props.theme.text.weight.regular};
+  margin-top: 10px;
 `;
 
 const ViewActivity = ({ fetchActivities }) => {
@@ -56,57 +59,18 @@ const ViewActivity = ({ fetchActivities }) => {
   const [loading, setLoading] = useState(true);
   const [_activities, _setActivities] = useState(activities);
 
-  const generateActivityContent = async () => {
-    try {
-      setLoading(true);
-      const response = await call('POST', 'users/generateActivityContent', { date, planId: activities[0].training_plan_id });
-      await fetchActivities();
-      _setActivities(response);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-
-  }
-
-  useEffect(() => {
-    let shouldGenerate = false;
-
-    for (let i = 0; i < _activities.length; i++) {
-      if (_activities[i].description === "" || _activities[i].guidance === "") {
-        shouldGenerate = true;
-        break;
-      }
-    }
-
-    if (shouldGenerate) {
-      generateActivityContent();
-    } else {
-      setLoading(false)
-    }
-  }, [])
-
   return (
     <Container>
       <DayTitle>{moment(date).format('dddd, MMMM Do')}</DayTitle>
       {_activities.map((activity) => {
-        const Icon = getIconFromActivity(activity.icon);
+        const Icon = getIconFromActivity(activity.icon, true);
         return (
           <ActivityContainer key={activity.id}>
-            <ActivityTop>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Icon />
               <ActivityName>{activity.title}</ActivityName>
-            </ActivityTop>
-            <ActivityBottom>
-              {loading ? (
-                <CenteredActivityIndicator color="#f8f8f8" />
-              ) : (
-                <>
-                  <ActivityBody>{activity.description}</ActivityBody>
-                  <ActivityBody>{activity.guidance}</ActivityBody>
-                </>
-              )}
-            </ActivityBottom>
+            </View>
+            <ActivityBody>{activity.details}</ActivityBody>
           </ActivityContainer>
         )
       })}

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { View } from 'react-native';
 import styled, { ThemeProvider } from 'styled-components';
 import { REACT_APP_MIXPANEL_API_KEY } from '@env';
 import { StatusBar } from 'react-native';
@@ -72,19 +73,21 @@ const ConnectedApp = () => {
   };
 
   return (
-    <MixpanelProvider>
-      <NavigationContainer onStateChange={handleNavStateChange}>
-        <ThemeProvider theme={theme}>
-          <Provider store={store}>
-            <ActiveRouteProvider activeRoute={activeRouteName}>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <App />
-              </GestureHandlerRootView>
-            </ActiveRouteProvider>
-          </Provider>
-        </ThemeProvider>
-      </NavigationContainer>
-    </MixpanelProvider>
+    <View style={{ flex: 1, backgroundColor: '#16171B' }}>
+      <MixpanelProvider>
+        <NavigationContainer theme={{ colors: { background: '#16171B' } }} onStateChange={handleNavStateChange}>
+          <ThemeProvider theme={theme}>
+            <Provider store={store}>
+              <ActiveRouteProvider activeRoute={activeRouteName}>
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <App />
+                </GestureHandlerRootView>
+              </ActiveRouteProvider>
+            </Provider>
+          </ThemeProvider>
+        </NavigationContainer>
+      </MixpanelProvider>
+    </View>
   );
 };
 

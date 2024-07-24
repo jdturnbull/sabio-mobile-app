@@ -37,7 +37,6 @@ const Profile = () => {
 
   return (
     <Container>
-      <HeaderView />
       <ProfileStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="View">
         <ProfileStack.Screen name="View" component={View} />
         <ProfileStack.Screen name="EquipmentAndFacilities">

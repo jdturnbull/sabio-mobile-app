@@ -96,7 +96,7 @@ const DayItem = ({ _day }) => {
 
     const handleComplete = () => { };
 
-    const icons_and_titles = activities.map(activity => ({ Icon: getIconFromActivity(activity.icon), title: activity.title }));
+    const icons_and_titles = activities.map(activity => ({ Icon: getIconFromActivity(activity.icon, true), title: activity.title }));
 
     return (
         <Container onPress={handlePress} style={{ borderLeftColor: DAY_COLOR_MAP[day] }}>
