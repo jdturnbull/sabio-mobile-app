@@ -7,6 +7,8 @@ import Onboarding from '../screens/Onboarding';
 import Main from '../screens/Main';
 import Notifications from './Notifications';
 import Account from './Account';
+import PlanOverview from './PlanOverview';
+import RearrangeWeek from './RearrangeWeek';
 import { useNavigation } from '@react-navigation/native';
 import { setup, updateState } from '../stores/user/userSlice';
 import useActiveRoute from '../hooks/useActiveRoute';
@@ -115,6 +117,8 @@ const Root = () => {
         <RootStack.Screen name="NotificationSettings" component={NotificationSettings} options={SlideFromRightTransition} />
         <RootStack.Screen name="ManagePlan" component={ManagePlan} options={SlideFromRightTransition} />
         <RootStack.Screen name="Privacy" component={Privacy} options={SlideFromRightTransition} />
+        <RootStack.Screen name="PlanOverview" component={PlanOverview} options={SlideFromRightTransition} />
+        <RootStack.Screen name="RearrangeWeek" component={RearrangeWeek} options={SlideFromRightTransition} />
       </RootStack.Navigator>
       <Modal
         animationType="slide"

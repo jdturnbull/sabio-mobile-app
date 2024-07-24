@@ -1,11 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
 import ArrowRight from '../../../../assets/icons/24x/ArrowRight';
-
 import WeekView from '../components/WeekView';
 
 const Container = styled.View`
@@ -17,6 +14,7 @@ const Header = styled.View`
   display: flex;
   flex-direction: row;
   align-items: center;
+  padding-horizontal: 20px;
   padding: 20px;
 `;
 
@@ -47,6 +45,12 @@ const Slider = ({ weeks }) => {
   const scrollViewRef = useRef(null);
   const [visibleIndex, setVisibleIndex] = useState(0);
 
+  const [_weeks, _setWeeks] = useState(weeks);
+
+  useEffect(() => {
+    _setWeeks(weeks);
+  }, [weeks]);
+
   const handlePrev = () => {
     if (visibleIndex > 0) {
       setVisibleIndex((prev) => prev - 1);
@@ -72,9 +76,9 @@ const Slider = ({ weeks }) => {
         <HeaderTouchable onPress={handlePrev}>
           <ArrowLeft style={visibleIndex === 0 ? { display: 'none' } : {}} />
         </HeaderTouchable>
-        <HeaderText>{`Week ${weeks[visibleIndex]?.week || ''}`}</HeaderText>
+        <HeaderText>{`Week ${_weeks[visibleIndex]?.week || ''}`}</HeaderText>
         <HeaderTouchable onPress={handleNext}>
-          <ArrowRight style={visibleIndex === weeks.length - 1 ? { display: 'none' } : {}} />
+          <ArrowRight style={visibleIndex === _weeks.length - 1 ? { display: 'none' } : {}} />
         </HeaderTouchable>
       </Header>
       <Scrollable
@@ -85,9 +89,9 @@ const Slider = ({ weeks }) => {
         onScroll={handleScroll}
         scrollEventThrottle={16}
         showsHorizontalScrollIndicator={false}>
-        {weeks.map((week, index) => (
+        {_weeks.map((__week, index) => (
           <WeekContainer key={index}>
-            <WeekView week={week} />
+            <WeekView week={__week} />
           </WeekContainer>
         ))}
       </Scrollable>

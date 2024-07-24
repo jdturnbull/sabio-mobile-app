@@ -42,6 +42,9 @@ const Main = styled(ScrollView)`
 
 const Account = () => {
   const navigation = useNavigation();
+  const route = useNavigation().getState().routes.find(r => r.name === 'Account');
+  const params = route ? route.params : {};
+
   const connections = useSelector((state) => state.user.connections);
 
   const handleBack = () => navigation.goBack();
@@ -65,6 +68,12 @@ const Account = () => {
       navigation.navigate('Privacy');
     }
   }
+
+  useEffect(() => {
+    if (params?.option) {
+      handleOptionPress(params.option);
+    }
+  }, [params])
 
 
   return (

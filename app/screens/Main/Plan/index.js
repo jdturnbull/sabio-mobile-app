@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
+import { useNavigationState, useFocusEffect } from '@react-navigation/native';
 
 import Slider from './screens/Slider';
-import Overview from './screens/Overview';
 import Replan from './screens/Replan';
 import AddActivity from './screens/AddActivity';
-import ViewActivity from './screens/ViewActivity';
+import ViewDay from './screens/ViewDay';
 import { useSelector } from 'react-redux';
 import call from '../../../utils/call';
 
@@ -14,6 +14,7 @@ const PlanStack = createStackNavigator();
 const Plan = () => {
   const training_plans = useSelector((state) => state.user.training_plans);
   const [weeks, setWeeks] = useState([]);
+  const navigationState = useNavigationState(state => state);
 
   const training_plan = useMemo(() => {
     return training_plans?.find(plan => plan.status === 'ACTIVE');
@@ -32,23 +33,22 @@ const Plan = () => {
     setWeeks(weeksData);
   }, [training_plan]);
 
-  useEffect(() => {
-    fetchActivities();
-  }, [fetchActivities]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchActivities();
+    }, [fetchActivities, navigationState])
+  );
 
   return (
     <PlanStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Slider">
       <PlanStack.Screen name="Slider">
         {props => <Slider {...props} weeks={weeks} />}
       </PlanStack.Screen>
-      <PlanStack.Screen name="Overview">
-        {props => <Overview {...props} weeks={weeks} />}
-      </PlanStack.Screen>
       <PlanStack.Screen name="Replan">
         {props => <Replan {...props} weeks={weeks} />}
       </PlanStack.Screen>
-      <PlanStack.Screen name="ViewActivity">
-        {props => <ViewActivity {...props} fetchActivities={fetchActivities} />}
+      <PlanStack.Screen name="ViewDay">
+        {props => <ViewDay {...props} fetchActivities={fetchActivities} />}
       </PlanStack.Screen>
       <PlanStack.Screen name="AddActivity" component={AddActivity} />
     </PlanStack.Navigator>

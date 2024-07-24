@@ -1,10 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import moment from 'moment';
+import Toast from 'react-native-toast-message';
 import getIconFromActivity from "../../../../utils/getIconFromActivity";
 import { TouchableOpacity, View } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useNavigation } from "@react-navigation/native";
+import { hapticImpact } from "../../../../utils/haptics";
+import Tick from '../../../../assets/icons/14x/TickNoCircle';
+import call from "../../../../utils/call";
+import { useSelector } from "react-redux";
 
 const DAY_COLOR_MAP = {
     'Monday': '#A1AAD3',
@@ -27,6 +31,18 @@ const Container = styled(TouchableOpacity)`
 
 const Top = styled.View`
 margin-bottom: 10px;
+flex-direction: row;
+justify-content: space-between;
+`;
+
+const CompleteTouchable = styled(TouchableOpacity)`
+    height: 20px;
+    width: 20px;
+    border: ${(props) => props.complete ? `2px solid ${props.dayColor}` : '2px solid #A1AAD315'};
+    background-color: ${(props) => props.complete ? props.dayColor : 'transparent'};
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
 `;
 
 const DayText = styled.Text`
@@ -74,10 +90,17 @@ const ProgressBar = styled(Animated.View)`
     border-bottom-left-radius: 8px;
 `;
 
-const DayItem = ({ _day }) => {
+const DayItem = ({ _day, handleSwipeRight, handleSwipeLeft }) => {
     const { activities, day } = _day;
     const navigation = useNavigation();
+    const user = useSelector((state) => state.user.user);
     const progress = useSharedValue(0);
+
+    const [complete, setComplete] = useState(activities.every(activity => activity.status === 'COMPLETE'));
+
+    useEffect(() => {
+        setComplete(activities.every(activity => activity.status === 'COMPLETE'));
+    }, [activities]);
 
     useEffect(() => {
         const completed = activities.every(activity => activity.status === 'COMPLETE');
@@ -91,10 +114,30 @@ const DayItem = ({ _day }) => {
     });
 
     const handlePress = () => {
-        navigation.navigate('ViewActivity', { _day });
+        navigation.navigate('ViewDay', { _day, handleSwipeRight, handleSwipeLeft });
     };
 
-    const handleComplete = () => { };
+
+    const handleComplete = async () => {
+        const { training_plan_id } = _day.activities[0];
+
+        if (complete) {
+            setComplete(false);
+            progress.value = withTiming(0, { duration: 500 });
+            await call('POST', 'users/uncompleteDay', { planId: training_plan_id, date: _day.date })
+        } else {
+            setComplete(true);
+            hapticImpact();
+            Toast.show({
+                topOffset: 60,
+                type: 'success',
+                text1: `Well done ${user.first_name}!`,
+                text2: "We are proud of you 💪"
+            });
+            progress.value = withTiming(100, { duration: 500 });
+            await call('POST', 'users/completeDay', { planId: training_plan_id, date: _day.date })
+        }
+    };
 
     const icons_and_titles = activities.map(activity => ({ Icon: getIconFromActivity(activity.icon, true), title: activity.title }));
 
@@ -102,6 +145,9 @@ const DayItem = ({ _day }) => {
         <Container onPress={handlePress} style={{ borderLeftColor: DAY_COLOR_MAP[day] }}>
             <Top>
                 <DayText>{day}</DayText>
+                <CompleteTouchable onPress={handleComplete} complete={complete} dayColor={DAY_COLOR_MAP[day]}>
+                    {complete && <Tick />}
+                </CompleteTouchable>
             </Top>
             <Mid>
                 {icons_and_titles.map(({ Icon, title }) => (

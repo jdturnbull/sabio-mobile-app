@@ -4,6 +4,10 @@ import moment from 'moment';
 import DayItem from './DayItem';
 import { ScrollView, ActivityIndicator, View } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { useNavigation } from '@react-navigation/native';
+import PlanScreenOptions from './PlanScreenOptions';
+import SabioMessage from './SabioMessage';
+import { hapticImpact, hapticNotificationError } from '../../../../utils/haptics';
 
 const Container = styled(ScrollView)`
   flex: 1;
@@ -36,17 +40,20 @@ const WeekView = ({ week }) => {
   const [loading, setLoading] = useState(true);
   const opacity = useSharedValue(0);
 
+  const navigation = useNavigation();
+
+
   const days = useMemo(() => {
     const daysMap = groupActivitiesByDay(week.activities);
     return sortDays(daysMap);
-  }, [week.activities]);
+  }, [week]);
 
   useEffect(() => {
     if (days.length > 0) {
       setLoading(false);
       opacity.value = withTiming(1, { duration: 1000 });
     }
-  }, [days]);
+  }, [days, week]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -54,6 +61,28 @@ const WeekView = ({ week }) => {
       opacity: opacity.value,
     };
   });
+
+  const handleSwipeRight = (date) => {
+    const nextTrainingDay = days.find(day => moment(day.date).isAfter(moment(date)));
+
+    if (nextTrainingDay) {
+      navigation.navigate('ViewDay', { _day: nextTrainingDay, handleSwipeRight, handleSwipeLeft, date: nextTrainingDay.date });
+      hapticImpact();
+    } else {
+      hapticNotificationError();
+    }
+  }
+
+  const handleSwipeLeft = (date) => {
+    const previousTrainingDay = days.find(day => moment(day.date).isBefore(moment(date)));
+
+    if (previousTrainingDay) {
+      navigation.navigate('ViewDay', { _day: previousTrainingDay, handleSwipeRight, handleSwipeLeft, date: previousTrainingDay.date });
+      hapticImpact();
+    } else {
+      hapticNotificationError();
+    }
+  }
 
   if (loading) {
     return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -64,7 +93,9 @@ const WeekView = ({ week }) => {
   return (
     <Animated.View style={animatedStyle}>
       <Container showsVerticalScrollIndicator={false}>
-        {days.map((day) => <DayItem key={day.date} _day={day} />)}
+        <PlanScreenOptions week={week} />
+        <SabioMessage focus={week.focus} />
+        {days.map((day) => <DayItem key={day.date} _day={day} handleSwipeRight={handleSwipeRight} handleSwipeLeft={handleSwipeLeft} />)}
       </Container>
     </Animated.View>
   );

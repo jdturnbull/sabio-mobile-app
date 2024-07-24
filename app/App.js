@@ -6,6 +6,7 @@ import { StatusBar } from 'react-native';
 import PushNotification from 'react-native-push-notification';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
 import { Mixpanel } from 'mixpanel-react-native';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import { Provider, useDispatch } from 'react-redux';
@@ -16,9 +17,37 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { OverlayPortal } from './components/shared/Overlay';
 import { createDatabase } from './data/database';
 import Root from './screens/Root';
-import { setup } from './stores/user/userSlice';
 import { theme } from './utils/theme';
 import { MixpanelProvider } from './hooks/useMixpanel';
+
+const toastConfig = {
+  success: (props) => (
+    <BaseToast
+      {...props}
+      style={{ borderLeftColor: '#EE6E12' }}
+      contentContainerStyle={{ backgroundColor: '#1F2025' }}
+      text1Style={{
+        color: '#f8f8f8',
+        fontSize: 13
+      }}
+      text2Style={{
+        fontSize: 10
+      }}
+    />
+  ),
+  error: (props) => (
+    <ErrorToast
+      {...props}
+      style={{ borderLeftColor: '#EE6E12' }}
+      contentContainerStyle={{ backgroundColor: '#1F2025' }}
+      text1Style={{
+        color: '#f8f8f8',
+        fontSize: 15
+      }}
+    />
+  ),
+};
+
 
 createDatabase();
 
@@ -87,6 +116,7 @@ const ConnectedApp = () => {
           </ThemeProvider>
         </NavigationContainer>
       </MixpanelProvider>
+      <Toast config={toastConfig} />
     </View>
   );
 };

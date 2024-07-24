@@ -9,7 +9,7 @@ const SvgComponent = (props) => (
         {...props}
     >
         <G
-            stroke="#fff"
+            stroke={props.color || '#f8f8f8'}
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
@@ -19,7 +19,7 @@ const SvgComponent = (props) => (
         </G>
         <Defs>
             <ClipPath id="a">
-                <Path fill="#fff" d="M0 0h18v18H0z" />
+                <Path fill={props.color || '#f8f8f8'} d="M0 0h18v18H0z" />
             </ClipPath>
         </Defs>
     </Svg>

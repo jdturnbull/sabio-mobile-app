@@ -10,7 +10,7 @@ import Progress from './Progress';
 import Community from './Community';
 import Profile from './Profile';
 
-const HIDE_HEADER_ROUTES = ['ViewActivity', 'EquipmentAndFacilities', 'PastExperience', 'Injuries', 'Medications', 'ChronicIllness', 'Preferences', 'Schedules'];
+const HIDE_HEADER_ROUTES = ['ViewDay', 'EquipmentAndFacilities', 'PastExperience', 'Injuries', 'Medications', 'ChronicIllness', 'Preferences', 'Schedules', 'PlanOverview', 'RearrangeWeek'];
 
 const width = Dimensions.get('window').width;
 
