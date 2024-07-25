@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/native";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from 'react-native-reanimated';
 import moment from 'moment';
@@ -9,6 +9,7 @@ import Title from "../../components/shared/Title";
 import SubHeader from "../../components/shared/SubHeader";
 import Calendar from '../../assets/icons/18x/Calendar';
 import getIconFromActivity from "../../utils/getIconFromActivity";
+import call from "../../utils/call";
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -61,11 +62,12 @@ const DayText = styled.Text`
 
 const ItemContainer = styled(Animated.View)`
     flex: 1;
-    height: 92px;
+    height: 87px;
     border: 2px dashed ${(props) => props.color ? 'transparent' : props.theme.colors.borderHighlight};
     background-color: ${(props) => props.color ? props.theme.colors.borderHighlight : 'transparent'};
     border-radius: 8px;
     padding: 5px;
+    margin-bottom: 5px;
 `;
 
 const ActivityContainer = styled.View`
@@ -81,8 +83,24 @@ const ActivityText = styled.Text`
     margin-left: 5px;
 `;
 
+const UpdateTouchable = styled(TouchableOpacity)`
+    background-color: ${(props) => props.theme.colors.primary};
+    padding: 5px 15px;
+    border-radius: 8px;
+`;
+
+const UpdateText = styled.Text`
+    font-family: ${(props) => props.theme.text.family};
+    font-size: ${(props) => props.theme.text.size.sm};
+    color: ${(props) => props.theme.text.colors.white};
+    font-weight: ${(props) => props.theme.text.weight.bold};
+    text-align: center;
+`;
+
 const RearrangeWeek = ({ navigation, route }) => {
     const { week } = route.params;
+
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     const computeActivitiesIntoDays = (activities) => {
         let response = [
@@ -122,37 +140,73 @@ const RearrangeWeek = ({ navigation, route }) => {
 
     const handleGestureEnd = (event, index) => {
         const indexChange = Math.round(positions[index].value / 92);
-        const _newData = listItems.slice();
-        const [movedItem] = _newData.splice(index, 1);
+        const newData = listItems.slice();
+        const [movedItem] = newData.splice(index, 1);
         const startIndex = listItems.findIndex(item => item.day === movedItem.day);
         const newIndex = startIndex + indexChange;
 
         if (newIndex > -1 && newIndex < 7) {
-            _newData.splice(newIndex, 0, movedItem);
-
-            const newData = _newData.map((item, index) => {
-                return {
-                    ...item,
-                    day: DAYS[index]
-                }
-            });
-
-            // Update positions for both the moved item and the item at the new index
-            const temp = positions[startIndex].value;
+            newData.splice(newIndex, 0, movedItem);
 
             positions[startIndex].value = withSpring(positions[newIndex].value);
-
             positions[newIndex].value = withSpring(newIndex);
 
             runOnJS(setListItems)(newData);
+            runOnJS(setHasUnsavedChanges)(true);
+
+            positions.forEach((pos, idx) => {
+                pos.value = withSpring(idx);
+            });
+        }
+    };
+
+    const handleBack = () => {
+        navigation.goBack();
+    }
+
+    const handleUpdate = async () => {
+        const activitiesToUpdate = [];
+
+        for (let i = 0; i < listItems.length; i++) {
+            const item = listItems[i];
+
+            for (let j = 0; j < item.activities.length; j++) {
+                const new_day = DAYS[i];
+                const existing_day = moment(item.activities[j].date).format('dddd');
+
+                if (new_day !== existing_day) {
+                    const difference = DAYS.indexOf(new_day) - DAYS.indexOf(existing_day);
+
+                    let new_date;
+
+                    if (difference > 0) {
+                        new_date = moment(item.activities[j].date).add(difference, 'days').toDate();
+                    } else {
+                        new_date = moment(item.activities[j].date).subtract(Math.abs(difference), 'days').toDate();
+                    }
+
+                    activitiesToUpdate.push({
+                        ...item.activities[j],
+                        date: new_date
+                    });
+                }
+            }
+        }
+
+        if (activitiesToUpdate.length > 0) {
+            await call('POST', "users/reorganiseWeek", { activities: activitiesToUpdate });
+            navigation.goBack();
         }
     };
 
     return (
         <Container>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                <TouchableOpacity onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>
-                <Title style={{ marginBottom: 0, marginLeft: 10 }}>Rearrange Week {1}</Title>
+                <TouchableOpacity onPress={handleBack}><ArrowLeft /></TouchableOpacity>
+                <Title style={{ marginBottom: 0, marginLeft: 10, flex: 1 }}>Rearrange Week {1}</Title>
+                <UpdateTouchable onPress={handleUpdate}>
+                    <UpdateText>Save</UpdateText>
+                </UpdateTouchable>
             </View>
             <SubHeader style={{ marginBottom: 20 }}>Reorder days to rearrange your week</SubHeader>
             <Content>
@@ -175,6 +229,8 @@ const RearrangeWeek = ({ navigation, route }) => {
                             };
                         });
 
+                        const RestIcon = getIconFromActivity('rest');
+
                         return (
                             <PanGestureHandler
                                 key={item.id}
@@ -192,6 +248,11 @@ const RearrangeWeek = ({ navigation, route }) => {
                                                 </ActivityContainer>
                                             )
                                         })}
+                                        {!item.activities.length && (
+                                            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                                <RestIcon color={'#A1AAD340'} />
+                                            </View>
+                                        )}
                                     </ItemContainer>
                                 </Animated.View>
                             </PanGestureHandler>
