@@ -3,13 +3,11 @@ import styled from 'styled-components';
 import moment from 'moment';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { ScrollView, View, TouchableOpacity, Text, Dimensions } from 'react-native';
-import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import getIconFromActivity from '../../../../utils/getIconFromActivity';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
 import Title from '../../../../components/shared/Title';
 import SubHeader from '../../../../components/shared/SubHeader';
-import { runOnJS } from 'react-native-reanimated';
 
 const DAY_COLOR_MAP = {
   'Monday': '#885A89',
@@ -101,51 +99,40 @@ const ViewDay = () => {
   const navigation = useNavigation();
 
   const user = useSelector((state) => state.user.user);
-  const { _day, handleSwipeRight, handleSwipeLeft } = route.params;
+  const { _day } = route.params;
   const { day, date, activities } = _day;
 
-  const horizontalSwipeGesture = Gesture.Pan()
-    .onUpdate((event) => {
-      if (event.translationX > 50) {
-        runOnJS(handleSwipeLeft)(date);
-      } else if (event.translationX < -50) {
-        runOnJS(handleSwipeRight)(date);
-      }
-    });
-
   return (
-    <GestureDetector gesture={horizontalSwipeGesture}>
-      <Container>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-          <TouchableOpacity onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>
-          <Title style={{ marginBottom: 0, marginLeft: 10 }}>{moment(date).format('dddd, MMMM Do')}</Title>
-        </View>
-        <SubHeader style={{ marginBottom: 20 }}>Swipe left or right to view previous or next days</SubHeader>
-        {activities.map((activity, i) => {
-          const Icon = getIconFromActivity(activity.icon, true);
-          return (
-            <ActivityContainer key={activity.id}>
-              <ActivityHeader color={DAY_COLOR_MAP[day]}>
-                <HeaderText>Session</HeaderText>
-              </ActivityHeader>
-              <ActivityBody>
-                <Left>
-                  <NumberText>{i + 1}</NumberText>
-                </Left>
-                <View style={{ marginLeft: 6, marginRight: 12, width: 2, backgroundColor: '#f8f8f810', height: '100%', borderRadius: 50 }} />
-                <Right>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                    <Icon />
-                    <ActivityTitle>{activity.title}</ActivityTitle>
-                  </View>
-                  <ActivityBodyText>{activity.details}</ActivityBodyText>
-                </Right>
-              </ActivityBody>
-            </ActivityContainer>
-          )
-        })}
-      </Container>
-    </GestureDetector>
+    <Container>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>
+        <Title style={{ marginBottom: 0, marginLeft: 10 }}>{moment(date).format('dddd, MMMM Do')}</Title>
+      </View>
+      <SubHeader style={{ marginBottom: 20 }}>Activities for the day</SubHeader>
+      {activities.map((activity, i) => {
+        const Icon = getIconFromActivity(activity.icon, true);
+        return (
+          <ActivityContainer key={activity.id}>
+            <ActivityHeader color={DAY_COLOR_MAP[day]}>
+              <HeaderText>Session</HeaderText>
+            </ActivityHeader>
+            <ActivityBody>
+              <Left>
+                <NumberText>{i + 1}</NumberText>
+              </Left>
+              <View style={{ marginLeft: 6, marginRight: 12, width: 2, backgroundColor: '#f8f8f810', height: '100%', borderRadius: 50 }} />
+              <Right>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                  <Icon />
+                  <ActivityTitle>{activity.title}</ActivityTitle>
+                </View>
+                <ActivityBodyText>{activity.details}</ActivityBodyText>
+              </Right>
+            </ActivityBody>
+          </ActivityContainer>
+        )
+      })}
+    </Container>
   );
 };
 
