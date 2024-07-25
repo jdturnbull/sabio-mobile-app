@@ -12,7 +12,7 @@ import SubHeader from '../../../../components/shared/SubHeader';
 import { runOnJS } from 'react-native-reanimated';
 
 const DAY_COLOR_MAP = {
-  'Monday': '#A1AAD3',
+  'Monday': '#885A89',
   'Tuesday': '#D4B483',
   'Wednesday': '#355834',
   'Thursday': '#6D466B',

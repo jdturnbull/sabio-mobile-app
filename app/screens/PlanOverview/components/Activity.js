@@ -4,7 +4,7 @@ import moment from 'moment';
 import getIconFromActivity from "../../../utils/getIconFromActivity";
 
 const DAY_COLOR_MAP = {
-    'Monday': '#A1AAD3',
+    'Monday': '#885A89',
     'Tuesday': '#D4B483',
     'Wednesday': '#355834',
     'Thursday': '#6D466B',
