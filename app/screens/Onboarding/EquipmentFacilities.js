@@ -49,7 +49,8 @@ const EquipmentFacilities = ({ editMode }) => {
 
   const handleSubmit = async () => {
     if (editMode) {
-      dispatch(updateProfile({ userId: user_state.user.id, data: { equipment_and_facilities: selected.join(',') } }));
+      const new_arr = [...user_state.profile.equipment_and_facilities.split(','), ...selected];
+      dispatch(updateProfile({ userId: user_state.user.id, data: { equipment_and_facilities: new_arr.join(',') } }));
       navigation.goBack();
       return;
     } else {

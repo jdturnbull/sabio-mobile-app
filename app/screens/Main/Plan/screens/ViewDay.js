@@ -137,3 +137,5 @@ const ViewDay = () => {
 };
 
 export default ViewDay;
+
+// TODO NEXT: HOOK PROFILE CHANGES INTO PLAN

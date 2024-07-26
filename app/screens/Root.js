@@ -12,7 +12,7 @@ import RearrangeWeek from './RearrangeWeek';
 import { useNavigation } from '@react-navigation/native';
 import { setup, updateState } from '../stores/user/userSlice';
 import useActiveRoute from '../hooks/useActiveRoute';
-import NotificationSettings from './Main/NotificationSettings';
+import NotificationSettings from './NotificationSettings';
 import ManagePlan from './Main/ManagePlan';
 import Privacy from './Privacy';
 import SubscriptionModalContent from '../components/authed/SubscriptionModalContent';

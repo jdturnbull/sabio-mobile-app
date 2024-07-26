@@ -1,8 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { View, TouchableOpacity } from 'react-native';
-import ArrowLeft from '../../../assets/icons/24x/ArrowLeft';
+import { Switch } from 'react-native-paper';
+import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 
 const Container = styled.View`
   flex: 1;
@@ -28,6 +30,8 @@ const HeaderText = styled.Text`
 
 const NotificationSettings = () => {
     const navigation = useNavigation();
+
+    const user = useSelector((state) => state.user.user);
 
     const handleBack = () => {
         navigation.goBack();

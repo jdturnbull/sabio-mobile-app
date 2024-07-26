@@ -31,7 +31,7 @@ const ModalInnerContent = styled.View`
     background-color: ${(props) => props.theme.colors.background2};
     border-radius: 10px;
     padding: 20px;
-    shadow-color: ${(props) => props.theme.colors.background1};
+    shadow-color: #000;
     shadow-offset: 0px 0px;
     shadow-opacity: 0.2;
     shadow-radius: 3.84px;
