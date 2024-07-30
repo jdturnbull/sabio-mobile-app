@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { TouchableWithoutFeedback, Keyboard, View, TouchableOpacity } from 'react-native';
+import { TouchableWithoutFeedback, Keyboard, View, TouchableOpacity, Alert } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Title from '../../components/shared/Title';
 import CustomInput from '../../components/shared/CustomInput';
@@ -49,9 +49,24 @@ const EquipmentFacilities = ({ editMode }) => {
 
   const handleSubmit = async () => {
     if (editMode) {
-      const new_arr = [...user_state.profile.equipment_and_facilities.split(','), ...selected];
-      dispatch(updateProfile({ userId: user_state.user.id, data: { equipment_and_facilities: new_arr.join(',') } }));
-      navigation.goBack();
+      Alert.alert(
+        'Confirm',
+        'This may change your future activities',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Confirm',
+            onPress: () => {
+              dispatch(updateProfile({ userId: user_state.user.id, data: { equipment_and_facilities: selected.join(',') } }));
+              navigation.goBack();
+            },
+          },
+        ],
+        { cancelable: false }
+      );
       return;
     } else {
       dispatch(updateState({ profile: { ...state.profile, equipmentFacilities: selected } }));

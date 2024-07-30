@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Easing, View, Modal, Dimensions } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Easing, View, Modal, Dimensions, ActivityIndicator, Text } from 'react-native';
 import { withIAPContext } from 'react-native-iap';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,6 +16,8 @@ import NotificationSettings from './NotificationSettings';
 import ManagePlan from './Main/ManagePlan';
 import Privacy from './Privacy';
 import SubscriptionModalContent from '../components/authed/SubscriptionModalContent';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
+import call from '../utils/call';
 
 const MAIN_SCREENS = ['Slider', 'Account', 'Notifications', 'Reports', 'Feed', 'View'];
 
@@ -77,14 +79,71 @@ const Root = () => {
   const navigation = useNavigation();
   const user = useSelector((state) => state.user.user);
   const session = useSelector((state) => state.user.session);
+  const planIsUpdating = useSelector((state) => state.user.plan_updating);
+
+  const intervalRef = useRef(null);
 
   const route = useActiveRoute();
+
+  const opacity = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
 
   useEffect(() => {
     if (!user) {
       dispatch(setup('Root'));
     }
   }, [user]);
+
+  useEffect(() => {
+    if (planIsUpdating) {
+      opacity.value = withTiming(0.8, {
+        duration: 300,
+      });
+    } else {
+      opacity.value = withTiming(0, {
+        duration: 300,
+      });
+    }
+  }, [planIsUpdating]);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let updatedUser = await call('GET', `users/${user.id}`);
+
+        if (updatedUser?.should_replan) {
+          intervalRef.current = setInterval(async () => {
+            updatedUser = await call('GET', `users/${user.id}`);
+            if (!updatedUser?.should_replan) {
+              clearInterval(intervalRef.current);
+              dispatch(updateState({ plan_updating: false }));
+            }
+          }, 5000);
+        } else {
+          dispatch(updateState({ plan_updating: false }));
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    if (planIsUpdating) {
+      fetchData();
+
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
+    }
+  }, [planIsUpdating]);
+
 
 
   useEffect(() => {
@@ -128,8 +187,11 @@ const Root = () => {
       >
         <SubscriptionModalContent />
       </Modal>
+      {planIsUpdating && <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#000', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }, animatedStyle]}>
+        <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold', marginBottom: 20 }}>Sabio is analysing your changes</Text>
+        <ActivityIndicator color={'#fff'} />
+      </Animated.View>}
     </View>
-
   );
 };
 

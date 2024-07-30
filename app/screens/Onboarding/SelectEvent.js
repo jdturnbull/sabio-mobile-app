@@ -97,10 +97,10 @@ const SelectEvent = () => {
       )}
       {!loading && events.length > 0 && (
         <ScrollView style={{ marginTop: 0, height: '70%' }} showsVerticalScrollIndicator={false}>
+          <AddRaceButton style={{ marginBottom: 12 }} />
           {events.map((event) => (
             <EventItem key={event.id} event={event} onPress={handleResultPress} />
           ))}
-          {events.length < 4 && <AddRaceButton />}
         </ScrollView>
       )}
     </Container>

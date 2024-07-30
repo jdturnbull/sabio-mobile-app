@@ -83,7 +83,7 @@ const ActivityTitle = styled.Text`
   font-size: ${(props) => props.theme.text.size.md};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.md};
   font-weight: ${(props) => props.theme.text.weight.bold};
-  margin-left: 10px;
+  margin-left: 5px;
 `;
 
 const ActivityBodyText = styled.Text`
@@ -93,6 +93,8 @@ const ActivityBodyText = styled.Text`
   letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
   font-weight: ${(props) => props.theme.text.weight.regular};
 `;
+
+const EmojiText = styled.Text``;
 
 const ViewDay = () => {
   const route = useRoute();
@@ -110,7 +112,6 @@ const ViewDay = () => {
       </View>
       <SubHeader style={{ marginBottom: 20 }}>Activities for the day</SubHeader>
       {activities.map((activity, i) => {
-        const Icon = getIconFromActivity(activity.icon, true);
         return (
           <ActivityContainer key={activity.id}>
             <ActivityHeader color={DAY_COLOR_MAP[day]}>
@@ -123,7 +124,7 @@ const ViewDay = () => {
               <View style={{ marginLeft: 6, marginRight: 12, width: 2, backgroundColor: '#f8f8f810', height: '100%', borderRadius: 50 }} />
               <Right>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                  <Icon />
+                  <EmojiText>{activity.icon}</EmojiText>
                   <ActivityTitle>{activity.title}</ActivityTitle>
                 </View>
                 <ActivityBodyText>{activity.details}</ActivityBodyText>

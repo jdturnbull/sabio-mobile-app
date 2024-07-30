@@ -45,13 +45,13 @@ const IconInnerRing = styled.View`
   justify-content: center;
 `;
 
-const AddRaceButton = () => {
+const AddRaceButton = ({ style }) => {
   const navigation = useNavigation();
 
   const handlePress = () => navigation.navigate('AddRace');
 
   return (
-    <Container onPress={handlePress}>
+    <Container onPress={handlePress} style={style}>
       <Left>
         <IconOuterRing>
           <IconInnerRing>

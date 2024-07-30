@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import CustomDivider from '../../components/shared/CustomDivider';
 import { useDispatch } from 'react-redux';
 import { clearState, updateState } from '../../stores/onboarding/onboardingSlice';
+import SubHeader from '../../components/shared/SubHeader';
 
 const OPTIONS_LIST = [
   { label: 'Run a set distance', id: 'run_set_distance', Icon: Measure },
@@ -65,7 +66,8 @@ const GoalSelect = () => {
 
   return (
     <Container>
-      <Title>What is your goal?</Title>
+      <Title>What do you want to achieve?</Title>
+      <SubHeader style={{ marginBottom: 20 }}>Select an option or enter a custom goal</SubHeader>
       <ScrollView>
         <RaceEventOption onPress={handlePress} />
         <CustomGoalOption onPress={handlePress} />

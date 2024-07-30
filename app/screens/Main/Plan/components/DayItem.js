@@ -90,6 +90,8 @@ const ProgressBar = styled(Animated.View)`
     border-bottom-left-radius: 8px;
 `;
 
+const EmojiText = styled.Text``;
+
 const DayItem = ({ _day, handleSwipeRight, handleSwipeLeft }) => {
     const { activities, day } = _day;
     const navigation = useNavigation();
@@ -139,7 +141,7 @@ const DayItem = ({ _day, handleSwipeRight, handleSwipeLeft }) => {
         }
     };
 
-    const icons_and_titles = activities.map(activity => ({ Icon: getIconFromActivity(activity.icon, true), title: activity.title }));
+    const icons_and_titles = activities.map(activity => ({ icon: activity.icon, title: activity.title }));
 
     return (
         <Container onPress={handlePress} style={{ borderLeftColor: DAY_COLOR_MAP[day] }}>
@@ -150,9 +152,9 @@ const DayItem = ({ _day, handleSwipeRight, handleSwipeLeft }) => {
                 </CompleteTouchable>
             </Top>
             <Mid>
-                {icons_and_titles.map(({ Icon, title }) => (
+                {icons_and_titles.map(({ icon, title }) => (
                     <IconActivity key={title}>
-                        <Icon />
+                        <EmojiText>{icon}</EmojiText>
                         <ActivityTitle numberOfLines={1}>{title}</ActivityTitle>
                     </IconActivity>
                 ))}

@@ -118,7 +118,7 @@ const CustomGoal = () => {
         <Title style={{ marginBottom: 10 }}>Enter a custom goal</Title>
         <TouchableOpacity style={{ paddingBottom: 10, marginBottom: 30 }} onPress={() => setModalVisible(true)}>
           <SubHeader>
-            Help Sabio by using <HighlightText>S.M.A.R.T goals</HighlightText>
+            Help Sabio by using a <HighlightText>(i) S.M.A.R.T goal</HighlightText>
           </SubHeader>
         </TouchableOpacity>
         <CustomInput label={'Custom goal'} placeholder={'Your goal'} value={goal} setValue={setGoal} multiline={true} />

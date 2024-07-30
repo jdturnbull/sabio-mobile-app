@@ -217,6 +217,7 @@ export const userSlice = createSlice({
     profile: null,
     injuries: [],
     medications: [],
+    plan_updating: false,
     training_plans: [],
     chronic_conditions: [],
     preferences: [],
@@ -258,6 +259,7 @@ export const userSlice = createSlice({
     });
     builder.addCase(updateProfile.fulfilled, (state, action) => {
       Object.assign(state.profile, action.payload);
+      state.plan_updating = true;
     });
     builder.addCase(addNewPlan.fulfilled, (state, action) => {
       state.user = action.payload;
@@ -286,30 +288,48 @@ export const userSlice = createSlice({
     });
     builder.addCase(addInjury.fulfilled, (state, action) => {
       state.injuries.push(action.payload);
+      state.plan_updating = true;
     });
     builder.addCase(updateInjury.fulfilled, (state, action) => {
       state.injuries = state.injuries.filter(injury => injury.id !== action.payload.id);
       state.injuries.push(action.payload);
+      state.plan_updating = true;
+    });
+    builder.addCase(addPreference.fulfilled, (state, action) => {
+      state.preferences = state.preferences.filter(preference => preference.id !== action.payload.id);
+      state.preferences.push(action.payload);
+      state.plan_updating = true;
+    });
+    builder.addCase(updatePreference.fulfilled, (state, action) => {
+      state.preferences = state.preferences.filter(preference => preference.id !== action.payload.id);
+      state.preferences.push(action.payload);
+      state.plan_updating = true;
     });
     builder.addCase(addMedication.fulfilled, (state, action) => {
       state.medications.push(action.payload);
+      state.plan_updating = true;
     });
     builder.addCase(updateMedication.fulfilled, (state, action) => {
       state.medications = state.medications.filter(medication => medication.id !== action.payload.id);
       state.medications.push(action.payload);
+      state.plan_updating = true;
     });
     builder.addCase(updateChronicConditions.fulfilled, (state, action) => {
       state.chronic_conditions = action.payload;
+      state.plan_updating = true;
     });
     builder.addCase(updateSchedule.fulfilled, (state, action) => {
       state.schedules = state.schedules.filter(schedule => schedule.id !== action.payload.id);
       state.schedules.push(action.payload);
+      state.plan_updating = true;
     });
     builder.addCase(addSchedule.fulfilled, (state, action) => {
       state.schedules.push(action.payload);
+      state.plan_updating = true;
     });
     builder.addCase(updateActiveSchedule.fulfilled, (state, action) => {
       state.schedules = action.payload;
+      state.plan_updating = true;
     });
   },
 });

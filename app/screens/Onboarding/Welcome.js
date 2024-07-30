@@ -144,7 +144,7 @@ const Welcome = () => {
                 <Mascot source={wave_right} style={{ width: 220, height: 202 }} />
               </View>
               <View style={{ height: '60%', justifyContent: 'center' }}>
-                <Header>Your new fitness coach</Header>
+                <Header style={{ fontSize: 24 }}>Your new fitness coach</Header>
                 <SubHeader style={{ textAlign: 'center' }}>
                   Meet Sabio, your fitness coach powered by artificial intelligence
                 </SubHeader>
@@ -155,7 +155,7 @@ const Welcome = () => {
                 <Mascot source={existing} style={{ width: 220, height: 202 }} />
               </View>
               <View style={{ height: '60%', justifyContent: 'center' }}>
-                <Header>Completely focused on you</Header>
+                <Header style={{ fontSize: 24 }}>Completely focused on you</Header>
                 <SubHeader style={{ textAlign: 'center' }}>
                   Adaptable to injuries, preferences, illness and schedule limitations
                 </SubHeader>
@@ -166,7 +166,7 @@ const Welcome = () => {
                 <Mascot source={wave_left} style={{ width: 230, height: 202 }} />
               </View>
               <View style={{ height: '60%', justifyContent: 'center' }}>
-                <Header>Guided by your Strava</Header>
+                <Header style={{ fontSize: 24 }}>Guided by your Strava</Header>
                 <SubHeader style={{ textAlign: 'center' }}>
                   Enrich Sabio with your data by connecting with Strava
                 </SubHeader>
@@ -177,7 +177,7 @@ const Welcome = () => {
                 <Mascot source={slight_side_eye} style={{ width: 220, height: 202 }} />
               </View>
               <View style={{ height: '60%', justifyContent: 'center' }}>
-                <Header>At a 10th of the price</Header>
+                <Header style={{ fontSize: 24 }}>Free to use</Header>
                 <SubHeader style={{ textAlign: 'center' }}>
                   Our mission is to make intelligent coaching available to everyone
                 </SubHeader>

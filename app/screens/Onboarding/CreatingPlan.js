@@ -7,6 +7,7 @@ import { setup } from '../../stores/user/userSlice';
 import mascot from '../../assets/mascot/wave_right.png';
 import { useNavigation } from '@react-navigation/native';
 import call from '../../utils/call';
+import SubHeader from '../../components/shared/SubHeader';
 
 const guidance = [
   'Connect Strava to enhance Sabio',
@@ -212,6 +213,7 @@ const CreatingPlan = () => {
     <Container>
       <Image source={mascot} style={{ width: 220, height: 202 }} />
       <PercentageLabel>Building your plan</PercentageLabel>
+      <SubHeader style={{ marginTop: 10 }}>This may take a few minutes</SubHeader>
       <ProgressBarContainer>
         <ProgressBarInner style={animatedStyle} />
       </ProgressBarContainer>

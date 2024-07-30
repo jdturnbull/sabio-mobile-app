@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ScrollView, TouchableOpacity, View, TextInput } from "react-native";
+import { ScrollView, TouchableOpacity, View, TextInput, Alert } from "react-native";
 import styled from 'styled-components';
 import EditableOption from "../components/EditableOption";
 import { useDispatch, useSelector } from "react-redux";
@@ -81,21 +81,70 @@ const Preferences = () => {
     };
 
     const handlePreferenceSubmit = () => {
-        dispatch(addPreference({ userId: user.id, preference: newPreference }));
-        setNewPreference("");
-        setShowInput(false);
+        console.log('here')
+        Alert.alert(
+            'Confirm',
+            'This may change your future activities',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Confirm',
+                    onPress: () => {
+                        dispatch(addPreference({ userId: user.id, preference: newPreference }));
+                        setNewPreference("");
+                        setShowInput(false);
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
     }
 
     const handleArchive = (preferenceId) => {
-        dispatch(updatePreference({ preferenceId, data: { status: "ARCHIVED" } }));
-        setPreferences(preferences.filter(preference => preference.id !== preferenceId));
-        setArchivedPreferences([...archivedPreferences, _preferences.find(preference => preference.id === preferenceId)]);
+        Alert.alert(
+            'Confirm',
+            'This will archive the preference and may change your plan',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Confirm',
+                    onPress: () => {
+                        dispatch(updatePreference({ preferenceId, data: { status: "ARCHIVED" } }));
+                        setPreferences(preferences.filter(preference => preference.id !== preferenceId));
+                        setArchivedPreferences([...archivedPreferences, _preferences.find(preference => preference.id === preferenceId)]);
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
     }
 
     const handleRestore = (preferenceId) => {
-        dispatch(updatePreference({ preferenceId, data: { status: "ACTIVE" } }));
-        setArchivedPreferences(archivedPreferences.filter(preference => preference.id !== preferenceId));
-        setPreferences([...preferences, _preferences.find(preference => preference.id === preferenceId)]);
+        Alert.alert(
+            'Confirm',
+            'This will restore the preference and may change your plan',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Confirm',
+                    onPress: () => {
+                        dispatch(updatePreference({ preferenceId, data: { status: "ACTIVE" } }));
+                        setArchivedPreferences(archivedPreferences.filter(preference => preference.id !== preferenceId));
+                        setPreferences([...preferences, _preferences.find(preference => preference.id === preferenceId)]);
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
     }
 
     return (
@@ -118,7 +167,7 @@ const Preferences = () => {
                 ) : (
                     <NewButtonText>Add new</NewButtonText>
                 )}
-                {showInput ? <Return /> : <Add />}
+                {showInput ? <Return color={'#999'} /> : <Add color={'#f8f8f8'} />}
             </NewButton>
             <Scrollable>
                 {preferences.map((preference, i) => <EditableOption key={i} item={preference} label={preference.description} handleSwipe={handleArchive} />)}

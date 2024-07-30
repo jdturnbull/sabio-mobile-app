@@ -13,7 +13,6 @@ const navigationMap = {
   'Equipment and facilities': 'EquipmentAndFacilities',
   'Current ability': 'PastExperience',
   'Injuries': 'Injuries',
-  'Medications': 'Medications',
   'Chronic conditions': 'ChronicIllness',
   'Training preferences': 'Preferences',
   'Training schedules': 'Schedules',
@@ -65,7 +64,6 @@ const View = () => {
         <OptionBox label={'Equipment and facilities'} onPress={handlePress} value={''} />
         <OptionBox label={'Current ability'} onPress={handlePress} value={''} />
         <OptionBox label={'Injuries'} onPress={handlePress} value={''} />
-        <OptionBox label={'Medications'} onPress={handlePress} value={''} />
         <OptionBox label={'Chronic conditions'} onPress={handlePress} value={''} />
         <OptionBox label={'Training preferences'} onPress={handlePress} value={''} />
         <OptionBox label={'Training schedules'} onPress={handlePress} value={''} />

@@ -111,8 +111,24 @@ const RateAbility = ({ editMode }) => {
     }
 
     if (editMode) {
-      dispatch(updateProfile({ userId: user_state.user.id, data: { past_experience: OPTIONS.find((opt) => opt.label === selected).body } }));
-      navigation.goBack();
+      Alert.alert(
+        'Confirm',
+        'This may change your future activities',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Confirm',
+            onPress: () => {
+              dispatch(updateProfile({ userId: user_state.user.id, data: { past_experience: OPTIONS.find((opt) => opt.label === selected).body } }));
+              navigation.goBack();
+            },
+          },
+        ],
+        { cancelable: false }
+      );
       return;
     } else {
       dispatch(updateState({ profile: { ...state.profile, ability: selected } }));
