@@ -52,7 +52,7 @@ const ConnectStrava = () => {
         if (connected) {
             return;
         }
-        if (user.subscription_status !== 'SUBSCRIBED') {
+        if (user?.subscription_status !== 'SUBSCRIBED') {
             dispatch(updateState({ showSubscribeModal: true }));
         } else {
             try {

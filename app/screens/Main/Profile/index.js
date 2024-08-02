@@ -5,7 +5,7 @@ import { useNavigationState } from '@react-navigation/native';
 import View from './screens/View';
 import EquipmentAndFacilities from '../../Onboarding/EquipmentFacilities';
 import PastExperience from '../../Onboarding/RateAbility';
-import Injuries from './screens/Injuries';
+import Injury from './screens/Injury';
 import ChronicIllness from '../../Onboarding/ChronicIllness';
 import Preferences from './screens/Preferences';
 import Schedules from './screens/Schedules';
@@ -45,7 +45,7 @@ const Profile = () => {
           {(props) => <PastExperience {...props} editMode={true} />}
         </ProfileStack.Screen>
         <ProfileStack.Screen name="Injuries">
-          {(props) => <Injuries {...props} editMode={true} />}
+          {(props) => <Injury {...props} editMode={true} />}
         </ProfileStack.Screen>
         <ProfileStack.Screen name="ChronicIllness">
           {(props) => <ChronicIllness {...props} editMode={true} />}

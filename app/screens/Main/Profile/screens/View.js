@@ -12,7 +12,7 @@ import { updateState } from '../../../../stores/user/userSlice';
 const navigationMap = {
   'Equipment and facilities': 'EquipmentAndFacilities',
   'Current ability': 'PastExperience',
-  'Injuries': 'Injuries',
+  'Report an injury': 'Injuries',
   'Chronic conditions': 'ChronicIllness',
   'Training preferences': 'Preferences',
   'Training schedules': 'Schedules',
@@ -40,7 +40,7 @@ const View = () => {
   const user = useSelector((state) => state.user.user);
 
   const handlePress = (label) => {
-    if (user.subscription_status === 'UNSUBSCRIBED') {
+    if (user?.subscription_status === 'UNSUBSCRIBED') {
       dispatch(updateState({ showSubscribeModal: true }))
       return;
     }
@@ -56,14 +56,14 @@ const View = () => {
   return (
     <Container>
       <Top>
-        {user.subscription_status === 'UNSUBSCRIBED' && <Premium />}
+        {user?.subscription_status === 'UNSUBSCRIBED' && <Premium />}
         <Title style={{ marginBottom: 2, marginLeft: 10 }}>Profile Information</Title>
       </Top>
       <SubHeader>Update information to customise your plan</SubHeader>
       <OptionsContainer>
         <OptionBox label={'Equipment and facilities'} onPress={handlePress} value={''} />
         <OptionBox label={'Current ability'} onPress={handlePress} value={''} />
-        <OptionBox label={'Injuries'} onPress={handlePress} value={''} />
+        <OptionBox label={'Report an injury'} onPress={handlePress} value={''} />
         <OptionBox label={'Chronic conditions'} onPress={handlePress} value={''} />
         <OptionBox label={'Training preferences'} onPress={handlePress} value={''} />
         <OptionBox label={'Training schedules'} onPress={handlePress} value={''} />

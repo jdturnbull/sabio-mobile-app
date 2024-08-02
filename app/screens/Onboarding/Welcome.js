@@ -124,6 +124,8 @@ const Welcome = () => {
         navigation.navigate('GoalSelect');
       } else if (user.onboarding_status === 'COMPLETE') {
         navigation.navigate('Main');
+      } else if (user.onboarding_status === 'GENERATING_REHAB_PLAN') {
+        navigation.navigate('CreatingPlan');
       }
     }
   }, [user]);

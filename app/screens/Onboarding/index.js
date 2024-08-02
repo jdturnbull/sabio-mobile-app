@@ -23,7 +23,6 @@ import WhenTrain from './WhenTrain';
 import LongerActivityDay from './LongerActivityDay';
 import WhenStart from './WhenStart';
 import WhichUnits from './WhichUnits';
-import CurrentInjuries from './CurrentInjuries';
 import ChronicIllness from './ChronicIllness';
 import EquipmentFacilities from './EquipmentFacilities';
 import CreatingPlan from './CreatingPlan';
@@ -42,9 +41,11 @@ const Onboarding = () => {
         navigation.navigate('GoalSelect');
         return;
       }
+
+      // If we get here then the onboarding_status is being used to indicate a plan step change
+      navigation.navigate('CreatingPlan');
     }
-    // If we get here then the onboarding_status is being used to indicate a plan step change
-    navigation.navigate('CreatingPlan');
+
   }, []);
 
   return (
@@ -74,7 +75,6 @@ const Onboarding = () => {
         <OnboardingStack.Screen name="LongerActivityDay" component={LongerActivityDay} />
         <OnboardingStack.Screen name="WhenStart" component={WhenStart} />
         <OnboardingStack.Screen name="WhichUnits" component={WhichUnits} />
-        <OnboardingStack.Screen name="CurrentInjuries" component={CurrentInjuries} />
         <OnboardingStack.Screen name="ChronicIllness" component={ChronicIllness} />
         <OnboardingStack.Screen name="EquipmentFacilities" component={EquipmentFacilities} />
         <OnboardingStack.Screen name="CreatingPlan" component={CreatingPlan} />

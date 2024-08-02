@@ -35,7 +35,7 @@ const WhichUnits = () => {
     }
 
     dispatch(updateState({ profile: { ...state.profile, preferredUnit: selected } }));
-    navigation.navigate('CurrentInjuries');
+    navigation.navigate('ChronicIllness');
   };
   return (
     <Container>

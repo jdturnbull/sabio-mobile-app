@@ -138,6 +138,9 @@ const CreatingPlan = () => {
       case 'RESETTING_PLAN':
         progressValue = 0;
         break;
+      case 'GENERATING_REHAB_PLAN':
+        progressValue = 0;
+        break;
       case 'ANALYSING_DATA':
         progressValue = 25;
         break;

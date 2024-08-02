@@ -38,26 +38,42 @@ const ChronicIllness = ({ editMode }) => {
     }
   }) || [];
 
-  const [selected, setSelected] = useState(pre_selected || []);
+  const initialDetails = existing_conditions?.reduce((acc, condition) => {
+    if (OPTIONS.includes(condition.name)) {
+      acc[condition.name] = condition.details;
+    }
+    return acc;
+  }, {}) || {};
 
-  const [details, setDetails] = useState('');
+  const [selected, setSelected] = useState(pre_selected || []);
+  const [details, setDetails] = useState(initialDetails);
 
   const handleSubmit = async () => {
+    const chronicConditions = selected.map((condition) => ({
+      name: condition,
+      details: details[condition] || '',
+    }));
+
     if (editMode) {
-      dispatch(updateChronicConditions({ userId: user_state.user.id, chronic_conditions: selected, details }));
+      dispatch(updateChronicConditions({ userId: user_state.user.id, chronic_conditions: chronicConditions }));
       navigation.goBack();
       return;
     }
-    dispatch(updateState({ profile: { ...state.profile, chronicConditions: { conditions: selected, details } } }));
+    dispatch(updateState({ profile: { ...state.profile, chronicConditions } }));
     navigation.navigate('EquipmentFacilities');
   };
 
   const handleSelect = (opt) => {
     if (selected.includes(opt)) {
       setSelected([...selected.filter((s) => s !== opt)]);
+      setDetails({ ...details, [opt]: '' });
     } else {
       setSelected([...selected, opt]);
     }
+  };
+
+  const handleDetailChange = (opt, value) => {
+    setDetails({ ...details, [opt]: value });
   };
 
   return (
@@ -74,15 +90,19 @@ const ChronicIllness = ({ editMode }) => {
           </View>
           <OptionsContainer>
             {OPTIONS.map((opt) => (
-              <SelectableItem key={opt} onPress={handleSelect} label={opt} selected={selected.includes(opt)} />
+              <View key={opt}>
+                <SelectableItem onPress={() => handleSelect(opt)} label={opt} selected={selected.includes(opt)} />
+                {selected.includes(opt) && (
+                  <CustomInput
+                    label={`Details for ${opt}`}
+                    placeholder={`Enter details for ${opt}`}
+                    value={details[opt] || ''}
+                    setValue={(value) => handleDetailChange(opt, value)}
+                  />
+                )}
+              </View>
             ))}
           </OptionsContainer>
-          <CustomInput
-            label={'Optional information'}
-            placeholder={'Example: Arthritis location'}
-            value={details}
-            setValue={setDetails}
-          />
           <View style={{ flex: 1 }} />
           <NextButton editMode={editMode} onPress={handleSubmit} style={{ marginBottom: editMode ? 0 : 20 }} />
         </Container>

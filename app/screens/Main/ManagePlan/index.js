@@ -4,12 +4,8 @@ import { View, TouchableOpacity, ScrollView, Modal, Text, ActivityIndicator } fr
 import { useNavigation } from '@react-navigation/native';
 import ArrowLeft from '../../../assets/icons/24x/ArrowLeft';
 import OptionBox from '../../../components/authed/OptionBox';
-import Clock from '../../../assets/icons/24x/Clock';
-import Repeat from '../../../assets/icons/24x/Repeat';
 import AddOutlined from '../../../assets/icons/24x/AddOutlined';
-import DateInput from '../../../components/shared/DateInput';
 import { useDispatch, useSelector } from 'react-redux';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import NewPlanConfirm from './components/NewPlanConfirm';
 import TrainingPlanCard from './components/TrainingPlanCard';
 import { activatePlan, updateState } from '../../../stores/user/userSlice';
@@ -72,7 +68,7 @@ const ManagePlan = () => {
     }
 
     const handleActivate = (planId) => {
-        if (user.subscription_status === 'SUBSCRIBED') {
+        if (user?.subscription_status === 'SUBSCRIBED') {
             setLoading(true);
             setModalVisible(false);
             setTimeout(() => {

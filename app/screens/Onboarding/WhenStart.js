@@ -144,7 +144,7 @@ const WhenStart = () => {
     dispatch(updateState({ profile: { ...state.profile, startDate: date } }));
 
     if (state.race?.unit) {
-      navigation.navigate('CurrentInjuries');
+      navigation.navigate('ChronicIllness');
     } else {
       navigation.navigate('WhichUnits');
     }

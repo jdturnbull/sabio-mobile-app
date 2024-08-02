@@ -207,6 +207,16 @@ export const updateActiveSchedule = createAsyncThunk('users/updateActiveSchedule
   }
 });
 
+export const createRehabPlan = createAsyncThunk('users/createRehabPlan', async ({ userId, description, location }) => {
+  try {
+    const response = await call('POST', 'users/createRehabPlan', { userId, description, location });
+
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 
 export const userSlice = createSlice({
   name: 'user',
@@ -330,6 +340,19 @@ export const userSlice = createSlice({
     builder.addCase(updateActiveSchedule.fulfilled, (state, action) => {
       state.schedules = action.payload;
       state.plan_updating = true;
+    });
+    builder.addCase(createRehabPlan.fulfilled, (state, action) => {
+      state.user = action.payload.user
+      state.profile = null;
+      state.injuries = [];
+      state.medications = [];
+      state.training_plans = [];
+      state.chronic_conditions = [];
+      state.preferences = [];
+      state.schedules = [];
+      state.progress_reports = [];
+      state.conversations = [];
+      state.connections = [];
     });
   },
 });

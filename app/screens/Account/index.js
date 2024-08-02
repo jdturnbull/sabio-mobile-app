@@ -55,8 +55,8 @@ const Account = () => {
   const [hideSetNotif, setHideSetNotif] = useState(user?.notifications_enabled && user?.notification_settings?.hide_prompt);
 
   useEffect(() => {
-    if (user) setHideSetNotif(user.notifications_enabled || user.notification_settings?.hide_prompt);
-    if (user) setHideSubscribe(user.subscription_status === 'SUBSCRIBED');
+    if (user) setHideSetNotif(user?.notifications_enabled || user?.notification_settings?.hide_prompt);
+    if (user) setHideSubscribe(user?.subscription_status === 'SUBSCRIBED');
   }, [user, connections])
 
   const handleOptionPress = (opt) => {
