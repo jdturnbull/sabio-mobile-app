@@ -8,7 +8,6 @@ import PastExperience from '../../Onboarding/RateAbility';
 import Injury from './screens/Injury';
 import ChronicIllness from '../../Onboarding/ChronicIllness';
 import Preferences from './screens/Preferences';
-import Schedules from './screens/Schedules';
 
 const Container = styled.View`
   flex: 1;
@@ -52,9 +51,6 @@ const Profile = () => {
         </ProfileStack.Screen>
         <ProfileStack.Screen name="Preferences">
           {(props) => <Preferences {...props} editMode={true} />}
-        </ProfileStack.Screen>
-        <ProfileStack.Screen name="Schedules">
-          {(props) => <Schedules {...props} editMode={true} />}
         </ProfileStack.Screen>
       </ProfileStack.Navigator>
     </Container>

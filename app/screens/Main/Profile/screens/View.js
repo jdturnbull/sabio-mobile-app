@@ -15,7 +15,6 @@ const navigationMap = {
   'Report an injury': 'Injuries',
   'Chronic conditions': 'ChronicIllness',
   'Training preferences': 'Preferences',
-  'Training schedules': 'Schedules',
 };
 
 const Container = styled(ScrollView)`
@@ -66,7 +65,6 @@ const View = () => {
         <OptionBox label={'Report an injury'} onPress={handlePress} value={''} />
         <OptionBox label={'Chronic conditions'} onPress={handlePress} value={''} />
         <OptionBox label={'Training preferences'} onPress={handlePress} value={''} />
-        <OptionBox label={'Training schedules'} onPress={handlePress} value={''} />
       </OptionsContainer>
     </Container>
   );

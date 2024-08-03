@@ -103,7 +103,11 @@ const Top = () => {
                             <ModalContent>
                                 <ModalInput
                                     value={newUsername}
-                                    onChangeText={setNewUsername}
+                                    onChangeText={(text) => {
+                                        if (text.length <= 30) {
+                                            setNewUsername(text);
+                                        }
+                                    }}
                                     placeholder="Enter new username"
                                     placeholderTextColor="#888"
                                 />
