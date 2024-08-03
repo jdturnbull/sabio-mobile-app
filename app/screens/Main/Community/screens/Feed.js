@@ -5,15 +5,17 @@ import { ScrollView, RefreshControl, View } from 'react-native';
 import call from '../../../../utils/call';
 import Post from '../components/Post';
 import { useSelector } from 'react-redux';
+import Title from '../../../../components/shared/Title';
+import SubHeader from '../../../../components/shared/SubHeader';
 
 const Container = styled.View`
   flex: 1;
   background-color: #16171b;
+  padding: 20px;
 `;
 
 const Scrollable = styled(ScrollView)`
   flex: 1;
-  padding: 20px;
 `;
 
 const Feed = () => {
@@ -63,6 +65,8 @@ const Feed = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={'#fff'} />
         }
       >
+        <Title style={{ marginBottom: 10 }}>Social Feed</Title>
+        <SubHeader style={{ marginBottom: 20 }}>Encourage the community by double tapping posts you like!</SubHeader>
         {posts.map((post, index) => (
           <Post key={index} post={post} userId={user.id} username={user.username} />
         ))}

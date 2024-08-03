@@ -9,6 +9,7 @@ const Container = styled(TouchableOpacity)`
   height: 45px;
   border-radius: 8px;
   background-color: ${(props) => props.theme.colors.white};
+  margin-bottom: 10px;
 `;
 
 const Text = styled.Text`
@@ -16,6 +17,7 @@ const Text = styled.Text`
   letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
   font-weight: ${(props) => props.theme.text.weight.bold};
   font-size: ${(props) => props.theme.text.size.sm};
+
 `;
 
 const NextButton = ({ style, onPress, editMode, text }) => {

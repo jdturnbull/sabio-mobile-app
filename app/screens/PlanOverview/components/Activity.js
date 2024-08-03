@@ -1,7 +1,7 @@
 import React from "react";
+import { Text } from "react-native";
 import styled from "styled-components";
 import moment from 'moment';
-import getIconFromActivity from "../../../utils/getIconFromActivity";
 
 const DAY_COLOR_MAP = {
     'Monday': '#885A89',
@@ -43,8 +43,6 @@ const TitleText = styled.Text`
 
 const Activity = ({ activity }) => {
 
-    const Icon = getIconFromActivity(activity.icon, true);
-
     const complete = activity.status === 'COMPLETE';
 
     const day = moment(activity.date).format('dddd');
@@ -55,7 +53,7 @@ const Activity = ({ activity }) => {
                 <CompletedIndicator complete={complete} color={DAY_COLOR_MAP[day]} />
             </Left>
             <Right>
-                <Icon color={complete ? '#f8f8f8' : '#f8f8f840'} />
+                <Text>{activity.icon}</Text>
                 <TitleText complete={complete}>{activity.title}</TitleText>
             </Right>
         </Container>

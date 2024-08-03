@@ -6,6 +6,8 @@ import Avatar from '../../../../assets/icons/24x/Account';
 import BodyText from "../../../../components/shared/BodyText";
 import Like from '../../../../assets/icons/18x/Like';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { hapticImpact } from "../../../../utils/haptics";
+import call from "../../../../utils/call";
 
 const Container = styled.View`
     background-color: ${(props) => props.theme.colors.background2};
@@ -54,8 +56,8 @@ const TitleText = styled.Text`
 `;
 
 const Post = ({ post, userId, username }) => {
-    const [liked, setLiked] = useState(post.likes.split(',').includes(userId));
-    const [likeCount, setLikeCount] = useState(post.likes.split(',').length - 1);
+    const [liked, setLiked] = useState(post.likes.split(',').includes(userId.toString()));
+    const [likeCount, setLikeCount] = useState(post.likes.split(',').filter((d) => !!d).length);
 
     const time = moment(post.created_at).fromNow();
     let lastTap = null;
@@ -68,20 +70,21 @@ const Post = ({ post, userId, username }) => {
         };
     });
 
-    const handleLike = () => {
-        if (liked) {
-            setLikeCount(likeCount - 1);
-        } else {
+    const handleLike = async () => {
+        if (!liked) {
+            setLiked(true);
+            hapticImpact();
             setLikeCount(likeCount + 1);
-        }
-        setLiked(!liked);
 
-        scale.value = withSpring(1.5, {}, () => {
-            scale.value = withSpring(1);
-        });
+            scale.value = withSpring(1.5, {}, () => {
+                scale.value = withSpring(1);
+            });
+
+            await call('POST', 'users/addLike', { postId: post.id, userId: userId });
+        }
     }
 
-    const handleDoubleTap = () => {
+    const handleDoubleTap = async () => {
         const now = Date.now();
         if (lastTap && (now - lastTap) < 300) {
             handleLike();

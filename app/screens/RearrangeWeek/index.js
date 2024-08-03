@@ -63,8 +63,8 @@ const DayText = styled.Text`
 const ItemContainer = styled(Animated.View)`
     flex: 1;
     height: 87px;
-    border: 2px dashed ${(props) => props.color ? 'transparent' : props.theme.colors.borderHighlight};
-    background-color: ${(props) => props.color ? props.theme.colors.borderHighlight : 'transparent'};
+    border: 2px dashed ${(props) => props.color ? 'transparent' : props.theme.colors.background3};
+    background-color: ${(props) => props.color ? props.theme.colors.background3 : 'transparent'};
     border-radius: 8px;
     padding: 5px;
     margin-bottom: 5px;
@@ -79,6 +79,8 @@ const ActivityContainer = styled.View`
 const ActivityText = styled.Text`
     font-family: ${(props) => props.theme.text.family};
     font-size: ${(props) => props.theme.text.size.sm};
+    font-weight: ${(props) => props.theme.text.weight.bold};
+    letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
     color: ${(props) => props.theme.text.colors.white};
     margin-left: 5px;
 `;
@@ -240,10 +242,9 @@ const RearrangeWeek = ({ navigation, route }) => {
                                 <Animated.View style={animatedStyle}>
                                     <ItemContainer color={item.activities.length > 0 ? DAY_COLOR_MAP[item.day] : null}>
                                         {item.activities.map((activity, index) => {
-                                            const Icon = getIconFromActivity(activity.icon, true);
                                             return (
                                                 <ActivityContainer key={index}>
-                                                    <Icon />
+                                                    <Text>{activity.icon}</Text>
                                                     <ActivityText>{activity.title}</ActivityText>
                                                 </ActivityContainer>
                                             )

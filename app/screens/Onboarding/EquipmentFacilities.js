@@ -104,7 +104,8 @@ const EquipmentFacilities = ({ editMode }) => {
           <SelectableItem key={opt} onPress={handleSelect} label={opt} selected={selected.includes(opt)} />
         ))}
       </OptionsContainer>
-      <NextButton onPress={handleSubmit} editMode={editMode} style={{ marginBottom: 60 }} />
+      <View style={{ marginTop: 20, flex: 1 }} />
+      <NextButton onPress={handleSubmit} editMode={editMode} style={{ marginBottom: 40 }} />
     </Container>
   );
 };

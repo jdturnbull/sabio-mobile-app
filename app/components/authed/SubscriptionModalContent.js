@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Dimensions, ScrollView, View, Text, TouchableOpacity } from "react-native";
+import { Dimensions, ScrollView, View, Text, TouchableOpacity, Alert } from "react-native";
 import PremiumLarge from '../../assets/icons/48x/Premium';
 import Close from '../../assets/icons/24x/Clear';
 import Tick from '../../assets/icons/24x/TickOutline';
@@ -13,8 +13,8 @@ import {
     purchaseUpdatedListener,
     useIAP,
 } from 'react-native-iap';
-import { useDispatch } from "react-redux";
-import { updateState } from "../../stores/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { update, updateState } from "../../stores/user/userSlice";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
@@ -115,9 +115,14 @@ const BulletPoint = ({ text }) => {
 
 const SubscriptionModalContent = () => {
     const dispatch = useDispatch();
+    const user = useSelector((state) => state.user.user);
     const [selectedOption, setSelectedOption] = useState('Annual');
 
     const handleSubscribe = async () => {
+        dispatch(update({ userId: user.id, data: { subscription_status: "SUBSCRIBED" } }))
+        setTimeout(() => {
+            Alert.alert('Reload the app & you will be subscribed')
+        }, 1000)
     };
 
     const handleGesture = (event) => {
@@ -132,6 +137,7 @@ const SubscriptionModalContent = () => {
                 <ModalContent>
                     <ModalInnerContent>
                         <View style={{ width: '100%', alignItems: 'flex-end' }}>
+                            <Text style={{ color: 'red' }}>DEVELOPMENT MODE: JUST PRESS SUBSCRIBE AND IT WILL GO THROUGH WITHOUT CHARGE</Text>
                             <TouchableOpacity onPress={() => dispatch(updateState({ showSubscribeModal: false }))}>
                                 <Close />
                             </TouchableOpacity>
