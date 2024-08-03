@@ -154,10 +154,6 @@ const Root = () => {
       navigation.navigate('Main', { screen: 'Plan', params: { screen: 'Slider' } });
       return;
     }
-    if (user && user.onboarding_status !== 'COMPLETE' && user.onboarding_status !== 'NOT_STARTED') {
-      navigation.navigate('Onboarding', { screen: 'CreatingPlan' });
-      return;
-    }
     if (user && user.onboarding_status !== 'COMPLETE') {
       navigation.navigate('Onboarding');
     }
