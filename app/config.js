@@ -3,7 +3,7 @@ const CONFIG_DEV = {
 };
 
 const CONFIG_PROD = {
-  API_BASE: 'https://api.heysabio.com',
+  API_BASE: 'https://v2api.heysabio.com',
 };
 
 const CONFIG_NGROK = {
