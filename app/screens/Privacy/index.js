@@ -43,12 +43,20 @@ const Privacy = () => {
     const navigation = useNavigation();
     const user = useSelector((state) => state.user.user);
 
+    const [isProcessing, setIsProcessing] = useState(false);
+
     const [postAchievementsToSocial, setPostAchievementsToSocial] = useState(user.privacy_settings.post_achievements_to_social);
     const [postActivitiesToSocial, setPostActivitiesToSocial] = useState(user.privacy_settings.post_activities_to_social);
     const [postStreaksToSocial, setPostStreaksToSocial] = useState(user.privacy_settings.post_streaks_to_social);
 
     const handleBack = () => {
-        navigation.goBack();
+        if (!isProcessing) {
+            setIsProcessing(true);
+            navigation.goBack();
+            setTimeout(() => {
+                setIsProcessing(false);
+            }, 500);
+        }
     };
 
     const handleAchievementsChange = () => {
@@ -84,13 +92,13 @@ const Privacy = () => {
     return (
         <Container>
             <Header>
-                <TouchableOpacity onPress={handleBack} style={{ width: 80 }}>
+                <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}>
                     <ArrowLeft />
                 </TouchableOpacity>
                 <View
                     style={{
                         flex: 1,
-                        marginRight: 80,
+                        marginRight: 32,
                         alignItems: 'center',
                         textAlign: 'center'
                     }}>

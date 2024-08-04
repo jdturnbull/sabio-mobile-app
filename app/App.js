@@ -12,7 +12,6 @@ import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import { Provider, useDispatch } from 'react-redux';
 import { ActiveRouteProvider } from './hooks/useActiveRoute';
 import store from './stores/store';
-import { useSelector } from 'react-redux';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { OverlayPortal } from './components/shared/Overlay';
 import { createDatabase } from './data/database';

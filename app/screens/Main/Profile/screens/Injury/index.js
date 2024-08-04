@@ -20,8 +20,6 @@ const Container = styled.View`
     padding: 20px;
 `;
 
-const STAGES = ['START', 'LOCATION', 'CHECKED_BY_PROFFESSIONAL', 'RANGE_OF_MOTION', 'LOCKED_FEELING', 'DECISION'];
-
 const Injuries = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
@@ -33,6 +31,18 @@ const Injuries = () => {
     const [checkedByProfessional, setCheckedByProfessional] = useState(false);
     const [hasFullRangeOfMotion, setHasFullRangeOfMotion] = useState(false);
     const [hasLockedFeeling, setHasLockedFeeling] = useState(false);
+
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    const handleBack = () => {
+        if (!isProcessing) {
+            setIsProcessing(true);
+            navigation.goBack();
+            setTimeout(() => {
+                setIsProcessing(false);
+            }, 500);
+        }
+    };
 
     const handleNextStage = (value) => {
         if (stage === 'START') setStage('LOCATION');
@@ -65,7 +75,7 @@ const Injuries = () => {
     return (
         <Container>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                <TouchableOpacity onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>
+                <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}><ArrowLeft /></TouchableOpacity>
                 <Title style={{ marginBottom: 0, marginLeft: 10 }}>Report an injury</Title>
             </View>
             <Animated.View style={[{ width: '100%', flex: 1 }, animatedStyle]}>

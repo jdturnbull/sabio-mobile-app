@@ -25,6 +25,7 @@ import WhenStart from './WhenStart';
 import WhichUnits from './WhichUnits';
 import ChronicIllness from './ChronicIllness';
 import EquipmentFacilities from './EquipmentFacilities';
+import RequestNotifications from './RequestNotifications';
 import CreatingPlan from './CreatingPlan';
 
 const OnboardingStack = createStackNavigator();
@@ -77,6 +78,7 @@ const Onboarding = () => {
         <OnboardingStack.Screen name="WhichUnits" component={WhichUnits} />
         <OnboardingStack.Screen name="ChronicIllness" component={ChronicIllness} />
         <OnboardingStack.Screen name="EquipmentFacilities" component={EquipmentFacilities} />
+        <OnboardingStack.Screen name="RequestNotifications" component={RequestNotifications} />
         <OnboardingStack.Screen name="CreatingPlan" component={CreatingPlan} />
       </OnboardingStack.Navigator>
     </View>

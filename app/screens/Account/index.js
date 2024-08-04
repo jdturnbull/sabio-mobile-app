@@ -47,7 +47,17 @@ const Account = () => {
 
   const connections = useSelector((state) => state.user.connections);
 
-  const handleBack = () => navigation.goBack();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleBack = () => {
+    if (!isProcessing) {
+      setIsProcessing(true);
+      navigation.goBack();
+      setTimeout(() => {
+        setIsProcessing(false);
+      }, 500);
+    }
+  };
 
   const user = useSelector((state) => state.user.user);
 

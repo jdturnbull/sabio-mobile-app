@@ -103,6 +103,7 @@ const RearrangeWeek = ({ navigation, route }) => {
     const { week } = route.params;
 
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const computeActivitiesIntoDays = (activities) => {
         let response = [
@@ -163,7 +164,13 @@ const RearrangeWeek = ({ navigation, route }) => {
     };
 
     const handleBack = () => {
-        navigation.goBack();
+        if (!isProcessing) {
+            setIsProcessing(true);
+            navigation.goBack();
+            setTimeout(() => {
+                setIsProcessing(false);
+            }, 500);
+        }
     }
 
     const handleUpdate = async () => {
@@ -204,8 +211,8 @@ const RearrangeWeek = ({ navigation, route }) => {
     return (
         <Container>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                <TouchableOpacity onPress={handleBack}><ArrowLeft /></TouchableOpacity>
-                <Title style={{ marginBottom: 0, marginLeft: 10, flex: 1 }}>Rearrange Week {1}</Title>
+                <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}><ArrowLeft /></TouchableOpacity>
+                <Title style={{ marginBottom: 0, marginLeft: 10, flex: 1 }}>Rearrange Week {week.week}</Title>
                 <UpdateTouchable onPress={handleUpdate}>
                     <UpdateText>Save</UpdateText>
                 </UpdateTouchable>

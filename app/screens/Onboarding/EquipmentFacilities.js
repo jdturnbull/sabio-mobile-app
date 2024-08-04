@@ -46,6 +46,7 @@ const EquipmentFacilities = ({ editMode }) => {
   const [selected, setSelected] = useState(user_state?.profile?.equipment_and_facilities?.split(',') || []);
 
   const state = useSelector((state) => state.onboarding);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSubmit = async () => {
     if (editMode) {
@@ -70,7 +71,7 @@ const EquipmentFacilities = ({ editMode }) => {
       return;
     } else {
       dispatch(updateState({ profile: { ...state.profile, equipmentFacilities: selected } }));
-      navigation.navigate('CreatingPlan');
+      navigation.navigate('RequestNotifications');
     }
   };
 
@@ -90,11 +91,21 @@ const EquipmentFacilities = ({ editMode }) => {
     }
   };
 
+  const handleBack = () => {
+    if (!isProcessing) {
+      setIsProcessing(true);
+      navigation.goBack();
+      setTimeout(() => {
+        setIsProcessing(false);
+      }, 500);
+    }
+  };
+
   return (
     <Container>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-        {editMode && <TouchableOpacity onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>}
-        <Title style={{ marginBottom: 0, marginLeft: editMode ? 10 : 0 }}>Equipment and facilities</Title>
+        {editMode && <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}><ArrowLeft /></TouchableOpacity>}
+        <Title style={{ marginBottom: 0, marginLeft: editMode ? 10 : 0 }}>{editMode ? 'Update equipment' : 'Do you have any favourite equipment or facilities?'}</Title>
       </View>
       <SubHeader style={{ marginBottom: 20 }}>
         Sabio will assume you have the basics, here you can specify anything extra
@@ -105,7 +116,7 @@ const EquipmentFacilities = ({ editMode }) => {
         ))}
       </OptionsContainer>
       <View style={{ marginTop: 20, flex: 1 }} />
-      <NextButton onPress={handleSubmit} editMode={editMode} style={{ marginBottom: 40 }} />
+      <NextButton onPress={handleSubmit} editMode={editMode} style={{ marginBottom: 50 }} />
     </Container>
   );
 };

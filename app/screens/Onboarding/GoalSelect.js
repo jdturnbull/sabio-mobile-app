@@ -14,7 +14,7 @@ import Triathlon from '../../assets/icons/18x/Triathlon';
 import { useNavigation } from '@react-navigation/native';
 import CustomDivider from '../../components/shared/CustomDivider';
 import { useDispatch } from 'react-redux';
-import { clearState, updateState } from '../../stores/onboarding/onboardingSlice';
+import { clearState } from '../../stores/onboarding/onboardingSlice';
 import SubHeader from '../../components/shared/SubHeader';
 
 const OPTIONS_LIST = [

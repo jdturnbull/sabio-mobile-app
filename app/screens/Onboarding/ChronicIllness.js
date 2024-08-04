@@ -85,7 +85,7 @@ const ChronicIllness = ({ editMode }) => {
         keyboardOpeningTime={0}>
         <Container>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-            {editMode && <TouchableOpacity onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>}
+            {editMode && <TouchableOpacity style={{ padding: 8 }} onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>}
             <Title style={{ marginBottom: 0, marginLeft: editMode ? 10 : 0 }}>{editMode ? 'Update chronic conditions' : 'Do you have any chronic conditions?'}</Title>
           </View>
           <OptionsContainer>

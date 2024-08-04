@@ -11,6 +11,7 @@ export const save = createAsyncThunk('onboarding/save', async (props) => {
 
 const initial_state = {
   profile: null,
+  notification_settings: null,
 };
 
 export const onboardingSlice = createSlice({
@@ -25,7 +26,7 @@ export const onboardingSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(save.fulfilled, (state, action) => {});
+    builder.addCase(save.fulfilled, (state, action) => { });
   },
 });
 

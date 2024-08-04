@@ -91,13 +91,13 @@ const ManagePlan = () => {
     return (
         <Container>
             <Header>
-                <TouchableOpacity onPress={handleBack} style={{ width: 50 }}>
+                <TouchableOpacity onPress={handleBack} style={{ padding: 8 }}>
                     <ArrowLeft />
                 </TouchableOpacity>
                 <View
                     style={{
                         flex: 1,
-                        marginRight: 50,
+                        marginRight: 32,
                         alignItems: 'center',
                     }}>
                     <HeaderText>Manage Plans</HeaderText>

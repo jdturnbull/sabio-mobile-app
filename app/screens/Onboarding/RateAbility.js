@@ -99,6 +99,7 @@ const RateAbility = ({ editMode }) => {
   const pre_selected = OPTIONS.find((opt) => opt.body === user_state?.profile?.past_experience)?.label || 'Beginner';
 
   const [selected, setSelected] = useState(pre_selected);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePress = (label) => {
     setSelected(label);
@@ -141,10 +142,20 @@ const RateAbility = ({ editMode }) => {
     }
   };
 
+  const handleBack = () => {
+    if (!isProcessing) {
+      setIsProcessing(true);
+      navigation.goBack();
+      setTimeout(() => {
+        setIsProcessing(false);
+      }, 500);
+    }
+  };
+
   return (
     <Container>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        {editMode && <TouchableOpacity onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>}
+        {editMode && <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}><ArrowLeft /></TouchableOpacity>}
         <Title style={{ marginBottom: 0, marginLeft: editMode ? 10 : 0 }}>{editMode ? 'Update current ability' : 'Rate your current ability'}</Title>
       </View>
 

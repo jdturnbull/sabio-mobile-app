@@ -100,14 +100,26 @@ const ViewDay = () => {
   const route = useRoute();
   const navigation = useNavigation();
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const user = useSelector((state) => state.user.user);
   const { _day } = route.params;
   const { day, date, activities } = _day;
 
+  const handleBack = () => {
+    if (!isProcessing) {
+      setIsProcessing(true);
+      navigation.goBack();
+      setTimeout(() => {
+        setIsProcessing(false);
+      }, 500);
+    }
+  };
+
   return (
     <Container>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>
+        <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}><ArrowLeft /></TouchableOpacity>
         <Title style={{ marginBottom: 0, marginLeft: 10 }}>{moment(date).format('dddd, MMMM Do')}</Title>
       </View>
       <SubHeader style={{ marginBottom: 20 }}>Activities for the day</SubHeader>

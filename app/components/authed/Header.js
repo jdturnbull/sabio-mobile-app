@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import Bell from '../../assets/icons/24x/Bell';
 import Account from '../../assets/icons/24x/Account';
 import { useNavigation } from '@react-navigation/native';
@@ -28,6 +28,17 @@ const Title = styled.Text`
   font-weight: ${(props) => props.theme.text.weight.bold};
   font-size: ${(props) => props.theme.text.size.md};
   color: ${(props) => props.theme.text.colors.white};
+  margin-horizontal: 10px;
+`;
+
+const Badge = styled.View`
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: red;
 `;
 
 const Header = () => {
@@ -35,6 +46,15 @@ const Header = () => {
   const training_plans = useSelector(state => state.user.training_plans);
   const training_plan = training_plans?.find(plan => plan.status === 'ACTIVE');
 
+  const notifications = useSelector((state) => state.user.notifications);
+
+  let showAlertOnBell = false;
+
+  for (let i = 0; i < notifications.length; i++) {
+    if (notifications[i].status === 'PENDING' && notifications[i].type === 'display_only') {
+      showAlertOnBell = true;
+    }
+  }
 
   const handleBellPress = () => {
     hapticImpact();
@@ -50,26 +70,28 @@ const Header = () => {
   const route = parentRoute.state ? parentRoute.state.routes[parentRoute.state.index].name : parentRoute.name;
 
   const ROUTE_LABEL_MAP = {
-    Plan: training_plan?.name || 'Your Plan',
-    Main: training_plan?.name || 'Your Plan',
+    Plan: training_plan?.name.trim() || 'Your Plan',
+    Main: training_plan?.name.trim() || 'Your Plan',
     Progress: 'Your Progress',
     Community: 'Community',
     Profile: 'Profile',
   };
 
-
   return (
     <Container>
-      <TouchableOpacity onPress={handleBellPress}>
-        <Bell />
+      <TouchableOpacity style={{ padding: 8 }} onPress={handleBellPress}>
+        <View>
+          <Bell />
+          {showAlertOnBell && <Badge />}
+        </View>
       </TouchableOpacity>
       <TitleContainer>
         <Title>{ROUTE_LABEL_MAP[route]}</Title>
       </TitleContainer>
-      <TouchableOpacity onPress={handleAccountPress}>
+      <TouchableOpacity style={{ padding: 8 }} onPress={handleAccountPress}>
         <Account />
       </TouchableOpacity>
-    </Container>
+    </Container >
   );
 };
 

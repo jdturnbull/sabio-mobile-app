@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
-import { TouchableOpacity, View } from 'react-native';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import Notification from './Notification';
 
 const Container = styled.View`
   flex: 1;
@@ -25,26 +27,55 @@ const HeaderText = styled.Text`
   color: ${(props) => props.theme.text.colors.white};
 `;
 
+const Scrollable = styled(ScrollView)`
+  flex: 1;
+`;
+
 const Notifications = () => {
   const navigation = useNavigation();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const notifications = useSelector(state => state.user.notifications);
 
-  const handleBack = () => navigation.goBack();
+  useEffect(() => {
+    // Set all to read on open
+  }, [])
+
+  const handleBack = () => {
+    if (!isProcessing) {
+      setIsProcessing(true);
+      navigation.goBack();
+      setTimeout(() => {
+        setIsProcessing(false);
+      }, 500);
+    }
+  };
+
+
 
   return (
     <Container>
       <Header>
-        <TouchableOpacity onPress={handleBack} style={{ width: 50 }}>
+        <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}>
           <ArrowLeft />
         </TouchableOpacity>
         <View
           style={{
             flex: 1,
-            marginRight: 50,
+            marginRight: 32,
             alignItems: 'center',
           }}>
           <HeaderText>Notifications</HeaderText>
         </View>
       </Header>
+      <Scrollable
+        style={{ marginTop: 20 }}
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {notifications.map((notification, index) => (
+          <Notification key={index} notification={notification} />
+        ))}
+      </Scrollable>
     </Container>
   );
 };

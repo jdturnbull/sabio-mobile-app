@@ -5,7 +5,6 @@ import * as RNLocalize from 'react-native-localize';
 import call from '../../utils/call';
 
 export const setup = createAsyncThunk('user/setup', async (location) => {
-  console.log(location)
   // Do we have an existing session?
   const session = await AsyncStorage.getItem('session');
 
@@ -31,6 +30,7 @@ export const setup = createAsyncThunk('user/setup', async (location) => {
       progress_reports,
       conversations,
       connections,
+      notifications
     } = response;
 
     // If the session is not active then clear storage and return null
@@ -56,6 +56,7 @@ export const setup = createAsyncThunk('user/setup', async (location) => {
       progress_reports,
       conversations,
       connections,
+      notifications
     };
   } catch (error) {
     console.log('Setup failed')
@@ -233,6 +234,7 @@ export const userSlice = createSlice({
     preferences: [],
     schedules: [],
     progress_reports: [],
+    notifications: [],
     conversations: [],
     connections: [],
     showSubscribeModal: false,
@@ -256,6 +258,7 @@ export const userSlice = createSlice({
       state.progress_reports = action.payload.progress_reports;
       state.conversations = action.payload.conversations;
       state.connections = action.payload.connections;
+      state.notifications = action.payload.notifications;
       state.loading = false;
     });
     builder.addCase(continueWithApple.fulfilled, (state, action) => {
@@ -283,6 +286,7 @@ export const userSlice = createSlice({
       state.progress_reports = [];
       state.conversations = [];
       state.connections = [];
+      state.notifications = [];
     });
     builder.addCase(activatePlan.fulfilled, (state, action) => {
       state.profile = action.payload.profile;
@@ -295,6 +299,7 @@ export const userSlice = createSlice({
       state.progress_reports = action.payload.progress_reports;
       state.conversations = action.payload.conversations;
       state.connections = action.payload.connections;
+      state.notifications = action.payload.notifications;
     });
     builder.addCase(addInjury.fulfilled, (state, action) => {
       state.injuries.push(action.payload);
@@ -353,6 +358,7 @@ export const userSlice = createSlice({
       state.progress_reports = [];
       state.conversations = [];
       state.connections = [];
+      state.notifications = [];
     });
   },
 });

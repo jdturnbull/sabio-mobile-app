@@ -38,8 +38,8 @@ const Header = () => {
   const progress = useSharedValue(0.1);
 
   const [shouldHide, setShouldHide] = useState(false);
-
   const [canBack, setCanBack] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // 13 screens (max flow length)
   const increment = 1 / 13;
@@ -129,14 +129,20 @@ const Header = () => {
   });
 
   const handleBack = () => {
-    navigation.goBack();
+    if (!isProcessing) {
+      setIsProcessing(true);
+      navigation.goBack();
+      setTimeout(() => {
+        setIsProcessing(false);
+      }, 500);
+    }
   };
 
   return (
     <Container hide={shouldHide}>
       <View style={{ flex: 1 }}>
         {canBack && (
-          <TouchableOpacity onPress={handleBack}>
+          <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}>
             <BackIcon />
           </TouchableOpacity>
         )}

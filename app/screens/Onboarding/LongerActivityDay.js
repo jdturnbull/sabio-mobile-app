@@ -8,8 +8,6 @@ import NextButton from '../../components/shared/NextButton';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { Alert } from 'react-native';
 
-const OPTIONS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
 const Container = styled.ScrollView`
   flex: 1;
   padding: 20px;
@@ -21,12 +19,15 @@ const OptionsContainer = styled.View`
 `;
 
 const LongerActivityDay = () => {
-  const [selected, setSelected] = useState();
+
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
   const state = useSelector((state) => state.onboarding);
+
+  const OPTIONS = state?.profile?.trainingDays || [];
+  const [selected, setSelected] = useState(OPTIONS[0] || null);
 
   const handlePress = (item) => {
     setSelected(item);

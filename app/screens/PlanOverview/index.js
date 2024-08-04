@@ -69,6 +69,7 @@ const PlanOverview = () => {
     const [completionData, setCompletionData] = useState();
     const [planWeeks, setPlanWeeks] = useState([]);
     const [number_of_weeks, setNumberOfWeeks] = useState(0);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const compute = useCallback(async () => {
         setLoading(true);
@@ -86,10 +87,20 @@ const PlanOverview = () => {
         compute();
     }, [compute]);
 
+    const handleBack = () => {
+        if (!isProcessing) {
+            setIsProcessing(true);
+            navigation.goBack();
+            setTimeout(() => {
+                setIsProcessing(false);
+            }, 500);
+        }
+    };
+
     return (
         <Container>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                <TouchableOpacity onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>
+                <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}><ArrowLeft /></TouchableOpacity>
                 <Title style={{ marginBottom: 0, marginLeft: 10 }}>Plan Overview</Title>
             </View>
             <SubHeader style={{ marginBottom: 20 }}>Here's how Sabio will guide you to achieving your goals!</SubHeader>

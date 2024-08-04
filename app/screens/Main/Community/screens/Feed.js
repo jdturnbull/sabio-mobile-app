@@ -61,6 +61,7 @@ const Feed = () => {
     <Container>
       <Scrollable
         contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={'#fff'} />
         }

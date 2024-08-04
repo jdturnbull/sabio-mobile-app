@@ -60,6 +60,8 @@ const Preferences = () => {
     const [showArchived, setShowArchived] = useState(false);
     const inputRef = useRef(null);
 
+    const [isProcessing, setIsProcessing] = useState(false);
+
     const user = useSelector((state) => state.user.user);
 
     const [showInput, setShowInput] = useState(false);
@@ -147,10 +149,20 @@ const Preferences = () => {
         );
     }
 
+    const handleBack = () => {
+        if (!isProcessing) {
+            setIsProcessing(true);
+            navigation.goBack();
+            setTimeout(() => {
+                setIsProcessing(false);
+            }, 500);
+        }
+    };
+
     return (
         <Container>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                <TouchableOpacity onPress={() => navigation.goBack()}><ArrowLeft /></TouchableOpacity>
+                <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}><ArrowLeft /></TouchableOpacity>
                 <Title style={{ marginBottom: 0, marginLeft: 10 }}>Training Preferences</Title>
             </View>
             <SubHeader style={{ marginBottom: 20 }}>Changes to preferences update your plan, swipe a preference to remove it</SubHeader>

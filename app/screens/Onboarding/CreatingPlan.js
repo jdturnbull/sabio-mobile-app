@@ -80,6 +80,8 @@ const CreatingPlan = () => {
   const [initialDelayPassed, setInitialDelayPassed] = useState(false);
   const guidanceOpacity = useRef(new Animated.Value(0)).current; // Start with opacity 0
 
+  const [generatedWeek, setGeneratedWeek] = useState(user_state?.user?.onboarding_generated_week);
+
   const [stage, setStage] = useState('NOT_STARTED');
 
   // Checks to see if it should send data to backend
@@ -87,7 +89,7 @@ const CreatingPlan = () => {
     if (state.profile) {
       const status = user_state?.user?.onboarding_status;
       if (status === 'NOT_STARTED' || status === 'RESETTING_PLAN') {
-        dispatch(save({ state, user: user_state.user }));
+        dispatch(save({ state, user: user_state.user, notification_settings: state.notification_settings }));
       }
     }
   }, []);
@@ -102,12 +104,14 @@ const CreatingPlan = () => {
     const fetchData = async () => {
       try {
         let updatedUser = await call('GET', `users/${user_state.user.id}`);
+        setGeneratedWeek(updatedUser?.onboarding_generated_week);
         setStage(updatedUser?.onboarding_status);
 
         if (updatedUser?.onboarding_status !== 'COMPLETE') {
           intervalRef.current = setInterval(async () => {
             updatedUser = await call('GET', `users/${user_state.user.id}`);
             setStage(updatedUser?.onboarding_status);
+            setGeneratedWeek(updatedUser?.onboarding_generated_week);
             if (updatedUser?.onboarding_status === 'COMPLETE') {
               clearInterval(intervalRef.current);
               dispatch(setup('CreatingPlan'));
@@ -216,7 +220,7 @@ const CreatingPlan = () => {
     <Container>
       <Image source={mascot} style={{ width: 220, height: 202 }} />
       <PercentageLabel>Building your plan</PercentageLabel>
-      <SubHeader style={{ marginTop: 10 }}>This may take a few minutes</SubHeader>
+      <SubHeader style={{ marginTop: 10 }}>{!generatedWeek ? `This may take a few minutes` : `Finished planning week ${generatedWeek}`}</SubHeader>
       <ProgressBarContainer>
         <ProgressBarInner style={animatedStyle} />
       </ProgressBarContainer>
