@@ -7,6 +7,7 @@ import Post from '../components/Post';
 import { useSelector } from 'react-redux';
 import Title from '../../../../components/shared/Title';
 import SubHeader from '../../../../components/shared/SubHeader';
+import { useIsFocused } from '@react-navigation/native';
 
 const Container = styled.View`
   flex: 1;
@@ -21,6 +22,8 @@ const Scrollable = styled(ScrollView)`
 const Feed = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [posts, setPosts] = useState([]);
+
+  const isFocused = useIsFocused();
 
   const user = useSelector((state) => state.user.user);
 
@@ -39,7 +42,7 @@ const Feed = () => {
 
   useEffect(() => {
     getInitialPosts();
-  }, []);
+  }, [isFocused]);
 
   const handleLoadMore = async () => {
     let from = moment().subtract(2, 'week').format('YYYY-MM-DD');

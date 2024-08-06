@@ -56,7 +56,14 @@ const EquipmentFacilities = ({ editMode }) => {
     prompt += `Just return the equipment or facility, without an explaination for why they need it.\n`
     prompt += `Do not include in your list items that are absolutely necessary for the goal. For example you can safely assume someone with a running goal has access to running shoes.\n`
     prompt += `The equipment or facilities in your list should be things that you may want to assign them to use.\n`
-    prompt += `Your list should be a maximum of 20 items.\n`
+    prompt += `Your list should be appropriate to the difficulty of the goal in question: for example, if the goal is to run their first 5k, more extream equipment like a hydration vest or altitude mask shouldnt be suggested.\n`
+    prompt += `In addition to the difficulty of the goal, also consider your client's assesment of their own skill level when selecting the equipment. The client has determined their skill level as: ${user_state?.profile?.ability ? user_state?.profile?.ability : 'Beginner'}\n`
+    prompt += `Don't include anything relating to software such as a fitness tracker or mobile app.\n`
+    prompt += `Don't include anything that doesn't affect the type of activities you provide them, for example forms of clothing shouldn't be included as it won't affect the type of activities you provide them.\n`
+    prompt += `Don't include equipment that won't affect the type of activities you provide them, for example a water bottle won't affect the type of activities you provide them.\n`
+    prompt += `Your list should be a maximum of 10 items.\n`
+
+    console.log(prompt);
 
     if (existing_selections.length > 0) {
       prompt += `Your client already has access to the following equipment or facilities: ${existing_selections.join(', ')}\n`;

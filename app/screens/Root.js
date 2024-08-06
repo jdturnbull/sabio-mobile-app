@@ -7,6 +7,7 @@ import Onboarding from '../screens/Onboarding';
 import Main from '../screens/Main';
 import Notifications from './Notifications';
 import Account from './Account';
+import Chat from './Chat';
 import PlanOverview from './PlanOverview';
 import RearrangeWeek from './RearrangeWeek';
 import { useNavigation } from '@react-navigation/native';
@@ -177,6 +178,7 @@ const Root = () => {
         <RootStack.Screen name="Privacy" component={Privacy} options={SlideFromRightTransition} />
         <RootStack.Screen name="PlanOverview" component={PlanOverview} options={SlideFromRightTransition} />
         <RootStack.Screen name="RearrangeWeek" component={RearrangeWeek} options={SlideFromRightTransition} />
+        <RootStack.Screen name="Chat" component={Chat} />
       </RootStack.Navigator>
       <Modal
         animationType="slide"

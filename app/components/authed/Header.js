@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { TouchableOpacity, View } from 'react-native';
+import { WalkthroughElement } from 'react-native-walkthrough';
 import Bell from '../../assets/icons/24x/Bell';
 import Account from '../../assets/icons/24x/Account';
 import { useNavigation } from '@react-navigation/native';
@@ -69,9 +70,11 @@ const Header = () => {
   const parentRoute = navigation.getState().routes[navigation.getState().index];
   const route = parentRoute.state ? parentRoute.state.routes[parentRoute.state.index].name : parentRoute.name;
 
+  const charLength = training_plan?.name.trim().split('').length || 0;
+
   const ROUTE_LABEL_MAP = {
-    Plan: training_plan?.name.trim() || 'Your Plan',
-    Main: training_plan?.name.trim() || 'Your Plan',
+    Plan: charLength < 30 ? training_plan?.name.trim() : 'Your Plan',
+    Main: charLength < 30 ? training_plan?.name.trim() : 'Your Plan',
     Progress: 'Your Progress',
     Community: 'Community',
     Profile: 'Profile',

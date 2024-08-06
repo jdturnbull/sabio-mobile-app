@@ -3,13 +3,14 @@ import styled from 'styled-components';
 import moment from 'moment';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { ScrollView, View, TouchableOpacity, Text, Dimensions } from 'react-native';
-import { useSelector } from 'react-redux';
-import getIconFromActivity from '../../../../utils/getIconFromActivity';
+import { useDispatch, useSelector } from 'react-redux';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
 import Title from '../../../../components/shared/Title';
-import SubHeader from '../../../../components/shared/SubHeader';
 import call from '../../../../utils/call';
 import { hapticImpact } from '../../../../utils/haptics';
+import BodyText from '../../../../components/shared/BodyText';
+import ChatIcon from '../../../../assets/icons/24x/Chat';
+import { updateState } from '../../../../stores/user/userSlice';
 
 const DAY_COLOR_MAP = {
   'Monday': '#885A89',
@@ -114,15 +115,22 @@ const CompleteText = styled.Text`
 
 const EmojiText = styled.Text``;
 
+const ChatButton = styled(TouchableOpacity)`
+  padding: 10px;
+  border-radius: 8px;
+  align-items: center;
+`;
+
 const ViewDay = () => {
   const route = useRoute();
+  const dispatch = useDispatch();
   const navigation = useNavigation();
 
   const [isProcessing, setIsProcessing] = useState(false);
 
   const user = useSelector((state) => state.user.user);
 
-  const { _day } = route.params;
+  const { _day, recoveryGuidance } = route.params;
   const { day, date, activities } = _day;
 
   const [complete, setComplete] = useState(activities.every(activity => activity.status === 'COMPLETE'));
@@ -145,11 +153,22 @@ const ViewDay = () => {
     navigation.goBack();
   };
 
+  const handleChat = () => {
+    if (user.subscription_status === 'SUBSCRIBED') {
+      navigation.navigate('Chat', { context: day });
+    } else {
+      dispatch(updateState({
+        showSubscribeModal: true
+      }))
+    }
+  }
+
   return (
     <Container>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
         <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}><ArrowLeft /></TouchableOpacity>
-        <Title style={{ marginBottom: 0, marginLeft: 10 }}>{moment(date).format('dddd, MMMM Do')}</Title>
+        <Title style={{ marginBottom: 0, marginLeft: 10, flex: 1 }}>{moment(date).format('dddd, MMMM Do')}</Title>
+        <ChatButton onPress={handleChat}><ChatIcon /></ChatButton>
       </View>
       {activities.map((activity, i) => {
         return (
@@ -173,7 +192,11 @@ const ViewDay = () => {
           </ActivityContainer>
         )
       })}
-      <View style={{ flex: 1, }} />
+      <View style={{ flex: 1, marginTop: 20 }}>
+        <BodyText style={{ fontWeight: 600, marginBottom: 10 }}>Recovery guidance</BodyText>
+        <BodyText>{`${recoveryGuidance}`}</BodyText>
+        <BodyText style={{ marginTop: 10, fontWeight: 600, color: '#A1AAD3' }}>Press the icon in the top right to chat with Sabio for guidance</BodyText>
+      </View>
       {!complete && <CompleteButton onPress={handleComplete}>
         <CompleteText>Complete day</CompleteText>
       </CompleteButton>}

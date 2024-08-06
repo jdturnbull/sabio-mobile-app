@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ScrollView, RefreshControl, View, Image } from 'react-native';
 import moment from 'moment';
-import Title from '../../../../components/shared/Title';
 import { useSelector } from 'react-redux';
 import call from '../../../../utils/call';
 import Report from '../components/Report';
 import mascot from '../../../../assets/mascot/slight_side_eye.png';
 import BodyText from '../../../../components/shared/BodyText';
+import { useIsFocused } from '@react-navigation/native';
 
 const Container = styled(ScrollView)`
   flex: 1;
@@ -16,11 +16,12 @@ const Container = styled(ScrollView)`
 `;
 
 const Reports = () => {
-  const user = useSelector((state) => state.user.user);
   const training_plans = useSelector((state) => state.user.training_plans);
   const training_plan = training_plans.filter((p) => p.status === 'ACTIVE')[0];
 
   const nextReportIn = moment(training_plan.next_progress_report_at).diff(moment(), 'days');
+
+  const isFocused = useIsFocused();
 
   const [loading, setLoading] = useState(false);
   const [reports, setReports] = useState();
@@ -28,11 +29,20 @@ const Reports = () => {
 
   const fetchReports = async () => {
     setLoading(true);
+    setRefreshing(true);
     const response = await call('GET', `users/progressReports/${training_plan.id}`);
     const sortedReports = response.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     setReports(sortedReports);
     setLoading(false);
+    setRefreshing(false);
   };
+
+
+  useEffect(() => {
+    if (isFocused) {
+      fetchReports();
+    }
+  }, [isFocused]);
 
   const onRefresh = async () => {
     setRefreshing(true);

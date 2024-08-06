@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
 import Top from './components/Top';
 import SubscribePrompt from './components/SubscribePrompt';
 import NotificationPrompt from './components/NotificationPrompt';
-import { useSelector } from 'react-redux';
 import Course from '../../assets/icons/24x/Course';
 import Bell from '../../assets/icons/24x/Bell';
 import Privacy from '../../assets/icons/24x/Privacy';
@@ -105,14 +105,15 @@ const Account = () => {
         <Top />
         {!hideSetNotif && <NotificationPrompt />}
         {!hideSubscribe && <SubscribePrompt />}
-        <View style={{ marginVertical: 10 }}>
+        <View style={{ marginVertical: 10, width: '100%' }}>
           <OptionBox label="Manage your plans" Icon={Course} onPress={handleOptionPress} />
           <OptionBox label="Notification settings" Icon={Bell} onPress={handleOptionPress} />
           <OptionBox label="Privacy settings" Icon={Privacy} onPress={handleOptionPress} />
           <ConnectStrava />
         </View>
       </Main>
-    </Container>
+
+    </Container >
   );
 };
 

@@ -12,7 +12,13 @@ import NextButton from '../../components/shared/NextButton';
 import SubHeader from '../../components/shared/SubHeader';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 
-const TERRAINS = ['Flat', 'Rolling', 'Moderate', 'Hilly', 'All', 'Custom'];
+const TERRAINS = ['Flat', 'Moderate', 'Rolling', 'Hilly'];
+
+const TERRAIN_DATA = {
+  'Moderate': [0, 20, 0, 20, 0],
+  'Rolling': [0, 20, 0, 20, 0, 20, 0, 20, 0],
+  'Hilly': [0, 20, 0, 20, 0, 20, 0, 20, 0],
+}
 
 const Container = styled.View`
   flex: 1;
@@ -92,18 +98,9 @@ const SelectTerrain = () => {
           <SubHeader>Choose the terrain for your training</SubHeader>
           <OptionsContainer>
             {TERRAINS.map((opt) => {
-              return <SelectableItem key={opt} label={opt} onPress={handlePress} selected={selected === opt} />;
+              return <SelectableItem key={opt} label={opt} onPress={handlePress} selected={selected === opt} hasChart={TERRAIN_DATA[opt] ? true : false} chartData={TERRAIN_DATA[opt]} noCurve={opt === 'Hilly'} />;
             })}
           </OptionsContainer>
-          <CustomInputContainer style={animatedStyle}>
-            <CustomInput
-              style={{ flex: 1 }}
-              label={'Custom Terrain'}
-              placeholder={'Describe the terrain'}
-              value={description}
-              setValue={setDescription}
-            />
-          </CustomInputContainer>
           <View style={{ flex: 1 }} />
           <NextButton onPress={handleContinue} style={{ marginBottom: 20 }}>
             Continue

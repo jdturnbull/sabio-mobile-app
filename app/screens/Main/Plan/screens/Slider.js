@@ -81,6 +81,7 @@ const Slider = ({ weeks }) => {
     setVisibleIndex(index);
   };
 
+
   return (
     <Container>
       <Header>

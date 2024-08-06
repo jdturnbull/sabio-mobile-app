@@ -4,10 +4,8 @@ import moment from 'moment';
 import DayItem from './DayItem';
 import { ScrollView, ActivityIndicator, View } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { useNavigation } from '@react-navigation/native';
 import PlanScreenOptions from './PlanScreenOptions';
 import SabioMessage from './SabioMessage';
-import { hapticImpact, hapticNotificationError } from '../../../../utils/haptics';
 
 const Container = styled(ScrollView)`
   flex: 1;
@@ -40,9 +38,6 @@ const WeekView = ({ week }) => {
   const [loading, setLoading] = useState(true);
   const opacity = useSharedValue(0);
 
-  const navigation = useNavigation();
-
-
   const days = useMemo(() => {
     const daysMap = groupActivitiesByDay(week.activities);
     return sortDays(daysMap);
@@ -62,27 +57,6 @@ const WeekView = ({ week }) => {
     };
   });
 
-  const handleSwipeRight = (date) => {
-    const nextTrainingDay = days.find(day => moment(day.date).isAfter(moment(date)));
-
-    if (nextTrainingDay) {
-      navigation.navigate('ViewDay', { _day: nextTrainingDay, handleSwipeRight, handleSwipeLeft, date: nextTrainingDay.date });
-      hapticImpact();
-    } else {
-      hapticNotificationError();
-    }
-  }
-
-  const handleSwipeLeft = (date) => {
-    const previousTrainingDay = days.find(day => moment(day.date).isBefore(moment(date)));
-
-    if (previousTrainingDay) {
-      navigation.navigate('ViewDay', { _day: previousTrainingDay, handleSwipeRight, handleSwipeLeft, date: previousTrainingDay.date });
-      hapticImpact();
-    } else {
-      hapticNotificationError();
-    }
-  }
 
   if (loading) {
     return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -94,8 +68,8 @@ const WeekView = ({ week }) => {
     <Animated.View style={animatedStyle}>
       <Container showsVerticalScrollIndicator={false}>
         <PlanScreenOptions week={week} />
-        <SabioMessage focus={week.focus} />
-        {days.map((day) => <DayItem key={day.date} _day={day} handleSwipeRight={handleSwipeRight} handleSwipeLeft={handleSwipeLeft} />)}
+        <SabioMessage focus={week.focus} nutrition={week.nutrition_guidelines} />
+        {days.map((day, i) => <DayItem key={day.date} index={i} _day={day} recoveryGuidance={week.recovery_guidelines.monitor} />)}
       </Container>
     </Animated.View>
   );

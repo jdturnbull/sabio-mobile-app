@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import Toast from 'react-native-toast-message';
-import getIconFromActivity from "../../../../utils/getIconFromActivity";
 import { TouchableOpacity, View } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useNavigation } from "@react-navigation/native";
@@ -27,6 +25,10 @@ const Container = styled(TouchableOpacity)`
   margin-vertical: 8px;
   border-radius: 8px;
   border-left-width: 2px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.15;
+  shadow-radius: 3.84px;
 `;
 
 const Top = styled.View`
@@ -98,7 +100,7 @@ const ProgressBar = styled(Animated.View)`
 
 const EmojiText = styled.Text``;
 
-const DayItem = ({ _day, handleSwipeRight, handleSwipeLeft }) => {
+const DayItem = ({ _day, recoveryGuidance, index }) => {
     const { activities, day } = _day;
     const navigation = useNavigation();
     const user = useSelector((state) => state.user.user);
@@ -122,7 +124,7 @@ const DayItem = ({ _day, handleSwipeRight, handleSwipeLeft }) => {
     });
 
     const handlePress = () => {
-        navigation.navigate('ViewDay', { _day, handleSwipeRight, handleSwipeLeft });
+        navigation.navigate('ViewDay', { _day, recoveryGuidance });
     };
 
 
@@ -136,18 +138,13 @@ const DayItem = ({ _day, handleSwipeRight, handleSwipeLeft }) => {
         } else {
             setComplete(true);
             hapticImpact();
-            Toast.show({
-                topOffset: 60,
-                type: 'success',
-                text1: `Well done ${user.first_name}!`,
-                text2: "We are proud of you 💪"
-            });
             progress.value = withTiming(100, { duration: 500 });
             await call('POST', 'users/completeDay', { planId: training_plan_id, date: _day.date })
         }
     };
 
     const icons_and_titles = activities.map(activity => ({ icon: activity.icon, title: activity.title }));
+
 
     return (
         <Container onPress={handlePress} style={{ borderLeftColor: DAY_COLOR_MAP[day] }}>
@@ -172,6 +169,7 @@ const DayItem = ({ _day, handleSwipeRight, handleSwipeLeft }) => {
             </ProgressBarContainer>
         </Container>
     );
+
 };
 
 export default DayItem;

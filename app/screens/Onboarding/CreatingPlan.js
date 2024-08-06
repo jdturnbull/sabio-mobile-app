@@ -12,10 +12,14 @@ import SubHeader from '../../components/shared/SubHeader';
 const guidance = [
   'Connect Strava to enhance Sabio',
   'Notifications help you stay consistent',
-  'Sabio can plan around chronic conditions',
+  'Adjust your profile to further personalise your plan on the go',
   'Chat with Sabio for additional guidance',
-  'Switch between schedules when needed',
-  'Sabio adjusts plans based on your feedback',
+  'Reorganise your week with a simple drag and drop',
+  'Complete weekly checkins to let Sabio know if anything needs changing',
+  "Like other's activities to give them a motivational boost!",
+  "Check out the plan overview to see what you'll be doing during your training",
+  "Create multiple plans and switch between them with a press of a button",
+  "Injured? Sabio can assign physio to help you recover"
 ];
 
 const Container = styled.View`

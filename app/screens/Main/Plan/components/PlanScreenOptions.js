@@ -40,7 +40,7 @@ const IconContainer = styled.View`
     width: 30px;
     height: 30px;
     border-radius: 15px;
-    background-color: ${(props) => props.theme.colors.highlight};
+    background-color: ${(props) => props.theme.colors.background3};
     justify-content: center;
     align-items: center;
     margin-bottom: 5px;
@@ -49,7 +49,7 @@ const IconContainer = styled.View`
 const TouchableText = styled.Text`
     text-align: center;
     font-size: ${(props) => props.theme.text.size.xs};
-    color: ${(props) => props.theme.text.colors.white};
+    color: ${(props) => props.theme.text.colors.grey};
     font-weight: ${(props) => props.theme.text.weight.bold};
 `;
 
@@ -79,7 +79,7 @@ const PlanScreenOptions = ({ week }) => {
                 return (
                     <Touchable key={index} onPress={() => handlePress(option)}>
                         <IconContainer>
-                            <Icon />
+                            <Icon color={'#f8f8f890'} />
                         </IconContainer>
                         <TouchableText>{option.label}</TouchableText>
                     </Touchable>

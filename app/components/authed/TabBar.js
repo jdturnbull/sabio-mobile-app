@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import styled from 'styled-components';
-
+import { WalkthroughElement } from 'react-native-walkthrough';
 import PlanIcon from '../../assets/icons/24x/Plan';
 import ProgressIcon from '../../assets/icons/24x/Progress';
 import CommunityIcon from '../../assets/icons/24x/Community';

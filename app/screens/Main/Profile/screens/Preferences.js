@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ScrollView, TouchableOpacity, View, TextInput, Alert } from "react-native";
+import { ScrollView, TouchableOpacity, View, TextInput, Alert, Text } from "react-native";
 import styled from 'styled-components';
 import EditableOption from "../components/EditableOption";
 import { useDispatch, useSelector } from "react-redux";
@@ -166,6 +166,7 @@ const Preferences = () => {
                 <Title style={{ marginBottom: 0, marginLeft: 10 }}>Training Preferences</Title>
             </View>
             <SubHeader style={{ marginBottom: 20 }}>Changes to preferences update your plan, swipe a preference to remove it</SubHeader>
+            <SubHeader style={{ marginBottom: 20 }}>Example: <Text style={{ fontStyle: 'italic' }}>I prefer to run on treadmills</Text></SubHeader>
             <NewButton onPress={handleAddPreference}>
                 {showInput ? (
                     <StyledInput

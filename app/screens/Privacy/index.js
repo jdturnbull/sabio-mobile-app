@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Switch } from 'react-native-paper';
 import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
-import BodyText from '../../components/shared/BodyText';
 import { update } from '../../stores/user/userSlice';
 import NextButton from '../../components/shared/NextButton';
 

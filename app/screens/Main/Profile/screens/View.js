@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import SubHeader from '../../../../components/shared/SubHeader';
 import { ScrollView } from 'react-native';
@@ -31,6 +31,7 @@ const Top = styled.View`
 
 const OptionsContainer = styled.View`
   margin-top: 30px;
+  width: 100%;
 `;
 
 const View = () => {

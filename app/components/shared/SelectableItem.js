@@ -1,6 +1,8 @@
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
+import { LineChart } from 'react-native-svg-charts';
 import styled from 'styled-components';
+import * as shape from 'd3-shape';
 
 const Container = styled(TouchableOpacity)`
   background-color: ${(props) => (props.light ? props.theme.colors.background3 : props.theme.colors.background2)};
@@ -13,7 +15,6 @@ const Container = styled(TouchableOpacity)`
 `;
 
 const LabelText = styled.Text`
-  flex: 1;
   font-family: ${(props) => props.theme.text.family};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
   font-weight: ${(props) => props.theme.text.weight.semibold};
@@ -39,12 +40,40 @@ const RingInner = styled.View`
   background-color: ${(props) => (props.selected ? '#000' : 'transparent')};
 `;
 
-const SelectableItem = ({ label, onPress, selected, light }) => {
+const SelectableItem = ({ label, onPress, selected, light, hasChart, chartData, noCurve }) => {
   const handlePress = () => onPress(label);
 
   return (
     <Container light={light} onPress={handlePress}>
-      <LabelText>{label}</LabelText>
+      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ justifyContent: 'center' }}>
+          <LabelText>{label}</LabelText>
+        </View>
+        {hasChart && (
+          <View style={{ width: 100, height: 20, marginLeft: 20 }}>
+            {noCurve ? (
+              <LineChart
+                style={{ flex: 1 }}
+                data={chartData}
+                svg={{ stroke: '#f8f8f840' }}
+                contentInset={{ top: 5, bottom: 5 }}
+                yAccessor={({ item }) => item}
+                showGrid={false}
+              />
+            ) : (
+              <LineChart
+                style={{ flex: 1 }}
+                data={chartData}
+                svg={{ stroke: '#f8f8f840' }}
+                contentInset={{ top: 5, bottom: 5 }}
+                yAccessor={({ item }) => item}
+                showGrid={false}
+                curve={shape.curveNatural}
+              />
+            )}
+          </View>
+        )}
+      </View>
       <RingOuter selected={selected}>
         <RingInner selected={selected} />
       </RingOuter>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Title from "../../components/shared/Title";
 import SubHeader from "../../components/shared/SubHeader";
@@ -35,6 +35,13 @@ const RequestNotifications = () => {
     const [actionsNotifications, setActionsNotifications] = useState(true);
     const [progressNotifications, setProgressNotifications] = useState(true);
     const [motivationNotifications, setMotivationNotifications] = useState(true);
+
+    useEffect(() => {
+        // They've already setup notifs so we can skip
+        if (user?.onboarding_status === 'RESETTING_PLAN' || user?.onboarding_status === 'GENERATING_REHAB_PLAN') {
+            navigation.navigate('CreatingPlan');
+        }
+    }, [])
 
     const handleNext = async () => {
         PushNotification.requestPermissions().then(async (permissions) => {

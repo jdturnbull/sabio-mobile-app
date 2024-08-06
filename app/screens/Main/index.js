@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
-import { Dimensions, View, LayoutAnimation } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, View, LayoutAnimation, Alert } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigationState } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 import Header from '../../components/authed/Header';
 import TabBar from '../../components/authed/TabBar';
 
@@ -9,6 +10,9 @@ import Plan from './Plan';
 import Progress from './Progress';
 import Community from './Community';
 import Profile from './Profile';
+
+
+
 
 const HIDE_HEADER_ROUTES = ['ViewDay', 'EquipmentAndFacilities', 'PastExperience', 'Injuries', 'Medications', 'ChronicIllness', 'Preferences', 'Schedules', 'PlanOverview', 'RearrangeWeek'];
 
@@ -25,6 +29,9 @@ const getActiveSubRoute = (route) => {
 };
 
 const Main = () => {
+  const [tutorialAlertShown, setTutorialAlertShown] = useState(false);
+
+  const user = useSelector((state) => state.user.user);
   const navigationState = useNavigationState(state => state);
   const activeRoute = navigationState.routes[navigationState.index];
   const activeTab = activeRoute.state ? activeRoute.state.routes[activeRoute.state.index].name : activeRoute.name;
