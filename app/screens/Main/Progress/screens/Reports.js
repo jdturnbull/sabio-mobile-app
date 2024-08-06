@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { ScrollView, RefreshControl, View } from 'react-native';
+import { ScrollView, RefreshControl, View, Image } from 'react-native';
 import moment from 'moment';
 import Title from '../../../../components/shared/Title';
 import { useSelector } from 'react-redux';
 import call from '../../../../utils/call';
 import Report from '../components/Report';
+import mascot from '../../../../assets/mascot/slight_side_eye.png';
 import BodyText from '../../../../components/shared/BodyText';
 
 const Container = styled(ScrollView)`
@@ -50,10 +51,11 @@ const Reports = () => {
         <RefreshControl tintColor={'#f8f8f8'} refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <Title style={{ marginBottom: 20 }}>Your progress reports</Title>
       {!loading && reports?.length === 0 && (
         <View style={{ flex: 1, height: 500, justifyContent: 'center', alignItems: 'center' }}>
-          <BodyText style={{ color: '#f8f8f890' }}>Your first report will appear in {nextReportIn} days</BodyText>
+          <Image source={mascot} style={{ width: 123.2, height: 113.12 }} />
+          <BodyText style={{ marginTop: 40, fontWeight: 600 }}>Your first report will appear in {nextReportIn} days</BodyText>
+          <BodyText style={{ color: '#f8f8f890', fontWeight: 600, marginTop: 5 }}>Sabio is expecting good things 👀</BodyText>
         </View>
       )}
       {reports && reports.map((report) => <Report key={report.id} report={report} />)}
