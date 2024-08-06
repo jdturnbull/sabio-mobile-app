@@ -63,7 +63,7 @@ const Feed = () => {
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={'#fff'} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={'#f8f8f8'} />
         }
       >
         <Title style={{ marginBottom: 10 }}>Social Feed</Title>

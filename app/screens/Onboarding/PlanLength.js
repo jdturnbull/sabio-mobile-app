@@ -27,7 +27,7 @@ const PlanLength = () => {
 
   const navigation = useNavigation();
 
-  const [selected, setSelected] = useState('20 Weeks');
+  const [selected, setSelected] = useState('16 Weeks');
   const [weeks, setWeeks] = useState(12);
   const [date, setDate] = useState(today.format('YYYY-MM-DD'));
 
@@ -36,7 +36,7 @@ const PlanLength = () => {
   const OPTIONS = [
     {
       label: 'Custom Length',
-      subLabel: 'Min 4 weeks max 52 weeks',
+      subLabel: '4 - 52 weeks',
     },
     {
       label: '14 Weeks',
@@ -50,7 +50,7 @@ const PlanLength = () => {
       label: '20 Weeks',
       endDate: today.clone().add(16, 'weeks').format('DD MMM YYYY'),
     },
-    { label: 'Custom Date', subLabel: 'Min 1 month max 12 months' },
+    { label: 'Custom Date', subLabel: '1 - 12 months' },
   ];
 
   const handleNext = () => {
@@ -122,6 +122,7 @@ const PlanLength = () => {
             setWeeks={setWeeks}
             date={date}
             setDate={setDate}
+            reccomended={opt.label === '16 Weeks'}
           />
         ))}
       </OptionsContainer>

@@ -64,6 +64,7 @@ const GuidanceText = styled(Animated.Text)`
   font-weight: ${(props) => props.theme.text.weight.regular};
   letter-spacing: ${(props) => props.theme.text.letterSpacing.md};
   font-size: ${(props) => props.theme.text.size.md};
+  text-align: center;
 `;
 
 const CreatingPlan = () => {

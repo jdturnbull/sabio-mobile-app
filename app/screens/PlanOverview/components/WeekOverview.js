@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { View, TouchableOpacity } from "react-native";
 import styled from 'styled-components';
 import Tick from '../../../assets/icons/14x/TickNoCircle';
-import call from "../../../utils/call";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 import Activity from "./Activity";
@@ -85,22 +84,14 @@ const WeekOverview = ({ week, compute }) => {
         };
     });
 
-    const handleComplete = useCallback(async () => {
-        if (!week.complete) {
-            await call('POST', 'users/completeWeek', { week: week.week, planId: week.planId });
-        } else {
-            await call('POST', 'users/uncompleteWeek', { week: week.week, planId: week.planId });
-        }
-        compute();
-    }, [week.complete, week.week, week.planId, compute]);
 
     return (
         <Container>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <WeekText>{`Week ${week.week}`}</WeekText>
-                <CompleteTouchable onPress={handleComplete} complete={week.complete}>
-                    {week.complete && <Tick />}
-                </CompleteTouchable>
+                {week.complete && <CompleteTouchable disabled complete={week.complete}>
+                    <Tick />
+                </CompleteTouchable>}
             </View>
             <IndicatorContainer>
                 {week.activities.map((a) => (

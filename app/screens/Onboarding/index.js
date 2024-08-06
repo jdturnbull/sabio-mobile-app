@@ -59,7 +59,7 @@ const Onboarding = () => {
           headerShown: false,
         }}>
         <OnboardingStack.Screen name="Welcome" component={Welcome} />
-        <OnboardingStack.Screen name="GoalSelect" component={GoalSelect} />
+        <OnboardingStack.Screen name="GoalSelect" component={GoalSelect} options={{ gestureEnabled: false }} />
         <OnboardingStack.Screen name="SelectEvent" component={SelectEvent} />
         <OnboardingStack.Screen name="CustomGoal" component={CustomGoal} />
         <OnboardingStack.Screen name="AddRace" component={AddRace} />

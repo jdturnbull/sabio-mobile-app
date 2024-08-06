@@ -40,7 +40,7 @@ const WhichUnits = () => {
   return (
     <Container>
       <Title style={{ marginBottom: 10 }}>Which units would you like your plan to be displayed in?</Title>
-      <SubHeader>You can change this later</SubHeader>
+      <SubHeader>Be careful! You can't change this later without creating a new plan</SubHeader>
       <OptionsContainer>
         {OPTIONS.map((opt) => (
           <SelectableItem onPress={setSelected} key={opt} label={opt} selected={opt === selected} />

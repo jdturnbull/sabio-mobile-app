@@ -70,6 +70,7 @@ const ConnectStrava = () => {
         const connection = await call('GET', `connection/retrieve/${user.id}`);
         if (connection) {
             updateState({ connections: [connection] });
+            setConnected(true)
         }
     }
 

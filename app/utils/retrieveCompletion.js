@@ -2,10 +2,14 @@ import axios from 'axios';
 import { REACT_APP_OPENAI_API_KEY } from '@env';
 
 // gpt-4o, gpt-3.5-turbo
-export default async ({ prompt, model }) => {
-  const body = { model, messages: [{ role: 'user', content: prompt }] };
+export default async ({ prompt, model, json }) => {
+  let body;
 
-  console.log(prompt);
+  if (json) {
+    body = { model: model ? model : 'gpt-4o', messages: [{ role: 'user', content: prompt }], response_format: { type: 'json_object' } };
+  } else {
+    body = { model: model ? model : 'gpt-4o', messages: [{ role: 'user', content: prompt }] };
+  }
 
   const headers = {
     'Content-Type': 'application/json',

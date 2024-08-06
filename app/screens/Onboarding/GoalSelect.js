@@ -13,8 +13,8 @@ import Repeat from '../../assets/icons/18x/Repeat';
 import Triathlon from '../../assets/icons/18x/Triathlon';
 import { useNavigation } from '@react-navigation/native';
 import CustomDivider from '../../components/shared/CustomDivider';
-import { useDispatch } from 'react-redux';
-import { clearState } from '../../stores/onboarding/onboardingSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearState, updateState } from '../../stores/onboarding/onboardingSlice';
 import SubHeader from '../../components/shared/SubHeader';
 
 const OPTIONS_LIST = [
@@ -34,6 +34,7 @@ const Container = styled.View`
 const GoalSelect = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const state = useSelector((state) => state.onboarding);
 
   const handlePress = (option) => {
     dispatch(clearState());
@@ -51,7 +52,8 @@ const GoalSelect = () => {
       navigation.navigate('GeneralHealth');
     }
     if (option === 'run_first_5k') {
-      navigation.navigate('RateAbility');
+      dispatch(updateState({ profile: { ...state.profile, ability: 'Beginner' } }));
+      navigation.navigate('PlanLength');
     }
     if (option === 'lose_weight') {
       navigation.navigate('WhereTrain');

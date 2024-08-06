@@ -8,7 +8,6 @@ import PushNotification from 'react-native-push-notification';
 import { Switch } from "react-native-paper";
 import NextButton from "../../components/shared/NextButton";
 import { useDispatch, useSelector } from "react-redux";
-import { update } from "../../stores/user/userSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { updateState } from "../../stores/onboarding/onboardingSlice";

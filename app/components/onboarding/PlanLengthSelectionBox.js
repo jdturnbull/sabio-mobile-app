@@ -11,6 +11,9 @@ const Container = styled(TouchableOpacity)`
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 12px;
+`;
+
+const Inner = styled.View`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -18,9 +21,9 @@ const Container = styled(TouchableOpacity)`
 
 const LabelText = styled.Text`
   font-family: ${(props) => props.theme.text.family};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.md};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
   font-weight: ${(props) => props.theme.text.weight.bold};
-  font-size: 18px;
+  font-size: ${(props) => props.theme.text.size.sm};
   color: ${(props) => props.theme.text.colors.white};
 `;
 
@@ -50,13 +53,33 @@ const Left = styled.View`
 
 const EndDateText = styled.Text`
   font-family: ${(props) => props.theme.text.family};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
   font-weight: ${(props) => props.theme.text.weight.semibold};
-  font-size: ${(props) => props.theme.text.size.sm};
+  font-size: ${(props) => props.theme.text.size.xs};
   color: ${(props) => props.theme.text.colors.grey};
 `;
 
-const PlanLengthSelectionBox = ({ item, selected, setSelected, date, setDate, weeks, setWeeks }) => {
+const ReccomendedBox = styled.View`
+  background-color: ${(props) => props.theme.colors.primary};
+  padding: 5px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 95px;
+  margin-top: 10px;
+`;
+
+const ReccomendedText = styled.Text`
+  font-family: ${(props) => props.theme.text.family};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
+  font-weight: ${(props) => props.theme.text.weight.semibold};
+  font-size: ${(props) => props.theme.text.size.xs};
+  color: ${(props) => props.theme.text.colors.white};
+`;
+
+
+const PlanLengthSelectionBox = ({ item, selected, setSelected, date, setDate, weeks, setWeeks, reccomended }) => {
   const height = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -80,13 +103,15 @@ const PlanLengthSelectionBox = ({ item, selected, setSelected, date, setDate, we
     return (
       <View>
         <Container onPress={handlePress}>
-          <Left>
-            <LabelText>{item.label}</LabelText>
-            <EndDateText>{item.subLabel}</EndDateText>
-          </Left>
-          <RingOuter selected={selected}>
-            <RingInner selected={selected} />
-          </RingOuter>
+          <Inner>
+            <Left>
+              <LabelText>{item.label}</LabelText>
+              <EndDateText>{item.subLabel}</EndDateText>
+            </Left>
+            <RingOuter selected={selected}>
+              <RingInner selected={selected} />
+            </RingOuter>
+          </Inner>
         </Container>
         {selected && (
           <Animated.View style={animatedStyle}>
@@ -101,13 +126,15 @@ const PlanLengthSelectionBox = ({ item, selected, setSelected, date, setDate, we
     return (
       <View>
         <Container onPress={handlePress}>
-          <Left>
-            <LabelText>{item.label}</LabelText>
-            <EndDateText>{item.subLabel}</EndDateText>
-          </Left>
-          <RingOuter selected={selected}>
-            <RingInner selected={selected} />
-          </RingOuter>
+          <Inner>
+            <Left>
+              <LabelText>{item.label}</LabelText>
+              <EndDateText>{item.subLabel}</EndDateText>
+            </Left>
+            <RingOuter selected={selected}>
+              <RingInner selected={selected} />
+            </RingOuter>
+          </Inner>
         </Container>
         {selected && (
           <Animated.View style={animatedStyle}>
@@ -120,13 +147,18 @@ const PlanLengthSelectionBox = ({ item, selected, setSelected, date, setDate, we
 
   return (
     <Container onPress={handlePress}>
-      <Left>
-        <LabelText>{item.label}</LabelText>
-        <EndDateText>{`Ending ${item.endDate}`}</EndDateText>
-      </Left>
-      <RingOuter selected={selected}>
-        <RingInner selected={selected} />
-      </RingOuter>
+      <Inner>
+        <Left>
+          <LabelText>{item.label}</LabelText>
+          <EndDateText>{`${item.endDate}`}</EndDateText>
+        </Left>
+        <RingOuter selected={selected}>
+          <RingInner selected={selected} />
+        </RingOuter>
+      </Inner>
+      {reccomended && <ReccomendedBox>
+        <ReccomendedText>Recommended</ReccomendedText>
+      </ReccomendedBox>}
     </Container>
   );
 };

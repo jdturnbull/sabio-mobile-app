@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
+import { check, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import * as RNLocalize from 'react-native-localize';
 import call from '../../utils/call';
 
@@ -35,13 +36,16 @@ export const setup = createAsyncThunk('user/setup', async (location) => {
 
     // If the session is not active then clear storage and return null
     if (!updated_session?.active) {
-      console.log('here');
       await AsyncStorage.removeItem('session');
       return { session: null, user: null };
     }
 
     // The session is still active, set the updated session in storage and return
     await AsyncStorage.setItem('session', JSON.stringify(updated_session));
+
+
+    const notificationPermission = await check(PERMISSIONS.IOS.NOTIFICATIONS);
+    await call('POST', 'users/setNotificationPermission', { permission: notificationPermission, userId: user.id });
 
     return {
       session: updated_session,

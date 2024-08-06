@@ -36,6 +36,12 @@ justify-content: space-between;
 `;
 
 const CompleteTouchable = styled(TouchableOpacity)`
+    padding: 5px;
+    align-items: center;
+    justify-content: center;
+`;
+
+const CompleteInner = styled.View`
     height: 20px;
     width: 20px;
     border: ${(props) => props.complete ? `2px solid ${props.dayColor}` : '2px solid #A1AAD315'};
@@ -147,8 +153,10 @@ const DayItem = ({ _day, handleSwipeRight, handleSwipeLeft }) => {
         <Container onPress={handlePress} style={{ borderLeftColor: DAY_COLOR_MAP[day] }}>
             <Top>
                 <DayText>{day}</DayText>
-                <CompleteTouchable onPress={handleComplete} complete={complete} dayColor={DAY_COLOR_MAP[day]}>
-                    {complete && <Tick />}
+                <CompleteTouchable onPress={handleComplete}>
+                    <CompleteInner complete={complete} dayColor={DAY_COLOR_MAP[day]}>
+                        {complete && <Tick />}
+                    </CompleteInner>
                 </CompleteTouchable>
             </Top>
             <Mid>

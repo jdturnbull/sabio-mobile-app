@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import styled, { ThemeProvider } from 'styled-components';
 import { REACT_APP_MIXPANEL_API_KEY } from '@env';
@@ -18,6 +18,7 @@ import { createDatabase } from './data/database';
 import Root from './screens/Root';
 import { theme } from './utils/theme';
 import { MixpanelProvider } from './hooks/useMixpanel';
+import Splash from './screens/Splash';
 
 const toastConfig = {
   success: (props) => (
@@ -93,12 +94,25 @@ const App = () => {
 
 const ConnectedApp = () => {
   const [activeRouteName, setActiveRouteName] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleNavStateChange = (state) => {
     if (state) {
       setActiveRouteName(getActiveRouteName(state));
     }
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <Splash />;
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: '#16171B' }}>

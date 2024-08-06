@@ -8,6 +8,8 @@ import getIconFromActivity from '../../../../utils/getIconFromActivity';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
 import Title from '../../../../components/shared/Title';
 import SubHeader from '../../../../components/shared/SubHeader';
+import call from '../../../../utils/call';
+import { hapticImpact } from '../../../../utils/haptics';
 
 const DAY_COLOR_MAP = {
   'Monday': '#885A89',
@@ -21,7 +23,7 @@ const DAY_COLOR_MAP = {
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
-const Container = styled(ScrollView)`
+const Container = styled.View`
   flex: 1;
   background-color: #16171b;
   padding-top: 20px;
@@ -94,6 +96,22 @@ const ActivityBodyText = styled.Text`
   font-weight: ${(props) => props.theme.text.weight.regular};
 `;
 
+const CompleteButton = styled(TouchableOpacity)`
+    width: 100%;
+    background-color: ${(props) => props.theme.colors.white};
+    padding: 10px;
+    border-radius: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+`;
+
+const CompleteText = styled.Text`
+  font-family: ${(props) => props.theme.text.family};
+  font-size: ${(props) => props.theme.text.size.sm};
+  letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
+  font-weight: ${(props) => props.theme.text.weight.bold};
+`;
+
 const EmojiText = styled.Text``;
 
 const ViewDay = () => {
@@ -103,8 +121,11 @@ const ViewDay = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const user = useSelector((state) => state.user.user);
+
   const { _day } = route.params;
   const { day, date, activities } = _day;
+
+  const [complete, setComplete] = useState(activities.every(activity => activity.status === 'COMPLETE'));
 
   const handleBack = () => {
     if (!isProcessing) {
@@ -116,13 +137,20 @@ const ViewDay = () => {
     }
   };
 
+  const handleComplete = async () => {
+    const { training_plan_id } = _day.activities[0];
+
+    hapticImpact();
+    await call('POST', 'users/completeDay', { planId: training_plan_id, date: _day.date })
+    navigation.goBack();
+  };
+
   return (
     <Container>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
         <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}><ArrowLeft /></TouchableOpacity>
         <Title style={{ marginBottom: 0, marginLeft: 10 }}>{moment(date).format('dddd, MMMM Do')}</Title>
       </View>
-      <SubHeader style={{ marginBottom: 20 }}>Activities for the day</SubHeader>
       {activities.map((activity, i) => {
         return (
           <ActivityContainer key={activity.id}>
@@ -145,6 +173,10 @@ const ViewDay = () => {
           </ActivityContainer>
         )
       })}
+      <View style={{ flex: 1, }} />
+      {!complete && <CompleteButton onPress={handleComplete}>
+        <CompleteText>Complete day</CompleteText>
+      </CompleteButton>}
     </Container>
   );
 };

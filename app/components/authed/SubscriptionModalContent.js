@@ -137,7 +137,6 @@ const SubscriptionModalContent = () => {
                 <ModalContent>
                     <ModalInnerContent>
                         <View style={{ width: '100%', alignItems: 'flex-end' }}>
-                            <Text style={{ color: 'red' }}>DEVELOPMENT MODE: JUST PRESS SUBSCRIBE AND IT WILL GO THROUGH WITHOUT CHARGE</Text>
                             <TouchableOpacity onPress={() => dispatch(updateState({ showSubscribeModal: false }))}>
                                 <Close />
                             </TouchableOpacity>

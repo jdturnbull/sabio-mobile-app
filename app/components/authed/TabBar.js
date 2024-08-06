@@ -70,7 +70,7 @@ const TabBar = ({ state, navigation, width }) => {
           return (
             <Touchable onPress={() => handlePress(route)} key={route} width={width / routes.length}>
               <Icon color={selected ? '#fff' : '#f8f8f840'} />
-              <TouchableText selected={selected}>{route}</TouchableText>
+              <TouchableText selected={selected}>{route === 'Profile' ? 'Tweak' : route}</TouchableText>
             </Touchable>
           );
         })}

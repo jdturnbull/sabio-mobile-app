@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { TouchableWithoutFeedback, Keyboard, View, TouchableOpacity, Alert } from 'react-native';
+import { TouchableWithoutFeedback, Keyboard, View, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Title from '../../components/shared/Title';
 import CustomInput from '../../components/shared/CustomInput';
@@ -12,20 +12,8 @@ import SelectableItem from '../../components/shared/SelectableItem';
 import SubHeader from '../../components/shared/SubHeader';
 import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
 import { updateProfile } from '../../stores/user/userSlice';
-
-const OPTIONS = [
-  'Free weights',
-  'Swimming pool',
-  'Treadmill',
-  'Elliptical trainer',
-  'Rowing machine',
-  'Resistance bands',
-  'Yoga mat',
-  'Jump rope',
-  'Exercise ball (stability ball)',
-  'Punching bag',
-  'Stationary bike',
-];
+import extractGoalFromState from '../../utils/extractGoalFromState';
+import retrieveCompletion from '../../utils/retrieveCompletion';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -41,12 +29,56 @@ const EquipmentFacilities = ({ editMode }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
+  const [loading, setLoading] = useState(false);
+  const [options, setOptions] = useState([]);
+
   const user_state = useSelector((state) => state.user);
 
   const [selected, setSelected] = useState(user_state?.profile?.equipment_and_facilities?.split(',') || []);
 
   const state = useSelector((state) => state.onboarding);
+
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const suggestEquipment = async () => {
+    setLoading(true);
+
+    let existing_selections = [];
+
+    if (editMode) {
+      existing_selections = user_state?.profile?.equipment_and_facilities?.split(',') || [];
+    }
+
+    const goal = extractGoalFromState(state);
+
+    let prompt = `You are a personal trainer. Your client has informed you of their goal: ${goal}\n`;
+    prompt += `As their trainer, and with careful consideration of their goal, please return (as JSON) a list of equipment or facilities that will benefit their training.\n`
+    prompt += `Just return the equipment or facility, without an explaination for why they need it.\n`
+    prompt += `Do not include in your list items that are absolutely necessary for the goal. For example you can safely assume someone with a running goal has access to running shoes.\n`
+    prompt += `The equipment or facilities in your list should be things that you may want to assign them to use.\n`
+    prompt += `Your list should be a maximum of 20 items.\n`
+
+    if (existing_selections.length > 0) {
+      prompt += `Your client already has access to the following equipment or facilities: ${existing_selections.join(', ')}\n`;
+      prompt += `Do not return these in your list`
+    }
+
+    prompt += `Your response should be in the following format: {list: []}`;
+
+    const response = await retrieveCompletion({ prompt, json: true })
+    const { list } = JSON.parse(response)
+
+    const uniqueOptions = Array.from(new Set([...existing_selections, ...list]));
+    setOptions(uniqueOptions);
+
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    if (options.length === 0) {
+      suggestEquipment();
+    }
+  }, [])
 
   const handleSubmit = async () => {
     if (editMode) {
@@ -83,11 +115,7 @@ const EquipmentFacilities = ({ editMode }) => {
         setSelected([...selected.filter((s) => s !== opt)]);
       }
     } else {
-      if (opt === 'All') {
-        setSelected(OPTIONS);
-      } else {
-        setSelected([...selected, opt]);
-      }
+      setSelected([...selected, opt]);
     }
   };
 
@@ -111,8 +139,9 @@ const EquipmentFacilities = ({ editMode }) => {
         Sabio will assume you have the basics, here you can specify anything extra
       </SubHeader>
       <OptionsContainer>
-        {OPTIONS.map((opt) => (
-          <SelectableItem key={opt} onPress={handleSelect} label={opt} selected={selected.includes(opt)} />
+        {loading && <ActivityIndicator />}
+        {!loading && options.map((opt) => (
+          <SelectableItem key={opt} label={opt} selected={selected.includes(opt)} onPress={() => handleSelect(opt)} />
         ))}
       </OptionsContainer>
       <View style={{ marginTop: 20, flex: 1 }} />

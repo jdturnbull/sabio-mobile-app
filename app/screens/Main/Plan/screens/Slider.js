@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import styled from 'styled-components';
+import moment from 'moment';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
 import ArrowRight from '../../../../assets/icons/24x/ArrowRight';
 import WeekView from '../components/WeekView';
@@ -49,6 +50,16 @@ const Slider = ({ weeks }) => {
 
   useEffect(() => {
     _setWeeks(weeks);
+    const currentDate = moment();
+    const currentWeekIndex = weeks.findIndex(week =>
+      week.activities.some(activity =>
+        moment(activity.date).isSame(currentDate, 'week')
+      )
+    );
+    if (currentWeekIndex !== -1) {
+      setVisibleIndex(currentWeekIndex);
+      scrollViewRef.current.scrollTo({ x: currentWeekIndex * Dimensions.get('window').width, animated: false });
+    }
   }, [weeks]);
 
   const handlePrev = () => {
