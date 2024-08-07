@@ -69,7 +69,7 @@ const WeekView = ({ week }) => {
       <Container showsVerticalScrollIndicator={false}>
         <PlanScreenOptions week={week} />
         <SabioMessage focus={week.focus} nutrition={week.nutrition_guidelines} />
-        {days.map((day, i) => <DayItem key={day.date} index={i} _day={day} recoveryGuidance={week.recovery_guidelines.monitor} />)}
+        {days.map((day, i) => <DayItem key={day.date} index={i} _day={day} week={week} recoveryGuidance={week.recovery_guidelines.monitor} />)}
       </Container>
     </Animated.View>
   );

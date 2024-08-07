@@ -100,7 +100,7 @@ const ProgressBar = styled(Animated.View)`
 
 const EmojiText = styled.Text``;
 
-const DayItem = ({ _day, recoveryGuidance, index }) => {
+const DayItem = ({ _day, recoveryGuidance, week }) => {
     const { activities, day } = _day;
     const navigation = useNavigation();
     const user = useSelector((state) => state.user.user);
@@ -124,7 +124,7 @@ const DayItem = ({ _day, recoveryGuidance, index }) => {
     });
 
     const handlePress = () => {
-        navigation.navigate('ViewDay', { _day, recoveryGuidance });
+        navigation.navigate('ViewDay', { _day, recoveryGuidance, week });
     };
 
 

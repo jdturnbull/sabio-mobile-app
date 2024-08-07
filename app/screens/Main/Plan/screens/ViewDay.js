@@ -130,7 +130,7 @@ const ViewDay = () => {
 
   const user = useSelector((state) => state.user.user);
 
-  const { _day, recoveryGuidance } = route.params;
+  const { _day, recoveryGuidance, week } = route.params;
   const { day, date, activities } = _day;
 
   const [complete, setComplete] = useState(activities.every(activity => activity.status === 'COMPLETE'));
@@ -155,7 +155,7 @@ const ViewDay = () => {
 
   const handleChat = () => {
     if (user.subscription_status === 'SUBSCRIBED') {
-      navigation.navigate('Chat', { context: day });
+      navigation.navigate('Chat', { day, week });
     } else {
       dispatch(updateState({
         showSubscribeModal: true
