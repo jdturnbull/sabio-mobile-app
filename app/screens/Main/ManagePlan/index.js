@@ -49,6 +49,7 @@ const ManagePlan = () => {
     const user = useSelector((state) => state.user.user);
     const training_plans = useSelector((state) => state.user.training_plans);
     const training_plan = training_plans.find(plan => plan.status === "ACTIVE");
+    const expired_plans = training_plans.filter((plan) => plan.status === 'EXPIRED');
 
     const [prevActive, setPrevActive] = useState(training_plan);
     const [modalVisible, setModalVisible] = useState(false);
@@ -112,7 +113,7 @@ const ManagePlan = () => {
                     {training_plan && <View style={{ marginVertical: 20 }}><TrainingPlanCard plan={training_plan} handleActivate={handleActivate} /></View>}
                     <OptionBox label={'Add a new plan'} onPress={handlePress} Icon={AddOutlined} hideEndIcon />
                     {training_plans.length > 1 && <TrainingPlanList>
-                        <HeaderText style={{ fontWeight: 400 }}>Switchable Plans</HeaderText>
+                        {training_plans.filter(plan => plan.status === "ARCHIVED" || plan.status === "INACTIVE").length > 0 && <HeaderText style={{ fontWeight: 400 }}>Switchable Plans</HeaderText>}
                         {training_plans.filter(plan => plan.status === "INACTIVE").map((plan) => (
                             <TrainingPlanCard key={plan.id} plan={plan} handleActivate={handleActivate} />
                         ))}

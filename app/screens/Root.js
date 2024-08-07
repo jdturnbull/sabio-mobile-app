@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Easing, View, Modal, Dimensions, ActivityIndicator, Text } from 'react-native';
+import { Easing, View, Modal, Dimensions, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import { withIAPContext } from 'react-native-iap';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useDispatch, useSelector } from 'react-redux';
+import moment from 'moment-timezone';
 import Onboarding from '../screens/Onboarding';
 import Main from '../screens/Main';
 import Notifications from './Notifications';
@@ -17,8 +18,10 @@ import NotificationSettings from './NotificationSettings';
 import ManagePlan from './Main/ManagePlan';
 import Privacy from './Privacy';
 import SubscriptionModalContent from '../components/authed/SubscriptionModalContent';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import call from '../utils/call';
+import PlanExpiredModal from '../components/authed/PlanExpiredModal';
+import WeeklyCheckinModal from '../components/authed/WeeklyCheckinModal';
 
 const MAIN_SCREENS = ['Slider', 'Account', 'Notifications', 'Reports', 'Feed', 'View'];
 
@@ -81,6 +84,24 @@ const Root = () => {
   const user = useSelector((state) => state.user.user);
   const session = useSelector((state) => state.user.session);
   const planIsUpdating = useSelector((state) => state.user.plan_updating);
+
+  const [keepWeeklyCheckinClosed, setKeepWeeklyCheckinClosed] = useState(false);
+
+  const training_plans = useSelector((state) => state.user.training_plans) || [];
+  const training_plan = training_plans?.filter((p) => p.status === 'ACTIVE')[0] || null;
+
+  const [planExpired, setPlanExpired] = useState(false);
+  const [showWeeklyCheckinModal, setShowWeeklyCheckinModal] = useState(false);
+
+  useEffect(() => {
+    if (training_plan && moment(training_plan.end_date).isBefore(moment().tz(user.timezone))) {
+      setPlanExpired(true);
+    }
+
+    if (training_plan && training_plan.next_client_checkin_at < moment().valueOf() && !keepWeeklyCheckinClosed && user?.subscription_status === 'SUBSCRIBED') {
+      setShowWeeklyCheckinModal(true);
+    }
+  }, [training_plan]);
 
   const intervalRef = useRef(null);
 
@@ -145,7 +166,6 @@ const Root = () => {
     }
   }, [planIsUpdating]);
 
-
   useEffect(() => {
     if (!user) {
       navigation.navigate('Onboarding', { screen: 'Welcome' });
@@ -165,6 +185,15 @@ const Root = () => {
   const handleRequestClose = () => {
     dispatch(updateState({ showSubscribeModal: false }));
   };
+
+  const handleExpiredPlanClose = () => {
+    setPlanExpired(false);
+  }
+
+  const handleWeeklyCheckinClose = () => {
+    setShowWeeklyCheckinModal(false);
+    setKeepWeeklyCheckinClosed(true);
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: '#16171B' }}>
@@ -188,8 +217,22 @@ const Root = () => {
       >
         <SubscriptionModalContent />
       </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={planExpired}
+      >
+        <PlanExpiredModal handleClose={handleExpiredPlanClose} />
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showWeeklyCheckinModal}
+      >
+        <WeeklyCheckinModal handleClose={handleWeeklyCheckinClose} />
+      </Modal>
       {planIsUpdating && <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#000', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }, animatedStyle]}>
-        <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold', marginBottom: 20 }}>Sabio is analysing your changes</Text>
+        <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold', marginBottom: 20 }}>Sabio is analysing your plan</Text>
         <ActivityIndicator color={'#fff'} />
       </Animated.View>}
     </View>

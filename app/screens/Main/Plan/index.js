@@ -1,20 +1,37 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { useNavigationState, useFocusEffect } from '@react-navigation/native';
+import { useNavigationState, useFocusEffect, useIsFocused } from '@react-navigation/native';
 
 import Slider from './screens/Slider';
 import Replan from './screens/Replan';
 import AddActivity from './screens/AddActivity';
 import ViewDay from './screens/ViewDay';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import call from '../../../utils/call';
+import { updateState } from '../../../stores/user/userSlice';
 
 const PlanStack = createStackNavigator();
 
 const Plan = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user?.user);
+  const plan_updating = useSelector((state) => state.user.plan_updating);
   const training_plans = useSelector((state) => state.user.training_plans);
   const [weeks, setWeeks] = useState([]);
   const navigationState = useNavigationState(state => state);
+
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused) {
+      const run = async () => {
+        const plans = await call('GET', `users/training_plans/${user.id}`);
+        dispatch(updateState({ training_plans: plans }));
+      }
+
+      run();
+    }
+  }, [isFocused]);
 
   const training_plan = useMemo(() => {
     return training_plans?.find(plan => plan.status === 'ACTIVE');
@@ -41,6 +58,12 @@ const Plan = () => {
       fetchActivities();
     }, [fetchActivities, navigationState])
   );
+
+  useEffect(() => {
+    if (!plan_updating) {
+      fetchActivities();
+    }
+  }, [plan_updating]);
 
   return (
     <PlanStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Slider">

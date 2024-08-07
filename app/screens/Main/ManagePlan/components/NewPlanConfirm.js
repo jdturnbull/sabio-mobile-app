@@ -102,7 +102,7 @@ const NewPlanConfirm = ({ handleClose }) => {
         if (plansLeft > 0) {
             dispatch(addNewPlan({ userId: user.id, planId: training_plan.id }));
         } else {
-            Alert.alert('You have no more plan resets left');
+            Alert.alert('You have reached your maximum number of plans');
         }
     }
 

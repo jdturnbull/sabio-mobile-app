@@ -29,9 +29,7 @@ const getActiveSubRoute = (route) => {
 };
 
 const Main = () => {
-  const [tutorialAlertShown, setTutorialAlertShown] = useState(false);
-
-  const user = useSelector((state) => state.user.user);
+  const user = useSelector((state) => state.user?.user);
   const navigationState = useNavigationState(state => state);
   const activeRoute = navigationState.routes[navigationState.index];
   const activeTab = activeRoute.state ? activeRoute.state.routes[activeRoute.state.index].name : activeRoute.name;

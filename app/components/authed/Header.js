@@ -51,7 +51,7 @@ const Header = () => {
 
   let showAlertOnBell = false;
 
-  for (let i = 0; i < notifications.length; i++) {
+  for (let i = 0; i < notifications?.length; i++) {
     if (notifications[i].status === 'PENDING' && notifications[i].type === 'display_only') {
       showAlertOnBell = true;
     }

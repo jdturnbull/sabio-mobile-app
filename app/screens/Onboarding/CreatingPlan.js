@@ -69,6 +69,7 @@ const GuidanceText = styled(Animated.Text)`
   letter-spacing: ${(props) => props.theme.text.letterSpacing.md};
   font-size: ${(props) => props.theme.text.size.md};
   text-align: center;
+  lineHeight: 25px;
 `;
 
 const CreatingPlan = () => {

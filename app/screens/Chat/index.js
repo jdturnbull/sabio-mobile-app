@@ -40,7 +40,6 @@ const TypingAnimationContainer = styled.View`
   padding: 15px;
   margin-bottom: 20px;
   margin-right: 30px;
-  margin-left: 30px;
   align-self: flex-start;
   width: 65px;
 `;
@@ -396,7 +395,7 @@ const Chat = () => {
                             onSubmitEditing={handleSendUserMessage}
                             onKeyPress={(e) => {
                                 if (e.nativeEvent.key === 'Enter') {
-                                    e.preventDefault();
+                                    e.p
                                     handleSendUserMessage();
                                     setUserMessage('');
                                 }

@@ -1,12 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, Easing, StyleSheet } from 'react-native';
-import { useTheme } from 'styled-components';
 
 const TypingIndicator = () => {
     const animatedValues = useRef([new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)]).current;
     let animation;
-
-    const theme = useTheme();
 
     const animate = () => {
         const animationsIn = animatedValues.map((animatedValue) => {

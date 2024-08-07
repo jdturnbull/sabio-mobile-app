@@ -104,18 +104,18 @@ export const updateProfile = createAsyncThunk('users/updateProfile', async ({ da
   }
 });
 
-export const addNewPlan = createAsyncThunk('users/addNewPlan', async ({ userId, planId }) => {
+export const addNewPlan = createAsyncThunk('users/addNewPlan', async ({ userId, planId, hasExpired, achievedGoal }) => {
   try {
-    const response = await call('POST', 'users/addNewPlan', { userId, planId });
+    const response = await call('POST', 'users/addNewPlan', { userId, planId, hasExpired, achievedGoal });
     return response;
   } catch (error) {
     console.log(error);
   }
 });
 
-export const activatePlan = createAsyncThunk('users/activatePlan', async ({ userId, planId }) => {
+export const activatePlan = createAsyncThunk('users/activatePlan', async ({ userId, planId, prevPlanId, prevExpired, achievedGoal }) => {
   try {
-    const response = await call('POST', 'users/activatePlan', { userId, planId });
+    const response = await call('POST', 'users/activatePlan', { userId, planId, prevPlanId, prevExpired, achievedGoal });
     return response;
   } catch (error) {
     console.log(error);
@@ -217,6 +217,15 @@ export const createRehabPlan = createAsyncThunk('users/createRehabPlan', async (
     const response = await call('POST', 'users/createRehabPlan', { userId, description, location });
 
     return response;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+export const addWeeklyCheckin = createAsyncThunk('users/addWeeklyCheckin', async ({ userId, training_plan_id, data }) => {
+  try {
+    const training_plans = await call('POST', 'users/addWeeklyCheckin', { userId, training_plan_id, data });
+    return training_plans;
   } catch (error) {
     console.log(error);
   }
@@ -348,6 +357,10 @@ export const userSlice = createSlice({
     });
     builder.addCase(updateActiveSchedule.fulfilled, (state, action) => {
       state.schedules = action.payload;
+      state.plan_updating = true;
+    });
+    builder.addCase(addWeeklyCheckin.fulfilled, (state, action) => {
+      state.training_plans = action.payload;
       state.plan_updating = true;
     });
     builder.addCase(createRehabPlan.fulfilled, (state, action) => {
