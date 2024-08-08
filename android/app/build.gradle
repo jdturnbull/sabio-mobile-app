@@ -1,0 +1,65 @@
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "com.facebook.react"
+
+android {
+    ndkVersion rootProject.ext.ndkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk rootProject.ext.compileSdkVersion
+
+    namespace "com.heysabio.sabio"
+    defaultConfig {
+        applicationId "com.heysabio.sabio"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+    }
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            signingConfig signingConfigs.debug
+            minifyEnabled true // Enable ProGuard
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+
+    flavorDimensions "store"
+    productFlavors {
+        play {
+            dimension "store"
+        }
+        amazon {
+            dimension "store"
+        }
+    }
+}
+
+dependencies {
+    implementation("com.facebook.react:react-android:0.71.0") // Specify the version explicitly
+    implementation("com.facebook.react:hermes-android:0.71.0") // Specify the version explicitly
+
+    if (hermesEnabled.toBoolean()) {
+        implementation("com.facebook.react:hermes-android:0.71.0") // Specify the version explicitly
+    } else {
+        implementation jscFlavor
+    }
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation platform('com.google.firebase:firebase-bom:31.0.2')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+}
+
+// Apply the Google Services Plugin conditionally
+if (project.hasProperty("googleServicesEnabled") && project.googleServicesEnabled.toBoolean()) {
+    apply plugin: "com.google.gms.google-services"
+}
