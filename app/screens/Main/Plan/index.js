@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigationState, useFocusEffect, useIsFocused, useNavigation } from '@react-navigation/native';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import styled from 'styled-components';
 
 import Slider from './screens/Slider';
@@ -11,7 +11,6 @@ import ViewDay from './screens/ViewDay';
 import { useDispatch, useSelector } from 'react-redux';
 import call from '../../../utils/call';
 import { updateState } from '../../../stores/user/userSlice';
-import Chat from '../../../assets/icons/24x/Chat';
 
 const PlanStack = createStackNavigator();
 
@@ -86,9 +85,6 @@ const Plan = () => {
     }
   }, [plan_updating]);
 
-  const handleChatPress = () => {
-    navigation.navigate('Chat');
-  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -104,9 +100,6 @@ const Plan = () => {
         </PlanStack.Screen>
         <PlanStack.Screen name="AddActivity" component={AddActivity} />
       </PlanStack.Navigator>
-      <FloatingButton onPress={handleChatPress}>
-        <Chat color="#FFFFFF" />
-      </FloatingButton>
     </View>
   );
 };

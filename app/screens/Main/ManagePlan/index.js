@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import NewPlanConfirm from './components/NewPlanConfirm';
 import TrainingPlanCard from './components/TrainingPlanCard';
 import { activatePlan, updateState } from '../../../stores/user/userSlice';
+import InfoButton from '../../../components/shared/InfoButton';
 
 const Container = styled.View`
   flex: 1;
@@ -56,6 +57,8 @@ const ManagePlan = () => {
     const [modalContent, setModalContent] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    const showInfo = !user.first_screen_views['Manage Plan'];
+
 
     const handleBack = () => {
         navigation.goBack();
@@ -78,7 +81,7 @@ const ManagePlan = () => {
                 navigation.navigate('Plan');
             }, 500);
         } else {
-            dispatch(updateState({ showSubscribeModal: true }));
+            dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Manage plan' }));
         }
     }
 
@@ -103,6 +106,7 @@ const ManagePlan = () => {
                     }}>
                     <HeaderText>Manage Plans</HeaderText>
                 </View>
+                <InfoButton showInfo={showInfo} location={"Manage Plan"} small />
             </Header>
             {loading ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

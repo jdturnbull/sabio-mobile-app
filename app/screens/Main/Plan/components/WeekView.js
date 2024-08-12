@@ -6,6 +6,8 @@ import { ScrollView, ActivityIndicator, View } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import PlanScreenOptions from './PlanScreenOptions';
 import SabioMessage from './SabioMessage';
+import { useSelector } from 'react-redux';
+import InfoButton from '../../../../components/shared/InfoButton';
 
 const Container = styled(ScrollView)`
   flex: 1;
@@ -35,8 +37,11 @@ const sortDays = (daysMap) => {
 };
 
 const WeekView = ({ week }) => {
+  const user = useSelector((state) => state.user?.user);
   const [loading, setLoading] = useState(true);
   const opacity = useSharedValue(0);
+
+  const showInfo = !user.first_screen_views['plan'];
 
   const days = useMemo(() => {
     const daysMap = groupActivitiesByDay(week.activities);
@@ -57,7 +62,6 @@ const WeekView = ({ week }) => {
     };
   });
 
-
   if (loading) {
     return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <ActivityIndicator size="small" color="#f8f8f8" />
@@ -69,7 +73,11 @@ const WeekView = ({ week }) => {
       <Container showsVerticalScrollIndicator={false}>
         <PlanScreenOptions week={week} />
         <SabioMessage focus={week.focus} nutrition={week.nutrition_guidelines} />
+        <View style={{ width: '100%', alignItems: 'flex-end', marginBottom: 10 }}>
+          <InfoButton showInfo={showInfo} location={'Plan'} />
+        </View>
         {days.map((day, i) => <DayItem key={day.date} index={i} _day={day} week={week} recoveryGuidance={week.recovery_guidelines.monitor} />)}
+        <View style={{ height: 30 }} />
       </Container>
     </Animated.View>
   );

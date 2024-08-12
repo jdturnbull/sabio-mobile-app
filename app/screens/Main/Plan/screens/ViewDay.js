@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import moment from 'moment';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { ScrollView, View, TouchableOpacity, Text, Dimensions } from 'react-native';
+import { ScrollView, View, TouchableOpacity, Text, Dimensions, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
 import Title from '../../../../components/shared/Title';
@@ -10,7 +10,12 @@ import call from '../../../../utils/call';
 import { hapticImpact } from '../../../../utils/haptics';
 import BodyText from '../../../../components/shared/BodyText';
 import ChatIcon from '../../../../assets/icons/24x/Chat';
+import Repeat from '../../../../assets/icons/18x/Repeat';
+import Help from '../../../../assets/icons/18x/Help';
+import Tick from '../../../../assets/icons/18x/Tick';
 import { updateState } from '../../../../stores/user/userSlice';
+import { Animated } from 'react-native';
+import retrieveCompletion from '../../../../utils/retrieveCompletion';
 
 const DAY_COLOR_MAP = {
   'Monday': '#885A89',
@@ -121,14 +126,60 @@ const ChatButton = styled(TouchableOpacity)`
   align-items: center;
 `;
 
-const ViewDay = () => {
+const OptionButton = styled(TouchableOpacity)`
+  background-color: ${(props) => props.theme.colors.highlight};
+  padding: 8px;
+  border-radius: 8px;
+  margin-right: 10px;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const OptionText = styled.Text`
+  color: #f8f8f8;
+  font-weight: ${(props) => props.theme.text.weight.bold};
+  margin-left: 5px;
+`;
+
+const SpinningRepeat = (props) => {
+  const spinValue = new Animated.Value(0);
+
+  Animated.loop(
+    Animated.timing(
+      spinValue,
+      {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }
+    )
+  ).start();
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg']
+  });
+
+  return (
+    <Animated.View style={{ transform: [{ rotate: spin }] }}>
+      <Repeat {...props} />
+    </Animated.View>
+  );
+};
+
+const ViewDay = ({ fetchActivities }) => {
   const route = useRoute();
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isChanging, setIsChanging] = useState(false);
+  const [proposedChanges, setProposedChanges] = useState([]);
+  const [prevProposedChanges, setPrevProposedChanges] = useState([]);
 
   const user = useSelector((state) => state.user.user);
+  const training_plans = useSelector((state) => state.user.training_plans);
+  const training_plan = training_plans.filter((p) => p.status === 'ACTIVE')[0];
 
   const { _day, recoveryGuidance, week } = route.params;
   const { day, date, activities } = _day;
@@ -163,6 +214,80 @@ const ViewDay = () => {
     }
   }
 
+  const handleChangeActivity = () => {
+    if (user.subscription_status !== 'SUBSCRIBED') {
+      dispatch(updateState({
+        showSubscribeModal: true
+      }));
+    } else {
+      setProposedChanges([]);
+      setIsChanging(true);
+    }
+  };
+
+  useEffect(() => {
+    const runIsChanging = async () => {
+      let prompt = `You are a fitness instructor, you have assigned your client workout(s) for the day however your client has requested to change these activities. Here are the workout(s) you've assigned the client:\n\n`
+      prompt += `{workouts: [\n`
+
+      for (let i = 0; i < activities.length; i++) {
+        prompt += `{'id': ${activities[i].id}, 'title': ${activities[i].title}, 'details': ${activities[i].details}, 'icon': ${activities[i].icon}}\n`
+      }
+
+      prompt += `]}\n\n`;
+
+      prompt += `Your task is to assign the client with a different set of workouts, the new workouts should achieve the same percieved goal as the existing workouts.\n`;
+      prompt += `Here is the client's weekly focus: ${week.focus}\n`
+      prompt += `Here is the client's fitness goal: ${training_plan.goal}\n`
+
+      if (training_plan?.plan?.client_information?.equipment_facilities) {
+        prompt += `Here is some of the client's preffered equipment & facilities (you can also assign them activities not using these):\n`
+        prompt += `${training_plan.plan.client_information.equipment_facilities}\n\n`
+      }
+
+      if (prevProposedChanges.length > 0) {
+        prompt += `You've already attempted to assign the client alternate workouts however they've rejected these, here are the alternate workouts you suggested:\n`
+
+        for (let i = 0; i < prevProposedChanges.length; i++) {
+          prompt += `Title: ${prevProposedChanges[i].title}, details: ${prevProposedChanges.details}\n`
+        }
+
+        prompt += `\n\n`;
+      }
+
+      prompt += `You must return the same number of workouts as shown in the workouts initially assigned to the client.\n`;
+      prompt += `You MUST NOT change the id of the workout\n`;
+
+      prompt += `You must respond in JSON using the format: {workouts: []}`;
+
+      try {
+        const response = await retrieveCompletion({ prompt, json: true });
+        const { workouts } = JSON.parse(response);
+
+        setProposedChanges(workouts);
+        setPrevProposedChanges(workouts);
+        setIsChanging(false);
+
+        const new_activities = activities.map((activity) => {
+          const matchingChange = workouts.filter((p) => p.id === activity.id)[0];
+          return {
+            ...activity,
+            ...matchingChange
+          }
+        });
+
+        await call('POST', 'users/changeDayActivities', { new_activities })
+        await fetchActivities();
+
+      } catch (error) {
+        setProposedChanges([]);
+        setIsChanging(false);
+      }
+    }
+
+    if (isChanging) runIsChanging();
+  }, [isChanging])
+
   return (
     <Container>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
@@ -182,11 +307,15 @@ const ViewDay = () => {
               </Left>
               <View style={{ marginLeft: 6, marginRight: 12, width: 2, backgroundColor: '#f8f8f810', height: '100%', borderRadius: 50 }} />
               <Right>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                  <EmojiText>{activity.icon}</EmojiText>
-                  <ActivityTitle>{activity.title}</ActivityTitle>
-                </View>
-                <ActivityBodyText>{activity.details}</ActivityBodyText>
+                {!isChanging && <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                  <EmojiText>{proposedChanges.length > 0 ? proposedChanges[i].icon : activity.icon}</EmojiText>
+                  <ActivityTitle>{proposedChanges.length > 0 ? proposedChanges[i].title : activity.title}</ActivityTitle>
+                </View>}
+                {isChanging &&
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                    <ActivityIndicator />
+                  </View>}
+                {!isChanging && <ActivityBodyText>{proposedChanges.length > 0 ? proposedChanges[i].details : activity.details}</ActivityBodyText>}
               </Right>
             </ActivityBody>
           </ActivityContainer>
@@ -195,7 +324,24 @@ const ViewDay = () => {
       <View style={{ flex: 1, marginTop: 20 }}>
         <BodyText style={{ fontWeight: 600, marginBottom: 10 }}>Recovery guidance</BodyText>
         <BodyText>{`${recoveryGuidance}`}</BodyText>
-        <BodyText style={{ marginTop: 10, fontWeight: 600, color: '#A1AAD3' }}>Press the icon in the top right to chat with Sabio for guidance</BodyText>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
+          <OptionButton onPress={handleChat}>
+            <Help />
+            <OptionText>Ask a question</OptionText>
+          </OptionButton>
+          {!complete && <OptionButton onPress={handleChangeActivity}>
+            {isChanging ? (
+              proposedChanges.length === 0 ? (
+                <SpinningRepeat />
+              ) : (
+                <Tick />
+              )
+            ) : (
+              <Repeat />
+            )}
+            <OptionText>{activities.length > 1 ? 'Change activities' : 'Change activity'}</OptionText>
+          </OptionButton>}
+        </View>
       </View>
       {!complete && <CompleteButton onPress={handleComplete}>
         <CompleteText>Complete day</CompleteText>

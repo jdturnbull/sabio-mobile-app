@@ -68,7 +68,7 @@ const SubscribePrompt = () => {
     const dispatch = useDispatch();
 
     const handleOpen = () => {
-        dispatch(updateState({ showSubscribeModal: true }));
+        dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Subscribe' }));
     };
 
     const handleRestore = () => { };

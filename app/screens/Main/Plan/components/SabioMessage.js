@@ -6,7 +6,6 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 
 
 const Container = styled.View`
     flex-direction: row;
-    margin-bottom: 20px;
     shadow-color: #000;
     shadow-opacity: 0.25;
     shadow-radius: 3.84px;
@@ -53,7 +52,7 @@ const ToggleButtonText = styled.Text`
     font-weight: ${(props) => props.theme.text.weight.bold};
 `;
 
-const SabioMessage = ({ focus, nutrition }) => {
+const SabioMessage = ({ focus, nutrition, disabled }) => {
     const { caloric_intake, macronutrients } = nutrition;
     const [showMessage, setShowMessage] = useState(false);
     const [contentHeight, setContentHeight] = useState(0);
@@ -93,17 +92,17 @@ const SabioMessage = ({ focus, nutrition }) => {
                     }}
                 >
                     <MessageText>
-                        {`${focus}\n\n${caloric_intake}\n\n${macronutrients}`}
+                        {disabled ? 'Example weekly guidance' : `${focus}\n\n${caloric_intake}\n\n${macronutrients}`}
                     </MessageText>
                 </View>
                 <MessageContainer style={animatedStyle}>
                     <MessageText>
-                        {`${focus}\n\n${caloric_intake}\n\n${macronutrients}`}
+                        {disabled ? 'Example weekly guidance' : `${focus}\n\n${caloric_intake}\n\n${macronutrients}`}
                     </MessageText>
                 </MessageContainer>
-                <ToggleButton onPress={toggleMessage}>
+                {!disabled && <ToggleButton onPress={toggleMessage}>
                     <ToggleButtonText>{showMessage ? "Hide" : "Show"} Sabio's advice</ToggleButtonText>
-                </ToggleButton>
+                </ToggleButton>}
             </Right>
         </Container>
     )

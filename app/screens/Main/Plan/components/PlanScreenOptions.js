@@ -53,11 +53,12 @@ const TouchableText = styled.Text`
     font-weight: ${(props) => props.theme.text.weight.bold};
 `;
 
-const PlanScreenOptions = ({ week }) => {
+const PlanScreenOptions = ({ week, disabled }) => {
 
     const navigation = useNavigation();
 
     const handlePress = (option) => {
+        if (disabled) return;
         if (option.route === 'RearrangeWeek') {
             navigation.navigate(option.route, { week });
             return;

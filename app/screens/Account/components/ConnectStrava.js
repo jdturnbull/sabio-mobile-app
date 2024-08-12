@@ -53,7 +53,7 @@ const ConnectStrava = () => {
             return;
         }
         if (user?.subscription_status !== 'SUBSCRIBED') {
-            dispatch(updateState({ showSubscribeModal: true }));
+            dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Strava' }));
         } else {
             try {
                 const redirect_uri = encodeURIComponent(REACT_APP_STRAVA_REDIRECT);

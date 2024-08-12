@@ -59,7 +59,9 @@ const Account = () => {
     }
   };
 
-  const user = useSelector((state) => state.user.user);
+  const user = useSelector((state) => state.user?.user);
+
+  const showInfo = !user.first_screen_views['Account'];
 
   const [hideSubscribe, setHideSubscribe] = useState(user?.subscription_status === 'UNSUBSCRIBED')
   const [hideSetNotif, setHideSetNotif] = useState(user?.notifications_enabled && user?.notification_settings?.hide_prompt);

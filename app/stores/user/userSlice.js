@@ -250,6 +250,7 @@ export const userSlice = createSlice({
     notifications: [],
     conversations: [],
     connections: [],
+    subscribeModalTriggeredFrom: '',
     showSubscribeModal: false,
   },
   reducers: {

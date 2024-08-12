@@ -11,6 +11,7 @@ import call from "../../utils/call";
 import Calendar from '../../assets/icons/14x/Calendar';
 import Rocket from '../../assets/icons/14x/Rocket';
 import WeekOverview from './components/WeekOverview';
+import InfoButton from "../../components/shared/InfoButton";
 
 const Container = styled.View`
     flex: 1;
@@ -62,6 +63,7 @@ const WeekProgress = styled.View`
 
 const PlanOverview = () => {
     const navigation = useNavigation();
+    const user = useSelector((state) => state.user?.user);
     const training_plans = useSelector((state) => state.user.training_plans);
     const training_plan = useMemo(() => training_plans.find((plan) => plan.status === 'ACTIVE'), [training_plans]);
 
@@ -97,13 +99,19 @@ const PlanOverview = () => {
         }
     };
 
+    const showInfo = !user.first_screen_views['Plan Overview'];
+
+
     return (
         <Container>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
                 <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}><ArrowLeft /></TouchableOpacity>
                 <Title style={{ marginBottom: 0, marginLeft: 10 }}>Plan Overview</Title>
             </View>
-            <SubHeader style={{ marginBottom: 20 }}>Here's how Sabio will guide you to achieving your goals!</SubHeader>
+            <SubHeader>Here's how Sabio will guide you to achieving your goals!</SubHeader>
+            <View style={{ alignItems: 'flex-end', marginBottom: 20 }}>
+                <InfoButton showInfo={showInfo} location={"Plan Overview"} />
+            </View>
             <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
                 <TopContainer>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>

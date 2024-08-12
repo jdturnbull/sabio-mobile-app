@@ -1,10 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { ScrollView, TouchableOpacity, Dimensions, View } from 'react-native';
 import styled from 'styled-components';
 import moment from 'moment';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
 import ArrowRight from '../../../../assets/icons/24x/ArrowRight';
+import Chat from '../../../../assets/icons/24x/Chat';
 import WeekView from '../components/WeekView';
+import { useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateState } from '../../../../stores/user/userSlice';
 
 const Container = styled.View`
   flex: 1;
@@ -42,7 +46,27 @@ const WeekContainer = styled.View`
   padding-horizontal: 20px;
 `;
 
+const FloatingButton = styled(TouchableOpacity)`
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 28px;
+  background-color: ${props => props.theme.colors.primary};
+  justify-content: center;
+  align-items: center;
+  elevation: 5;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+`;
+
 const Slider = ({ weeks }) => {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const user = useSelector((state) => state.user?.user);
   const scrollViewRef = useRef(null);
   const [visibleIndex, setVisibleIndex] = useState(0);
 
@@ -81,6 +105,17 @@ const Slider = ({ weeks }) => {
     setVisibleIndex(index);
   };
 
+  const handleChatPress = () => {
+    if (user.subscription_status === 'SUBSCRIBED') {
+      navigation.navigate('Chat');
+    } else {
+      dispatch(updateState({
+        showSubscribeModal: true,
+        subscribeModalTriggeredFrom: 'Chat'
+      }))
+    }
+  };
+
 
   return (
     <Container>
@@ -107,6 +142,9 @@ const Slider = ({ weeks }) => {
           </WeekContainer>
         ))}
       </Scrollable>
+      <FloatingButton onPress={handleChatPress}>
+        <Chat color="#FFFFFF" />
+      </FloatingButton>
     </Container>
   );
 };

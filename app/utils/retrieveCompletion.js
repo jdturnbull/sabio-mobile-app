@@ -21,7 +21,7 @@ export default async ({ prompt, model, json }) => {
     const completion = await axios.post('https://api.openai.com/v1/chat/completions', body, { headers });
     return completion.data.choices[0].message.content;
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
     return null;
   }
 };

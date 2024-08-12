@@ -18,7 +18,7 @@ import { update, updateState } from "../../stores/user/userSlice";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
-const FEATURES = ['Guidance on injury management, workout details and best practices', 'Enhance Sabio with your Strava data to increase personalisation and coaching quality', 'Access to entire plan and advanced progress tracking']
+const FEATURES = ['Adjust plan based on changes to equipment, ability, preferences and more', 'Guidance on injury management, workout details and best practices', 'Enhance Sabio with your Strava data to increase personalisation and coaching quality', 'Create and switch between multiple training plans']
 
 const ModalContent = styled.View`
     flex: 1;
@@ -116,6 +116,7 @@ const BulletPoint = ({ text }) => {
 const SubscriptionModalContent = () => {
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user.user);
+    const triggeredFrom = useSelector((state) => state.user.subscribeModalTriggeredFrom);
     const [selectedOption, setSelectedOption] = useState('Annual');
 
     const handleSubscribe = async () => {
