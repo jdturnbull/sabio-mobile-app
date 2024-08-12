@@ -63,8 +63,8 @@ const DayText = styled.Text`
 const ItemContainer = styled(Animated.View)`
     flex: 1;
     height: 87px;
-    border: 2px dashed ${(props) => props.color ? 'transparent' : props.theme.colors.background3};
-    background-color: ${(props) => props.color ? props.theme.colors.background3 : 'transparent'};
+    border: 2px dashed ${(props) => props.color ? 'transparent' : props.theme.colors.background2};
+    background-color: ${(props) => props.color ? props.theme.colors.background2 : 'transparent'};
     border-radius: 8px;
     padding: 5px;
     margin-bottom: 5px;
