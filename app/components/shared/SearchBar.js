@@ -63,6 +63,8 @@ const SearchBar = ({ style, onSubmit }) => {
         onBlur={handleBlur}
         onChangeText={setText}
         value={text}
+        keyboardAppearance="dark"
+        blurOnSubmit={true}
         placeholder={placeholder}
         placeholderTextColor="#A1AAD350"
         selectionColor={'#A1AAD390'}

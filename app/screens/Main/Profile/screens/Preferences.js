@@ -176,6 +176,8 @@ const Preferences = () => {
                         value={newPreference}
                         onChangeText={setNewPreference}
                         onSubmitEditing={handlePreferenceSubmit}
+                        keyboardAppearance="dark"
+                        blurOnSubmit={true}
                     />
                 ) : (
                     <NewButtonText>Add new</NewButtonText>

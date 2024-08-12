@@ -4,7 +4,7 @@ import styled from "styled-components";
 import Premium from '../../../../assets/icons/14x/Premium';
 import { useSelector } from "react-redux";
 
-const Container = styled.View`
+const Container = styled(TouchableOpacity)`
     background-color: ${(props) => props.theme.colors.background2};
     border-radius: 10px;
     padding: 10px;
@@ -68,8 +68,14 @@ const TrainingPlanCard = ({ plan, handleActivate }) => {
 
     const handlePress = () => handleActivate(plan.id);
 
+    const handleContainerPress = () => {
+        if (user.subscription_status === 'SUBSCRIBED' && status === 'ARCHIVED') {
+            handlePress();
+        }
+    }
+
     return (
-        <Container active={status === 'ACTIVE'}>
+        <Container onPress={handleContainerPress} active={status === 'ACTIVE'} disabled={status === 'ACTIVE'}>
             <Top>
                 {status === 'ACTIVE' && <TopText>Currently Active Plan</TopText>}
                 <TopText>

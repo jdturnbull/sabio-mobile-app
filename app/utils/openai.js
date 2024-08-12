@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { REACT_APP_OPENAI_API_KEY } from '@env';
 import call from './call';
 
+console.log(REACT_APP_OPENAI_API_KEY);
 export const config = {
     headers: {
         Authorization: `Bearer ${REACT_APP_OPENAI_API_KEY}`,

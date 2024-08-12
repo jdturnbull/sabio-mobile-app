@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import SelectableItem from '../../components/shared/SelectableItem';
 import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
 
-const OPTIONS = ['Asthma', 'Diabetes', 'Arthritis', 'Osteoporosis', 'High Blood Pressure', 'Other'];
+const OPTIONS = ['Asthma', 'Diabetes', 'Arthritis', 'Osteoporosis', 'Other'];
 
 const Container = styled.View`
   flex: 1;

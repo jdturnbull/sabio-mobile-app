@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { useNavigationState, useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { useNavigationState, useFocusEffect, useIsFocused, useNavigation } from '@react-navigation/native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import styled from 'styled-components';
 
 import Slider from './screens/Slider';
 import Replan from './screens/Replan';
@@ -9,11 +11,30 @@ import ViewDay from './screens/ViewDay';
 import { useDispatch, useSelector } from 'react-redux';
 import call from '../../../utils/call';
 import { updateState } from '../../../stores/user/userSlice';
+import Chat from '../../../assets/icons/24x/Chat';
 
 const PlanStack = createStackNavigator();
 
+const FloatingButton = styled(TouchableOpacity)`
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 28px;
+  background-color: ${props => props.theme.colors.primary};
+  justify-content: center;
+  align-items: center;
+  elevation: 5;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+`;
+
 const Plan = () => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const user = useSelector((state) => state.user?.user);
   const plan_updating = useSelector((state) => state.user.plan_updating);
   const training_plans = useSelector((state) => state.user.training_plans);
@@ -65,19 +86,28 @@ const Plan = () => {
     }
   }, [plan_updating]);
 
+  const handleChatPress = () => {
+    navigation.navigate('Chat');
+  };
+
   return (
-    <PlanStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Slider">
-      <PlanStack.Screen name="Slider">
-        {props => <Slider {...props} weeks={weeks} />}
-      </PlanStack.Screen>
-      <PlanStack.Screen name="Replan">
-        {props => <Replan {...props} weeks={weeks} />}
-      </PlanStack.Screen>
-      <PlanStack.Screen name="ViewDay">
-        {props => <ViewDay {...props} fetchActivities={fetchActivities} />}
-      </PlanStack.Screen>
-      <PlanStack.Screen name="AddActivity" component={AddActivity} />
-    </PlanStack.Navigator>
+    <View style={{ flex: 1 }}>
+      <PlanStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Slider">
+        <PlanStack.Screen name="Slider">
+          {props => <Slider {...props} weeks={weeks} />}
+        </PlanStack.Screen>
+        <PlanStack.Screen name="Replan">
+          {props => <Replan {...props} weeks={weeks} />}
+        </PlanStack.Screen>
+        <PlanStack.Screen name="ViewDay">
+          {props => <ViewDay {...props} fetchActivities={fetchActivities} />}
+        </PlanStack.Screen>
+        <PlanStack.Screen name="AddActivity" component={AddActivity} />
+      </PlanStack.Navigator>
+      <FloatingButton onPress={handleChatPress}>
+        <Chat color="#FFFFFF" />
+      </FloatingButton>
+    </View>
   );
 };
 

@@ -102,6 +102,8 @@ const Top = () => {
                         <TouchableWithoutFeedback>
                             <ModalContent>
                                 <ModalInput
+                                    keyboardAppearance="dark"
+                                    blurOnSubmit={true}
                                     value={newUsername}
                                     onChangeText={(text) => {
                                         if (text.length <= 30) {

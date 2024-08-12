@@ -32,9 +32,12 @@ const EquipmentFacilities = ({ editMode }) => {
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState([]);
 
+  const [addingCustom, setAddingCustom] = useState(false);
+  const [customOption, setCustomOption] = useState('');
+
   const user_state = useSelector((state) => state.user);
 
-  const [selected, setSelected] = useState(user_state?.profile?.equipment_and_facilities?.split(',') || []);
+  const [selected, setSelected] = useState((user_state?.profile?.equipment_and_facilities?.split(',') || []).filter(Boolean))
 
   const state = useSelector((state) => state.onboarding);
 
@@ -46,7 +49,7 @@ const EquipmentFacilities = ({ editMode }) => {
     let existing_selections = [];
 
     if (editMode) {
-      existing_selections = user_state?.profile?.equipment_and_facilities?.split(',') || [];
+      existing_selections = selected
     }
 
     const goal = extractGoalFromState(state);
@@ -63,7 +66,6 @@ const EquipmentFacilities = ({ editMode }) => {
     prompt += `Don't include equipment that won't affect the type of activities you provide them, for example a water bottle won't affect the type of activities you provide them.\n`
     prompt += `Your list should be a maximum of 10 items.\n`
 
-    console.log(prompt);
 
     if (existing_selections.length > 0) {
       prompt += `Your client already has access to the following equipment or facilities: ${existing_selections.join(', ')}\n`;
@@ -147,12 +149,31 @@ const EquipmentFacilities = ({ editMode }) => {
       </SubHeader>
       <OptionsContainer>
         {loading && <ActivityIndicator />}
+        {!loading && <View>
+          <SelectableItem onPress={() => setAddingCustom(!addingCustom)} label={'Custom'} selected={addingCustom} />
+          {addingCustom && (
+            <CustomInput
+              label={`Press enter to submit`}
+              placeholder={`Trampoline`}
+              value={customOption}
+              setValue={(value) => setCustomOption(value)}
+              onSubmitEditing={() => {
+                if (customOption.trim() !== '') {
+                  setOptions([customOption.trim(), ...options]);
+                  setSelected([customOption.trim(), ...selected]);
+                  setCustomOption('');
+                  setAddingCustom(false);
+                }
+              }}
+            />
+          )}
+        </View>}
         {!loading && options.map((opt) => (
           <SelectableItem key={opt} label={opt} selected={selected.includes(opt)} onPress={() => handleSelect(opt)} />
         ))}
       </OptionsContainer>
       <View style={{ marginTop: 20, flex: 1 }} />
-      <NextButton onPress={handleSubmit} editMode={editMode} style={{ marginBottom: 50 }} />
+      {!loading && <NextButton onPress={handleSubmit} editMode={editMode} style={{ marginBottom: 50 }} />}
     </Container>
   );
 };

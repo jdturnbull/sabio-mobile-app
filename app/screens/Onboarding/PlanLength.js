@@ -111,7 +111,7 @@ const PlanLength = () => {
   return (
     <Container>
       <Title style={{ marginBottom: 10 }}>How long do you want your plan to be?</Title>
-      <SubHeader>Choose how long you'd to train for (you can change this later)</SubHeader>
+      <SubHeader>Choose how long you'd like to train for</SubHeader>
       <OptionsContainer>
         {OPTIONS.map((opt) => (
           <PlanLengthSelectionBox

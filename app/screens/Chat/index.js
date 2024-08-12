@@ -91,7 +91,7 @@ const StyledKeyboardAvoidingView = styled.KeyboardAvoidingView``;
 
 const Chat = () => {
     const route = useRoute();
-    const { day, week } = route.params;
+    const { day, week } = route.params || {};
 
     const navigation = useNavigation();
     const isFocused = useIsFocused();
@@ -162,7 +162,9 @@ const Chat = () => {
     const setupThread = async () => {
         if (thread) return thread;
         // TODO: Check if this date has a threadId already
-        const threadId = await call('GET', `users/getThreadByDate/${week.activities[0].date}/${user.id}/${week.activities[0].training_plan_id}`);
+        const threadId = week && week.activities && week.activities[0] ?
+            await call('GET', `users/getThreadByDate/${week.activities[0].date}/${user.id}/${week.activities[0].training_plan_id}`) :
+            null;
 
         if (threadId) {
             const { response, error } = await openai.retrieveThread(threadId);
@@ -173,7 +175,9 @@ const Chat = () => {
             const { response, error } = await openai.createThread(messages);
 
             if (response) {
-                await call('POST', 'users/createConversation', { user_id: user.id, thread_id: response.id, training_plan_id: week.activities[0].training_plan_id, associated_date: week.activities[0].date });
+                if (week && week.activities && week.activities[0]) {
+                    await call('POST', 'users/createConversation', { user_id: user.id, thread_id: response.id, training_plan_id: week.activities[0].training_plan_id, associated_date: week.activities[0].date });
+                }
                 return response;
             }
 
@@ -393,9 +397,11 @@ const Chat = () => {
                             value={userMessage}
                             onChangeText={(text) => setUserMessage(text)}
                             onSubmitEditing={handleSendUserMessage}
+                            keyboardAppearance="dark"
                             onKeyPress={(e) => {
                                 if (e.nativeEvent.key === 'Enter') {
-                                    e.p
+                                    e.preventDefault();
+                                    Keyboard.dismiss();
                                     handleSendUserMessage();
                                     setUserMessage('');
                                 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { Keyboard } from 'react-native';
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.colors.background2};
@@ -29,7 +30,7 @@ const StyledInput = styled.TextInput`
   text-align-vertical: ${(props) => (props.multiline ? 'top' : 'center')};
 `;
 
-const CustomInput = ({ placeholder, value, setValue, label, style, keyboardType, onFocus, multiline, hideLabel }) => {
+const CustomInput = ({ placeholder, value, setValue, label, style, keyboardType, onFocus, multiline, hideLabel, onSubmitEditing }) => {
   const [_placeholder, _setPlaceholder] = useState(placeholder);
 
   const handleFocus = () => {
@@ -51,8 +52,13 @@ const CustomInput = ({ placeholder, value, setValue, label, style, keyboardType,
         onFocus={handleFocus}
         onBlur={handleBlur}
         placeholder={_placeholder}
+        onSubmitEditing={() => {
+          Keyboard.dismiss();
+          if (onSubmitEditing) onSubmitEditing();
+        }}
         placeholderTextColor="#A1AAD350"
         selectionColor={'#A1AAD390'}
+        keyboardAppearance="dark"
         multiline={multiline}
       />
     </Container>
