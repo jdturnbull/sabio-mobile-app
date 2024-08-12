@@ -66,7 +66,8 @@ const ReccomendedBox = styled.View`
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: 95px;
+  justify-content: center;
+  width: 110px;
   margin-top: 10px;
 `;
 

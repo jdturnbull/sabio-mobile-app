@@ -172,7 +172,7 @@ const AddRace = () => {
             customInputStyle={{ paddingHorizontal: 20 }}
           />
         </Container>
-        <View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+        <View style={{ marginVertical: 20, paddingHorizontal: 20, marginBottom: 30 }}>
           <TouchableOpacity
             onPress={handleSubmit}
             style={{

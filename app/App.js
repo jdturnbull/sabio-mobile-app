@@ -33,6 +33,8 @@ PushNotification.configure({
   requestPermissions: true,
 });
 
+
+
 const mixpanel = new Mixpanel(REACT_APP_MIXPANEL_API_KEY, false);
 mixpanel.init();
 

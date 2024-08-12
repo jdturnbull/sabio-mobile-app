@@ -31,6 +31,7 @@ const getType = (attributes) => {
     return type;
 };
 
+
 export default getEvents = async ({ query, country }) => {
     const end_date_string = `${moment.utc().add(1, 'y').format('YYYY-MM-DD')}`;
     const date_range_string = `${moment.utc().add(2, 'w').format('YYYY-MM-DD')}..${end_date_string}`;

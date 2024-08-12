@@ -6,8 +6,6 @@ import SubHeader from '../../components/shared/SubHeader';
 import { TouchableOpacity } from 'react-native';
 import moment from 'moment-timezone';
 import { useDispatch, useSelector } from 'react-redux';
-import DateInput from '../../components/shared/DateInput';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import NextButton from '../../components/shared/NextButton';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { useNavigation } from '@react-navigation/native';
@@ -69,35 +67,8 @@ const SubOptionLabel = styled.Text`
   color: ${(props) => props.theme.text.colors.white};
 `;
 
-const RecommendedText = styled.Text`
-  font-family: ${(props) => props.theme.text.family};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.xs};
-  font-weight: ${(props) => props.theme.text.weight.semibold};
-  font-size: ${(props) => props.theme.text.size.xs};
-  color: ${(props) => props.theme.text.colors.darkGrey};
-`;
-
-const RingOuter = styled.View`
-  height: 26px;
-  width: 26px;
-  border-radius: 13px;
-  border: ${(props) => (props.selected ? '1px solid #EE6E12' : '1px solid #000')};
-  background-color: ${(props) => (props.selected ? '#EE6E12' : 'transparent')};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const RingInner = styled.View`
-  height: 10px;
-  width: 10px;
-  border-radius: 5px;
-  background-color: ${(props) => (props.selected ? '#000' : 'transparent')};
-`;
-
 const WhenStart = () => {
   const user = useSelector((state) => state.user);
-  const [date, setDate] = useState(moment.tz(user.timezone).format('YYYY-MM-DD'));
 
   const dispatch = useDispatch();
   const state = useSelector((state) => state.onboarding);
@@ -107,32 +78,35 @@ const WhenStart = () => {
   const scrollRef = useRef();
 
   const today = moment.tz(user.timezone).format('YYYY-MM-DD');
-  const tomorrow = moment.tz(user.timezone).add(1, 'day').format('YYYY-MM-DD');
 
-  const monday = moment
-    .tz(user.timezone)
-    .day(1)
-    .add(moment.tz(user.timezone).day() >= 1 ? 7 : 0, 'days')
-    .format('YYYY-MM-DD');
+  const getNextTwoTrainingDays = () => {
+    const today = moment.tz(user.timezone);
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const trainingDays = state.profile.trainingDays.map(day => daysOfWeek.indexOf(day));
 
-  const isSelected = (opt) => {
-    if (opt === 'now') {
-      if (date === today || date === tomorrow || date === monday) {
-        return true;
-      } else {
-        return false;
+    let nextDays = [];
+    let currentDay = today.clone();
+
+    while (nextDays.length < 2) {
+      if (trainingDays.includes(currentDay.day())) {
+        nextDays.push(currentDay.format('YYYY-MM-DD'));
       }
+      currentDay.add(1, 'day');
     }
 
-    if (opt === 'today') return date === today;
-    if (opt === 'tomorrow') return date === tomorrow;
-    if (opt === 'monday') return date === monday;
+    return nextDays;
   };
 
-  const handleSubOptionPress = (opt) => {
-    if (opt === 'today') setDate(today);
-    if (opt === 'tomorrow') setDate(tomorrow);
-    if (opt === 'monday') setDate(monday);
+  const [nextTrainingDay1, nextTrainingDay2] = getNextTwoTrainingDays();
+
+  const [date, setDate] = useState(nextTrainingDay1);
+
+  const isSelected = (_date) => {
+    return date === _date
+  };
+
+  const handleSubOptionPress = (_date) => {
+    setDate(_date);
   };
 
   const handleNext = () => {
@@ -153,34 +127,30 @@ const WhenStart = () => {
   return (
     <Container ref={scrollRef}>
       <Title style={{ marginBottom: 10 }}>When do you want to start your plan?</Title>
-      <SubHeader>Pick a day that suits you best</SubHeader>
+      <SubHeader>Pick one of your next training dates</SubHeader>
       <OptionsContainer>
         <NowOption>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View style={{ flex: 1 }}>
               <DateText>{moment(date, 'YYYY-MM-DD').format('D MMM YYYY')}</DateText>
             </View>
-            <View>
-              <RingOuter selected={isSelected('now')}>
-                <RingInner selected={isSelected('now')} />
-              </RingOuter>
-            </View>
           </View>
-          <Label>Now</Label>
+          <Label>
+            {moment(date, 'YYYY-MM-DD').diff(moment(), 'days') === 0
+              ? 'Today'
+              : moment(date, 'YYYY-MM-DD').diff(moment(), 'days') === 1
+                ? 'Tomorrow'
+                : `${moment(date, 'YYYY-MM-DD').diff(moment(), 'days')} days from today`}
+          </Label>
           <SubOptionBox>
-            <SubOption onPress={() => handleSubOptionPress('today')} selected={isSelected('today')}>
-              <SubOptionLabel selected={isSelected('today')}>Today</SubOptionLabel>
+            <SubOption onPress={() => handleSubOptionPress(nextTrainingDay1)} selected={isSelected(nextTrainingDay1)}>
+              <SubOptionLabel selected={isSelected(nextTrainingDay1)}>{moment(nextTrainingDay1, 'YYYY-MM-DD').format('dddd, Do')}</SubOptionLabel>
             </SubOption>
-            <SubOption onPress={() => handleSubOptionPress('tomorrow')} selected={isSelected('tomorrow')}>
-              <SubOptionLabel selected={isSelected('tomorrow')}>Tomorrow</SubOptionLabel>
-            </SubOption>
-            <SubOption onPress={() => handleSubOptionPress('monday')} selected={isSelected('monday')}>
-              <SubOptionLabel selected={isSelected('monday')}>Monday</SubOptionLabel>
-            </SubOption>
+            {nextTrainingDay2 && <SubOption onPress={() => handleSubOptionPress(nextTrainingDay2)} selected={isSelected(nextTrainingDay2)}>
+              <SubOptionLabel selected={isSelected(nextTrainingDay2)}>{moment(nextTrainingDay2, 'YYYY-MM-DD').format('dddd, Do')}</SubOptionLabel>
+            </SubOption>}
           </SubOptionBox>
-          <RecommendedText>Recommended for maximum training time</RecommendedText>
         </NowOption>
-        <DateInput value={date} setValue={setDate} label={'Plan start date'} />
       </OptionsContainer>
       <View style={{ flex: 1 }} />
       <NextButton style={{ marginBottom: 20 }} onPress={handleNext}>

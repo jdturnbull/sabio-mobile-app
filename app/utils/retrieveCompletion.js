@@ -11,6 +11,7 @@ export default async ({ prompt, model, json }) => {
     body = { model: model ? model : 'gpt-4o', messages: [{ role: 'user', content: prompt }] };
   }
 
+
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${REACT_APP_OPENAI_API_KEY}`,

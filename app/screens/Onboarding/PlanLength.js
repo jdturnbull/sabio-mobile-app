@@ -23,13 +23,14 @@ const OptionsContainer = styled.View`
 const PlanLength = () => {
   const user = useSelector((state) => state.user);
   const state = useSelector((state) => state.onboarding);
-  const today = moment.tz(user.timezone);
+
+  const start = moment.tz(state.profile.startDate, user.timezone);
 
   const navigation = useNavigation();
 
   const [selected, setSelected] = useState('16 Weeks');
-  const [weeks, setWeeks] = useState(12);
-  const [date, setDate] = useState(today.format('YYYY-MM-DD'));
+  const [weeks, setWeeks] = useState(16);
+  const [date, setDate] = useState(start.format('YYYY-MM-DD'));
 
   const dispatch = useDispatch();
 
@@ -40,15 +41,15 @@ const PlanLength = () => {
     },
     {
       label: '14 Weeks',
-      endDate: today.clone().add(14, 'weeks').format('DD MMM YYYY'),
+      endDate: start.clone().add(14, 'weeks').format('DD MMM YYYY'),
     },
     {
       label: '16 Weeks',
-      endDate: today.clone().add(16, 'weeks').format('DD MMM YYYY'),
+      endDate: start.clone().add(16, 'weeks').format('DD MMM YYYY'),
     },
     {
       label: '20 Weeks',
-      endDate: today.clone().add(16, 'weeks').format('DD MMM YYYY'),
+      endDate: start.clone().add(20, 'weeks').format('DD MMM YYYY'),
     },
     { label: 'Custom Date', subLabel: '1 - 12 months' },
   ];
@@ -78,13 +79,13 @@ const PlanLength = () => {
       return;
     }
 
-    if (selected === 'Custom Date' && moment(date).isBefore(today.clone().add(1, 'month'))) {
-      Alert.alert('The selected end date must be at least one month from today');
+    if (selected === 'Custom Date' && moment(date).isBefore(start.clone().add(1, 'month'))) {
+      Alert.alert('The selected end date must be at least one month from your start date');
       return;
     }
 
-    if (selected === 'Custom Date' && moment(date).isAfter(today.clone().add(1, 'year'))) {
-      Alert.alert('The selected end date must be within one year from today');
+    if (selected === 'Custom Date' && moment(date).isAfter(start.clone().add(1, 'year'))) {
+      Alert.alert('The selected end date must be within one year from your start date');
       return;
     }
 

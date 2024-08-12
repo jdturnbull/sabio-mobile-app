@@ -99,11 +99,14 @@ const NewPlanConfirm = ({ handleClose }) => {
     };
 
     const handleConfirm = () => {
-        if (plansLeft > 0) {
-            dispatch(addNewPlan({ userId: user.id, planId: training_plan.id }));
-        } else {
-            Alert.alert('You have reached your maximum number of plans');
-        }
+        // if (plansLeft > 0) {
+        //     dispatch(addNewPlan({ userId: user.id, planId: training_plan.id }));
+        // } else {
+        //     Alert.alert('You have reached your maximum number of plans');
+        // }
+
+        // TESTING PURPOSES
+        dispatch(addNewPlan({ userId: user.id, planId: training_plan.id }));
     }
 
 
