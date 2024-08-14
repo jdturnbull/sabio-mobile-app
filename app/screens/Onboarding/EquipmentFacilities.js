@@ -14,6 +14,7 @@ import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
 import { updateProfile } from '../../stores/user/userSlice';
 import extractGoalFromState from '../../utils/extractGoalFromState';
 import retrieveCompletion from '../../utils/retrieveCompletion';
+import { usePostHog } from 'posthog-react-native';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -26,6 +27,7 @@ const OptionsContainer = styled.View`
 `;
 
 const EquipmentFacilities = ({ editMode }) => {
+  const posthog = usePostHog();
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
@@ -97,12 +99,19 @@ const EquipmentFacilities = ({ editMode }) => {
         [
           {
             text: 'Cancel',
+            onPress: () => {
+              posthog.capture('profile_update_cancelled', { field: 'equipment_facilities' });
+            },
             style: 'cancel',
           },
           {
             text: 'Confirm',
             onPress: () => {
+              if (customOption !== '') {
+                selected.push(customOption);
+              }
               dispatch(updateProfile({ userId: user_state.user.id, data: { equipment_and_facilities: selected.join(',') } }));
+              posthog.capture('updated_equipment_facilities', { equipment_facilities: selected });
               navigation.goBack();
             },
           },
@@ -112,6 +121,7 @@ const EquipmentFacilities = ({ editMode }) => {
       return;
     } else {
       dispatch(updateState({ profile: { ...state.profile, equipmentFacilities: selected } }));
+      posthog.capture('set_onboarding_equipment_facilities', { equipment_facilities: selected });
       navigation.navigate('RequestNotifications');
     }
   };

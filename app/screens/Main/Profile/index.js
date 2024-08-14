@@ -31,8 +31,6 @@ const Profile = () => {
   const activeRoute = navigationState.routes[navigationState.index];
   const activeStackRoute = activeRoute.state ? activeRoute.state.routes[activeRoute.state.index].name : activeRoute.name;
 
-
-
   return (
     <Container>
       <ProfileStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="View">

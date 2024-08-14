@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { TouchableOpacity, Modal, View, Text, ScrollView } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withRepeat, Easing } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withRepeat, Easing, runOnJS } from 'react-native-reanimated';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import InfoIcon from '../../../assets/icons/24x/Info';
 import InfoIconSmall from '../../../assets/icons/20x/Info';
@@ -11,6 +11,10 @@ import ManagePlan from './content/ManagePlan';
 import Plan from './content/Plan';
 import PlanOverview from './content/PlanOverview';
 import Profile from './content/Profile';
+import { useDispatch, useSelector } from 'react-redux';
+import { update } from '../../../stores/user/userSlice';
+import Clear from '../../../assets/icons/24x/Clear';
+import { usePostHog } from 'posthog-react-native';
 
 const InnerView = styled.View`
     flex: 1;
@@ -66,10 +70,14 @@ const MODAL_HEIGHTS = {
     'default': '88%'
 };
 
-const InfoButton = ({ showInfo, location, small }) => {
+const InfoButton = ({ location, small }) => {
+    const posthog = usePostHog();
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user.user);
     const [modalVisible, setModalVisible] = useState(false);
     const infoButtonOpacity = useSharedValue(1);
     const translateY = useSharedValue(0);
+    const [showInfo, setShowInfo] = useState(!user?.first_screen_views[location]);
 
     useEffect(() => {
         if (showInfo) {
@@ -98,6 +106,7 @@ const InfoButton = ({ showInfo, location, small }) => {
 
     const handlePress = () => {
         translateY.value = 0; // Reset translateY when modal is opened
+        posthog.capture('info_button_pressed', { location: location });
         setModalVisible(true);
     };
 
@@ -107,9 +116,18 @@ const InfoButton = ({ showInfo, location, small }) => {
         }
     };
 
+    const setHasViewed = async () => {
+        if (showInfo) {
+            dispatch(update({ userId: user.id, data: { first_screen_views: { ...user.first_screen_views, [location]: true } } }));
+            posthog.capture('info_screen_viewed', { location: location });
+            setShowInfo(false);
+        }
+    }
+
     const handleGestureEnd = (event) => {
         if (event.nativeEvent.translationY > 100) {
             setModalVisible(false);
+            runOnJS(setHasViewed)();
         } else {
             translateY.value = withTiming(0);
         }
@@ -139,7 +157,15 @@ const InfoButton = ({ showInfo, location, small }) => {
                 <PanGestureHandler style={{ flex: 1 }} onGestureEvent={handleGesture} onHandlerStateChange={handleGestureEnd}>
                     <InnerView>
                         <ModalView style={modalStyle} height={modalHeight}>
-                            <Title>{`Using the ${location} screen`}</Title>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                                <Title style={{ marginBottom: 0 }}>{`Using the ${location} screen`}</Title>
+                                <TouchableOpacity style={{ padding: 5 }} onPress={() => {
+                                    setModalVisible(false);
+                                    setHasViewed();
+                                }}>
+                                    <Clear />
+                                </TouchableOpacity>
+                            </View>
                             <ModalContentContainer showsVerticalScrollIndicator={false}>
                                 <Content />
                             </ModalContentContainer>

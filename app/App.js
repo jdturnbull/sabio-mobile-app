@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import styled, { ThemeProvider } from 'styled-components';
-import { REACT_APP_MIXPANEL_API_KEY } from '@env';
 import { StatusBar } from 'react-native';
 import PushNotification from 'react-native-push-notification';
+import { PostHogProvider } from 'posthog-react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Mixpanel } from 'mixpanel-react-native';
+import { REACT_APP_POSTHOG_API_KEY } from '@env';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import { Provider, useDispatch } from 'react-redux';
 import { ActiveRouteProvider } from './hooks/useActiveRoute';
@@ -16,7 +16,6 @@ import { OverlayPortal } from './components/shared/Overlay';
 import { createDatabase } from './data/database';
 import Root from './screens/Root';
 import { theme } from './utils/theme';
-import { MixpanelProvider } from './hooks/useMixpanel';
 import Splash from './screens/Splash';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
@@ -29,14 +28,9 @@ PushNotification.configure({
   onNotification: function (notification) {
     notification.finish(PushNotificationIOS.FetchResult.NoData);
   },
-  popInitialNotification: true,
+  popInitialNotification: false,
   requestPermissions: true,
 });
-
-
-
-const mixpanel = new Mixpanel(REACT_APP_MIXPANEL_API_KEY, false);
-mixpanel.init();
 
 const AppContainer = styled.View`
   flex: 1;
@@ -100,8 +94,8 @@ const ConnectedApp = () => {
     <View style={{ flex: 1, backgroundColor: '#16171B' }}>
       {isLoading ? <Splash /> : (
         <Animated.View style={[{ flex: 1, backgroundColor: '#16171B' }, animatedStyle]}>
-          <MixpanelProvider>
-            <NavigationContainer theme={{ colors: { background: '#16171B' } }} onStateChange={handleNavStateChange}>
+          <NavigationContainer theme={{ colors: { background: '#16171B' } }} onStateChange={handleNavStateChange}>
+            <PostHogProvider apiKey={REACT_APP_POSTHOG_API_KEY} options={{ host: 'https://eu.i.posthog.com', customStorage: AsyncStorage }}>
               <ThemeProvider theme={theme}>
                 <Provider store={store}>
                   <ActiveRouteProvider activeRoute={activeRouteName}>
@@ -111,8 +105,8 @@ const ConnectedApp = () => {
                   </ActiveRouteProvider>
                 </Provider>
               </ThemeProvider>
-            </NavigationContainer>
-          </MixpanelProvider>
+            </PostHogProvider>
+          </NavigationContainer>
         </Animated.View>
       )}
     </View >

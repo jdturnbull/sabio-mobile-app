@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import moment from 'moment';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { ScrollView, View, TouchableOpacity, Text, Dimensions, ActivityIndicator } from 'react-native';
+import { View, TouchableOpacity, Text, Dimensions, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
 import Title from '../../../../components/shared/Title';
@@ -16,6 +16,7 @@ import Tick from '../../../../assets/icons/18x/Tick';
 import { updateState } from '../../../../stores/user/userSlice';
 import { Animated } from 'react-native';
 import retrieveCompletion from '../../../../utils/retrieveCompletion';
+import { usePostHog } from 'posthog-react-native';
 
 const DAY_COLOR_MAP = {
   'Monday': '#885A89',
@@ -168,6 +169,7 @@ const SpinningRepeat = (props) => {
 };
 
 const ViewDay = ({ fetchActivities }) => {
+  const posthog = usePostHog();
   const route = useRoute();
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -199,17 +201,21 @@ const ViewDay = ({ fetchActivities }) => {
   const handleComplete = async () => {
     const { training_plan_id } = _day.activities[0];
 
+
     hapticImpact();
     await call('POST', 'users/completeDay', { planId: training_plan_id, date: _day.date })
+    posthog.capture('completed_day', { day: day, date: _day.date });
     navigation.goBack();
   };
 
   const handleChat = () => {
     if (user.subscription_status === 'SUBSCRIBED') {
       navigation.navigate('Chat', { day, week });
+      posthog.capture('activity_chat_button_pressed', { day: day, week: week });
     } else {
       dispatch(updateState({
-        showSubscribeModal: true
+        showSubscribeModal: true,
+        subscribeModalTriggeredFrom: 'Chat'
       }))
     }
   }
@@ -217,9 +223,11 @@ const ViewDay = ({ fetchActivities }) => {
   const handleChangeActivity = () => {
     if (user.subscription_status !== 'SUBSCRIBED') {
       dispatch(updateState({
-        showSubscribeModal: true
+        showSubscribeModal: true,
+        subscribeModalTriggeredFrom: 'View day activity quick change'
       }));
     } else {
+      posthog.capture('activity_change_button_pressed', { day: day, week: week });
       setProposedChanges([]);
       setIsChanging(true);
     }
@@ -322,8 +330,8 @@ const ViewDay = ({ fetchActivities }) => {
         )
       })}
       <View style={{ flex: 1, marginTop: 20 }}>
-        <BodyText style={{ fontWeight: 600, marginBottom: 10 }}>Recovery guidance</BodyText>
-        <BodyText>{`${recoveryGuidance}`}</BodyText>
+        {recoveryGuidance && <BodyText style={{ fontWeight: 600, marginBottom: 10 }}>Recovery guidance</BodyText>}
+        {recoveryGuidance && <BodyText>{recoveryGuidance}</BodyText>}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
           <OptionButton onPress={handleChat}>
             <Help />

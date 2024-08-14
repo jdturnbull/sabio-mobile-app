@@ -9,6 +9,7 @@ import Title from "../shared/Title";
 import SubHeader from "../shared/SubHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { addWeeklyCheckin } from "../../stores/user/userSlice";
+import { usePostHog } from "posthog-react-native";
 
 const Container = styled.View`
     flex: 1;
@@ -57,6 +58,7 @@ const ButtonContainer = styled.View`
 `;
 
 const WeeklyCheckinModal = ({ handleClose }) => {
+    const posthog = usePostHog();
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user?.user);
     const training_plans = useSelector((state) => state.user.training_plans) || [];
@@ -68,14 +70,17 @@ const WeeklyCheckinModal = ({ handleClose }) => {
 
     const handleContinue = () => {
         if (!exerciseFlowNotWork && !anyLimitations && !boredom) {
+            posthog.capture('weekly_checkin_skip', { exerciseFlowNotWork, anyLimitations, boredom });
             handleClose();
         } else {
+            posthog.capture('weekly_checkin_save', { exerciseFlowNotWork, anyLimitations, boredom });
             dispatch(addWeeklyCheckin({ userId: user.id, training_plan_id: training_plan.id, data: { exerciseFlowNotWork, anyLimitations, boredom } }));
             handleClose();
         }
     }
 
     const handleSkip = () => {
+        posthog.capture('weekly_checkin_skip', { exerciseFlowNotWork, anyLimitations, boredom });
         handleClose();
     }
 

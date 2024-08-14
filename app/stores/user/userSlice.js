@@ -78,6 +78,7 @@ export const continueWithApple = createAsyncThunk('user/continueWithApple', asyn
     const timezone = RNLocalize.getTimeZone();
     const { user, session } = await call('POST', 'auth/apple', { ...response, timezone });
 
+
     await AsyncStorage.setItem('session', JSON.stringify(session));
 
     return { session, user };

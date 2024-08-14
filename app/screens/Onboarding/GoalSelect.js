@@ -16,6 +16,7 @@ import CustomDivider from '../../components/shared/CustomDivider';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearState, updateState } from '../../stores/onboarding/onboardingSlice';
 import SubHeader from '../../components/shared/SubHeader';
+import { usePostHog } from 'posthog-react-native';
 
 const OPTIONS_LIST = [
   { label: 'Run a set distance', id: 'run_set_distance', Icon: Measure },
@@ -32,6 +33,7 @@ const Container = styled.View`
 `;
 
 const GoalSelect = () => {
+  const posthog = usePostHog();
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const state = useSelector((state) => state.onboarding);
@@ -40,28 +42,36 @@ const GoalSelect = () => {
     dispatch(clearState());
 
     if (option === 'race_an_event') {
+      posthog.capture('goal_select_option_pressed', { option: 'race_an_event' });
       navigation.navigate('SelectEvent');
     }
     if (option === 'custom_goal') {
+      posthog.capture('goal_select_option_pressed', { option: 'custom_goal' });
       navigation.navigate('CustomGoal');
     }
     if (option === 'run_set_distance') {
+      posthog.capture('goal_select_option_pressed', { option: 'run_set_distance' });
       navigation.navigate('RunDistance');
     }
     if (option === 'improve_general_health') {
+      posthog.capture('goal_select_option_pressed', { option: 'improve_general_health' });
       navigation.navigate('GeneralHealth');
     }
     if (option === 'run_first_5k') {
+      posthog.capture('goal_select_option_pressed', { option: 'run_first_5k' });
       dispatch(updateState({ profile: { ...state.profile, ability: 'Beginner' } }));
       navigation.navigate('PlanLength');
     }
     if (option === 'lose_weight') {
+      posthog.capture('goal_select_option_pressed', { option: 'lose_weight' });
       navigation.navigate('WhereTrain');
     }
     if (option === 'train_for_a_triathlon') {
+      posthog.capture('goal_select_option_pressed', { option: 'train_for_a_triathlon' });
       navigation.navigate('TriathlonDistance');
     }
     if (option === 'general_fitness') {
+      posthog.capture('goal_select_option_pressed', { option: 'general_fitness' });
       navigation.navigate('GeneralFitness');
     }
   };

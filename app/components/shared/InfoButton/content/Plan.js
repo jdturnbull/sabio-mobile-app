@@ -74,7 +74,7 @@ const PlanExplainer = () => {
                     </View>
                     <View style={{ marginTop: 10 }}>
                         <ExplainerText>
-                            Chnage your weekly schedule
+                            Change your weekly schedule
                         </ExplainerText>
                     </View>
                 </View>

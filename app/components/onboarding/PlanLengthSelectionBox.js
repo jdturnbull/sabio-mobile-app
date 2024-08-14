@@ -116,7 +116,7 @@ const PlanLengthSelectionBox = ({ item, selected, setSelected, date, setDate, we
         </Container>
         {selected && (
           <Animated.View style={animatedStyle}>
-            <CustomSlider label={'Weeks'} value={weeks} setValue={setWeeks} max={52} min={4} step={1} />
+            <CustomSlider label={'Weeks'} value={weeks} setValue={setWeeks} max={45} min={4} step={1} />
           </Animated.View>
         )}
       </View>

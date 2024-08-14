@@ -6,6 +6,7 @@ import Calendar from '../../../../assets/icons/18x/Calendar';
 import Repeat from '../../../../assets/icons/18x/Repeat';
 import Edit from '../../../../assets/icons/18x/Edit';
 import { useNavigation } from "@react-navigation/native";
+import { usePostHog } from "posthog-react-native";
 
 const OPTIONS = [{ label: 'Overview', route: 'PlanOverview' }, { label: 'Organise', route: 'RearrangeWeek' }, { label: 'Adjust', route: 'Main', screen: 'Profile', subScreen: 'View' }, { label: 'Switch', route: 'Account', params: { option: 'Manage your plans' } }];
 
@@ -54,11 +55,12 @@ const TouchableText = styled.Text`
 `;
 
 const PlanScreenOptions = ({ week, disabled }) => {
-
+    const posthog = usePostHog();
     const navigation = useNavigation();
 
     const handlePress = (option) => {
         if (disabled) return;
+        posthog.capture('plan_screen_option_press', { option: option.label });
         if (option.route === 'RearrangeWeek') {
             navigation.navigate(option.route, { week });
             return;

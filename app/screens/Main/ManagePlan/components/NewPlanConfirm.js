@@ -5,6 +5,7 @@ import { View, TouchableOpacity, Dimensions } from "react-native";
 import Close from '../../../../assets/icons/18x/Clear';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewPlan } from '../../../../stores/user/userSlice';
+import { usePostHog } from 'posthog-react-native';
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window')
 
@@ -84,6 +85,7 @@ const getBodyText = (status, plansLeft) => {
 
 
 const NewPlanConfirm = ({ handleClose }) => {
+    const posthog = usePostHog();
     const dispatch = useDispatch();
     const state = useSelector(state => state.user);
     const user = state.user;
@@ -99,14 +101,13 @@ const NewPlanConfirm = ({ handleClose }) => {
     };
 
     const handleConfirm = () => {
-        // if (plansLeft > 0) {
-        //     dispatch(addNewPlan({ userId: user.id, planId: training_plan.id }));
-        // } else {
-        //     Alert.alert('You have reached your maximum number of plans');
-        // }
-
-        // TESTING PURPOSES
-        dispatch(addNewPlan({ userId: user.id, planId: training_plan.id }));
+        if (plansLeft > 0) {
+            posthog.capture('add_new_plan', { plansLeft: plansLeft });
+            dispatch(addNewPlan({ userId: user.id, planId: training_plan.id }));
+        } else {
+            posthog.capture('plan_limit_reached', { plansLeft: plansLeft });
+            Alert.alert('You have reached your maximum number of plans');
+        }
     }
 
 
@@ -127,6 +128,9 @@ const NewPlanConfirm = ({ handleClose }) => {
                         {plansLeft > 0 && <FloatingButton onPress={handleConfirm}>
                             <FloatingButtonText>Confirm</FloatingButtonText>
                         </FloatingButton>}
+                        <FloatingButton onPress={handleConfirm}>
+                            <FloatingButtonText>Confirm</FloatingButtonText>
+                        </FloatingButton>
                     </ModalInnerContent>
                 </ModalContent>
             </PanGestureHandler>

@@ -9,6 +9,7 @@ import Title from '../../components/shared/Title';
 import SubHeader from '../../components/shared/SubHeader';
 import NextButton from '../../components/shared/NextButton';
 import { update } from '../../stores/user/userSlice';
+import { usePostHog } from 'posthog-react-native';
 
 const Container = styled.View`
   flex: 1;
@@ -42,6 +43,7 @@ const OptionText = styled.Text`
 
 
 const NotificationSettings = () => {
+    const posthog = usePostHog();
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user.user);
@@ -69,6 +71,8 @@ const NotificationSettings = () => {
         if (socialNotifications || actionsNotifications || progressNotifications || motivationNotifications) {
             notifications_enabled = true;
         }
+
+        posthog.capture('notification_settings_save', { socialNotifications, actionsNotifications, progressNotifications, motivationNotifications, notifications_enabled });
 
         dispatch(update({
             userId: user.id,

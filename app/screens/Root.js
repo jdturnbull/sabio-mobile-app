@@ -22,6 +22,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import call from '../utils/call';
 import PlanExpiredModal from '../components/authed/PlanExpiredModal';
 import WeeklyCheckinModal from '../components/authed/WeeklyCheckinModal';
+import { usePostHog } from 'posthog-react-native';
 
 const MAIN_SCREENS = ['Slider', 'Account', 'Notifications', 'Reports', 'Feed', 'View'];
 
@@ -79,6 +80,7 @@ const CustomTransition = {
 const RootStack = createStackNavigator();
 
 const Root = () => {
+  const posthog = usePostHog();
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const user = useSelector((state) => state.user.user);
@@ -118,6 +120,11 @@ const Root = () => {
   useEffect(() => {
     if (!user) {
       dispatch(setup('Root'));
+    } else {
+      posthog.identify(user.id, {
+        email: user.email,
+        name: `${user.first_name} ${user.second_name}`,
+      });
     }
   }, [user]);
 

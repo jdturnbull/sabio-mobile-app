@@ -5,6 +5,7 @@ import moment from "moment-timezone";
 import BodyText from "../shared/BodyText";
 import { useDispatch, useSelector } from "react-redux";
 import { activatePlan, addNewPlan, setup } from "../../stores/user/userSlice";
+import { usePostHog } from "posthog-react-native";
 
 const Container = styled.View`
     flex: 1;
@@ -29,6 +30,7 @@ const Button = styled(TouchableOpacity)`
 `;
 
 const PlanExpiredModal = ({ handleClose }) => {
+    const posthog = usePostHog();
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user.user);
     const training_plans = useSelector((state) => state.user.training_plans);
@@ -42,12 +44,14 @@ const PlanExpiredModal = ({ handleClose }) => {
     const handlePress = (v) => setAchievedGoal(v);
 
     const handleSwitch = (id) => {
+        posthog.capture('switched_plan_on_expiry', { planId: id, prevPlanId: training_plan.id, achievedGoal });
         dispatch(activatePlan({ userId: user.id, planId: id, prevPlanId: training_plan.id, prevExpired: true, achievedGoal }));
         handleClose();
         navigation.navigate('Plan');
     };
 
     const handleNew = () => {
+        posthog.capture('created_plan_on_expiry', { planId: training_plan.id, achievedGoal });
         dispatch(addNewPlan({ userId: user.id, planId: training_plan.id, hasExpired: true, achievedGoal }));
         handleClose();
     };

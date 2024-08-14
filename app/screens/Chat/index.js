@@ -12,6 +12,7 @@ import call from "../../utils/call";
 import AssistantMessage from "./AssistantMessage";
 import UserMessage from "./UserMessage";
 import TypingAnimation from "./TypingAnimation";
+import { usePostHog } from "posthog-react-native";
 
 const Container = styled.View`
   flex: 1;
@@ -91,6 +92,7 @@ const StyledKeyboardAvoidingView = styled.KeyboardAvoidingView``;
 
 const Chat = () => {
     const route = useRoute();
+    const posthog = usePostHog();
     const { day, week } = route.params || {};
 
     const navigation = useNavigation();
@@ -301,6 +303,8 @@ const Chat = () => {
     const handleSendUserMessage = async () => {
         if (!userMessage) return;
         if (!canSend) return;
+
+        posthog.capture('send_chat_message', { message: userMessage });
 
         // Stop the user from sending a message while the AI is responding
         setCanSend(false);

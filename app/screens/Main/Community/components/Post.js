@@ -8,6 +8,7 @@ import Like from '../../../../assets/icons/18x/Like';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { hapticImpact } from "../../../../utils/haptics";
 import call from "../../../../utils/call";
+import { usePostHog } from "posthog-react-native";
 
 const Container = styled.View`
     background-color: ${(props) => props.theme.colors.background2};
@@ -56,6 +57,7 @@ const TitleText = styled.Text`
 `;
 
 const Post = ({ post, userId, username }) => {
+    const posthog = usePostHog();
     const [liked, setLiked] = useState(post.likes.split(',').includes(userId.toString()));
     const [likeCount, setLikeCount] = useState(post.likes.split(',').filter((d) => !!d).length);
 
@@ -72,6 +74,7 @@ const Post = ({ post, userId, username }) => {
 
     const handleLike = async () => {
         if (!liked) {
+            posthog.capture('like_post', { postId: post.id });
             setLiked(true);
             hapticImpact();
             setLikeCount(likeCount + 1);

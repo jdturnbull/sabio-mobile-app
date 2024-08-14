@@ -11,6 +11,7 @@ import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { useNavigation } from '@react-navigation/native';
 import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
 import { updateProfile } from '../../stores/user/userSlice';
+import { usePostHog } from 'posthog-react-native';
 
 const Container = styled.View`
   flex: 1;
@@ -90,6 +91,7 @@ const OPTIONS = [
 ];
 
 const RateAbility = ({ editMode }) => {
+  const posthog = usePostHog();
   const state = useSelector((state) => state.onboarding);
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -118,12 +120,16 @@ const RateAbility = ({ editMode }) => {
         [
           {
             text: 'Cancel',
+            onPress: () => {
+              posthog.capture('profile_update_cancelled', { field: 'past_experience' });
+            },
             style: 'cancel',
           },
           {
             text: 'Confirm',
             onPress: () => {
               dispatch(updateProfile({ userId: user_state.user.id, data: { past_experience: OPTIONS.find((opt) => opt.label === selected).body } }));
+              posthog.capture('updated_past_experience', { past_experience: OPTIONS.find((opt) => opt.label === selected).body });
               navigation.goBack();
             },
           },
@@ -133,7 +139,7 @@ const RateAbility = ({ editMode }) => {
       return;
     } else {
       dispatch(updateState({ profile: { ...state.profile, ability: selected } }));
-
+      posthog.capture('set_onboarding_ability', { ability: selected });
       if (state.race) {
         navigation.navigate('WhenTrain');
       } else {

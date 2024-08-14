@@ -65,7 +65,7 @@ const Plan = () => {
       const week_number = week.week;
       const focus = week.focus;
       const recovery_guidelines = week.recovery_guidelines;
-      const nutrition_guidelines = week.nutrition_guidelines;
+      const nutrition_guidelines = recovery_guidelines?.nutrition_guidelines;
 
       const week_activities = activities.filter(activity => activity.week === week_number);
       return { week: week_number, activities: week_activities, focus, recovery_guidelines, nutrition_guidelines };

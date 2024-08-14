@@ -12,6 +12,7 @@ import { addPreference, updatePreference } from "../../../../stores/user/userSli
 import SubHeader from "../../../../components/shared/SubHeader";
 import ArrowDown from '../../../../assets/icons/18x/ArrowDown';
 import ArrowUp from '../../../../assets/icons/18x/ArrowUp';
+import { usePostHog } from "posthog-react-native";
 
 const Container = styled.View`
 flex: 1;
@@ -52,6 +53,7 @@ const StyledInput = styled(TextInput)`
 `;
 
 const Preferences = () => {
+    const posthog = usePostHog();
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const _preferences = useSelector((state) => state.user.preferences);
@@ -68,7 +70,6 @@ const Preferences = () => {
     const [newPreference, setNewPreference] = useState("");
 
     useEffect(() => {
-        // This doesn't seem to cause a rerender when new preferences are added
         setPreferences(_preferences.filter(preference => preference.status !== "ARCHIVED").sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)));
         setArchivedPreferences(_preferences.filter(preference => preference.status === "ARCHIVED").sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)));
     }, [_preferences]);
@@ -83,7 +84,6 @@ const Preferences = () => {
     };
 
     const handlePreferenceSubmit = () => {
-        console.log('here')
         Alert.alert(
             'Confirm',
             'This may change your future activities',
@@ -98,6 +98,7 @@ const Preferences = () => {
                         dispatch(addPreference({ userId: user.id, preference: newPreference }));
                         setNewPreference("");
                         setShowInput(false);
+                        posthog.capture('training_preference_add', { preference: newPreference });
                     },
                 },
             ],
@@ -120,6 +121,7 @@ const Preferences = () => {
                         dispatch(updatePreference({ preferenceId, data: { status: "ARCHIVED" } }));
                         setPreferences(preferences.filter(preference => preference.id !== preferenceId));
                         setArchivedPreferences([...archivedPreferences, _preferences.find(preference => preference.id === preferenceId)]);
+                        posthog.capture('training_preference_archive', { preference: _preferences.find(preference => preference.id === preferenceId).description });
                     },
                 },
             ],
@@ -142,6 +144,7 @@ const Preferences = () => {
                         dispatch(updatePreference({ preferenceId, data: { status: "ACTIVE" } }));
                         setArchivedPreferences(archivedPreferences.filter(preference => preference.id !== preferenceId));
                         setPreferences([...preferences, _preferences.find(preference => preference.id === preferenceId)]);
+                        posthog.capture('training_preference_restore', { preference: _preferences.find(preference => preference.id === preferenceId).description });
                     },
                 },
             ],

@@ -41,8 +41,6 @@ const WeekView = ({ week }) => {
   const [loading, setLoading] = useState(true);
   const opacity = useSharedValue(0);
 
-  const showInfo = !user.first_screen_views['plan'];
-
   const days = useMemo(() => {
     const daysMap = groupActivitiesByDay(week.activities);
     return sortDays(daysMap);
@@ -72,11 +70,11 @@ const WeekView = ({ week }) => {
     <Animated.View style={animatedStyle}>
       <Container showsVerticalScrollIndicator={false}>
         <PlanScreenOptions week={week} />
-        <SabioMessage focus={week.focus} nutrition={week.nutrition_guidelines} />
+        <SabioMessage focus={week.focus} nutrition={week?.recovery_guidelines?.nutrition_guidelines} small />
         <View style={{ width: '100%', alignItems: 'flex-end', marginBottom: 10 }}>
-          <InfoButton showInfo={showInfo} location={'Plan'} />
+          <InfoButton location={'Plan'} />
         </View>
-        {days.map((day, i) => <DayItem key={day.date} index={i} _day={day} week={week} recoveryGuidance={week.recovery_guidelines.monitor} />)}
+        {days.map((day, i) => <DayItem key={day.date} index={i} _day={day} week={week} recoveryGuidance={week?.recovery_guidelines?.monitor} />)}
         <View style={{ height: 30 }} />
       </Container>
     </Animated.View>

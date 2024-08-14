@@ -99,8 +99,6 @@ const PlanOverview = () => {
         }
     };
 
-    const showInfo = !user.first_screen_views['Plan Overview'];
-
 
     return (
         <Container>
@@ -110,7 +108,7 @@ const PlanOverview = () => {
             </View>
             <SubHeader>Here's how Sabio will guide you to achieving your goals!</SubHeader>
             <View style={{ alignItems: 'flex-end', marginBottom: 20 }}>
-                <InfoButton showInfo={showInfo} location={"Plan Overview"} />
+                <InfoButton location={"Plan Overview"} small />
             </View>
             <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
                 <TopContainer>

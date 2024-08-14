@@ -10,6 +10,7 @@ import NewPlanConfirm from './components/NewPlanConfirm';
 import TrainingPlanCard from './components/TrainingPlanCard';
 import { activatePlan, updateState } from '../../../stores/user/userSlice';
 import InfoButton from '../../../components/shared/InfoButton';
+import { usePostHog } from 'posthog-react-native';
 
 const Container = styled.View`
   flex: 1;
@@ -44,6 +45,7 @@ const TrainingPlanList = styled.View`
 `;
 
 const ManagePlan = () => {
+    const posthog = usePostHog();
     const dispatch = useDispatch();
     const navigation = useNavigation();
 
@@ -57,8 +59,6 @@ const ManagePlan = () => {
     const [modalContent, setModalContent] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const showInfo = !user.first_screen_views['Manage Plan'];
-
 
     const handleBack = () => {
         navigation.goBack();
@@ -66,6 +66,7 @@ const ManagePlan = () => {
 
     const handlePress = (opt) => {
         if (opt === 'Add a new plan') {
+            posthog.capture('add_new_plan_confirm_open');
             setModalContent(<NewPlanConfirm handleClose={() => setModalVisible(false)} />);
             setModalVisible(true);
         }
@@ -73,6 +74,7 @@ const ManagePlan = () => {
 
     const handleActivate = (planId) => {
         if (user?.subscription_status === 'SUBSCRIBED') {
+            posthog.capture('activate_plan', { planId });
             setLoading(true);
             setModalVisible(false);
             setTimeout(() => {
@@ -106,7 +108,7 @@ const ManagePlan = () => {
                     }}>
                     <HeaderText>Manage Plans</HeaderText>
                 </View>
-                <InfoButton showInfo={showInfo} location={"Manage Plan"} small />
+                <InfoButton location={"Manage Plan"} small />
             </Header>
             {loading ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

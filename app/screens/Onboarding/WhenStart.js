@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import NextButton from '../../components/shared/NextButton';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { useNavigation } from '@react-navigation/native';
+import { usePostHog } from 'posthog-react-native';
 
 const Container = styled.View`
   flex: 1;
@@ -68,6 +69,7 @@ const SubOptionLabel = styled.Text`
 `;
 
 const WhenStart = () => {
+  const posthog = usePostHog();
   const user = useSelector((state) => state.user);
 
   const dispatch = useDispatch();

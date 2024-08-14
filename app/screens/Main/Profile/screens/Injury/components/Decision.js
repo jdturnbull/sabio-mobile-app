@@ -8,12 +8,14 @@ import CustomInput from "../../../../../../components/shared/CustomInput";
 import NextButton from "../../../../../../components/shared/NextButton";
 import { useDispatch, useSelector } from "react-redux";
 import { createRehabPlan, setup } from "../../../../../../stores/user/userSlice";
+import { usePostHog } from "posthog-react-native";
 
 const Container = styled.View`
     flex: 1;
 `;
 
 const Decision = ({ hasLockedFeeling, hasFullRangeOfMotion, checkedByProfessional, location }) => {
+    const posthog = usePostHog();
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user.user);
 
@@ -21,6 +23,7 @@ const Decision = ({ hasLockedFeeling, hasFullRangeOfMotion, checkedByProfessiona
         if (checkedByProfessional) {
             return true;
         }
+        posthog.capture('rehab_plan_decision', { canCreateRehabPlan: !hasLockedFeeling && hasFullRangeOfMotion, hasLockedFeeling, hasFullRangeOfMotion, checkedByProfessional });
         return !hasLockedFeeling && hasFullRangeOfMotion;
     });
 
@@ -38,6 +41,7 @@ const Decision = ({ hasLockedFeeling, hasFullRangeOfMotion, checkedByProfessiona
         }
 
         dispatch(createRehabPlan({ userId: user.id, description, location }));
+        posthog.capture('rehab_plan_create', { description, location });
     };
 
     return (

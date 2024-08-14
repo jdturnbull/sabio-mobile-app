@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { TouchableOpacity, View } from "react-native";
 import Sabio from '../../../../assets/icons/32x/SabioArmUp';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
+import { usePostHog } from "posthog-react-native";
 
 const Container = styled.View`
     flex-direction: row;
@@ -53,7 +54,7 @@ const ToggleButtonText = styled.Text`
 `;
 
 const SabioMessage = ({ focus, nutrition, disabled }) => {
-    const { caloric_intake, macronutrients } = nutrition;
+    const posthog = usePostHog();
     const [showMessage, setShowMessage] = useState(false);
     const [contentHeight, setContentHeight] = useState(0);
     const height = useSharedValue(35);
@@ -73,7 +74,19 @@ const SabioMessage = ({ focus, nutrition, disabled }) => {
     }, [showMessage, contentHeight, height]);
 
     const toggleMessage = () => {
+        posthog.capture('sabio_weekly_message_toggle', { opening: showMessage ? false : true });
         setShowMessage(prev => !prev);
+    }
+
+    const getMessageText = () => {
+        if (disabled) {
+            return 'Example weekly guidance';
+        }
+        let message = focus;
+        if (nutrition) {
+            message += `\n\n${nutrition.caloric_intake}\n\n${nutrition.macronutrients}`;
+        }
+        return message;
     };
 
     return (
@@ -92,12 +105,12 @@ const SabioMessage = ({ focus, nutrition, disabled }) => {
                     }}
                 >
                     <MessageText>
-                        {disabled ? 'Example weekly guidance' : `${focus}\n\n${caloric_intake}\n\n${macronutrients}`}
+                        {getMessageText()}
                     </MessageText>
                 </View>
                 <MessageContainer style={animatedStyle}>
                     <MessageText>
-                        {disabled ? 'Example weekly guidance' : `${focus}\n\n${caloric_intake}\n\n${macronutrients}`}
+                        {getMessageText()}
                     </MessageText>
                 </MessageContainer>
                 {!disabled && <ToggleButton onPress={toggleMessage}>

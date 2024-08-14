@@ -15,6 +15,7 @@ import {
 } from 'react-native-iap';
 import { useDispatch, useSelector } from "react-redux";
 import { update, updateState } from "../../stores/user/userSlice";
+import { usePostHog } from "posthog-react-native";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
@@ -114,20 +115,20 @@ const BulletPoint = ({ text }) => {
 }
 
 const SubscriptionModalContent = () => {
+    const posthog = usePostHog();
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user.user);
     const triggeredFrom = useSelector((state) => state.user.subscribeModalTriggeredFrom);
     const [selectedOption, setSelectedOption] = useState('Annual');
 
     const handleSubscribe = async () => {
+        posthog.capture('subscribe_button_pressed', { source: triggeredFrom });
         dispatch(update({ userId: user.id, data: { subscription_status: "SUBSCRIBED" } }))
-        setTimeout(() => {
-            Alert.alert('Reload the app & you will be subscribed')
-        }, 1000)
     };
 
     const handleGesture = (event) => {
         if (event.nativeEvent.translationY > 100) {
+            posthog.capture('closed_subscribe_modal', { source: triggeredFrom });
             dispatch(updateState({ showSubscribeModal: false }));
         }
     };
@@ -138,7 +139,10 @@ const SubscriptionModalContent = () => {
                 <ModalContent>
                     <ModalInnerContent>
                         <View style={{ width: '100%', alignItems: 'flex-end' }}>
-                            <TouchableOpacity onPress={() => dispatch(updateState({ showSubscribeModal: false }))}>
+                            <TouchableOpacity onPress={() => {
+                                posthog.capture('closed_subscribe_modal', { source: triggeredFrom });
+                                dispatch(updateState({ showSubscribeModal: false }))
+                            }}>
                                 <Close />
                             </TouchableOpacity>
                         </View>

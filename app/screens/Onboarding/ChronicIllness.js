@@ -11,6 +11,7 @@ import { updateChronicConditions } from '../../stores/user/userSlice';
 import { useNavigation } from '@react-navigation/native';
 import SelectableItem from '../../components/shared/SelectableItem';
 import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
+import { usePostHog } from 'posthog-react-native';
 
 const OPTIONS = ['Asthma', 'Diabetes', 'Arthritis', 'Osteoporosis', 'Other'];
 
@@ -27,6 +28,7 @@ const OptionsContainer = styled.View`
 const ChronicIllness = ({ editMode }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const posthog = usePostHog();
 
   const state = useSelector((state) => state.onboarding);
   const user_state = useSelector((state) => state.user);
@@ -55,10 +57,12 @@ const ChronicIllness = ({ editMode }) => {
     }));
 
     if (editMode) {
+      posthog.capture('updated_chronic_conditions', { chronic_conditions: chronicConditions });
       dispatch(updateChronicConditions({ userId: user_state.user.id, chronic_conditions: chronicConditions }));
       navigation.goBack();
       return;
     }
+    posthog.capture('set_onboarding_chronic_conditions', { chronic_conditions: chronicConditions });
     dispatch(updateState({ profile: { ...state.profile, chronicConditions } }));
     navigation.navigate('EquipmentFacilities');
   };

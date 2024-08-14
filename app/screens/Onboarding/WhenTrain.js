@@ -40,8 +40,14 @@ const WhenTrain = () => {
     if (selected.length === 0) {
       Alert.alert('Please select a day');
     } else {
-      dispatch(updateState({ profile: { ...state.profile, trainingDays: selected } }));
-      navigation.navigate('LongerActivityDay');
+      if (selected.length === 1) {
+        dispatch(updateState({ profile: { ...state.profile, trainingDays: selected, longActivityDay: selected[0] } }));
+        navigation.navigate('WhenStart');
+      } else {
+        dispatch(updateState({ profile: { ...state.profile, trainingDays: selected } }));
+        navigation.navigate('LongerActivityDay');
+      }
+
     }
   };
 

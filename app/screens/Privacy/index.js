@@ -7,6 +7,7 @@ import { Switch } from 'react-native-paper';
 import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
 import { update } from '../../stores/user/userSlice';
 import NextButton from '../../components/shared/NextButton';
+import { usePostHog } from 'posthog-react-native';
 
 const Container = styled.View`
   flex: 1;
@@ -38,6 +39,7 @@ const OptionText = styled.Text`
 `;
 
 const Privacy = () => {
+    const posthog = usePostHog();
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const user = useSelector((state) => state.user.user);
@@ -72,7 +74,6 @@ const Privacy = () => {
             setPostActivitiesToSocial(false);
         } else {
             setPostActivitiesToSocial(true);
-
         }
     };
 
@@ -86,6 +87,7 @@ const Privacy = () => {
 
     const handleSave = () => {
         dispatch(update({ userId: user.id, data: { privacy_settings: { ...user.privacy_settings, post_achievements_to_social: postAchievementsToSocial, post_activities_to_social: postActivitiesToSocial, post_streaks_to_social: postStreaksToSocial } } }))
+        posthog.capture('privacy_settings_save', { post_achievements_to_social: postAchievementsToSocial, post_activities_to_social: postActivitiesToSocial, post_streaks_to_social: postStreaksToSocial });
     };
 
     return (

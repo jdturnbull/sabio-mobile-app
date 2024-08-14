@@ -9,6 +9,7 @@ import Premium from '../../../../assets/icons/24x/Premium';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateState } from '../../../../stores/user/userSlice';
 import InfoButton from '../../../../components/shared/InfoButton';
+import { usePostHog } from 'posthog-react-native';
 
 const navigationMap = {
   'Equipment and facilities': 'EquipmentAndFacilities',
@@ -36,6 +37,7 @@ const OptionsContainer = styled.View`
 `;
 
 const View = () => {
+  const posthog = usePostHog();
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const user = useSelector((state) => state.user.user);
@@ -53,15 +55,13 @@ const View = () => {
     }
   };
 
-  const showInfo = !user.first_screen_views['Profile'];
-
 
   return (
     <Container>
       <Top>
         {user?.subscription_status === 'UNSUBSCRIBED' && <Premium />}
         <Title style={{ marginBottom: 2, marginLeft: user.subscription_status === 'UNSUBSCRIBED' ? 10 : 0, flex: 1 }}>Profile Information</Title>
-        <InfoButton showInfo={showInfo} location={'Profile'} small />
+        <InfoButton location={'Profile'} small />
       </Top>
       <SubHeader>Update information to customise your plan</SubHeader>
       <OptionsContainer>

@@ -10,6 +10,7 @@ import SubHeader from "../../components/shared/SubHeader";
 import Calendar from '../../assets/icons/18x/Calendar';
 import getIconFromActivity from "../../utils/getIconFromActivity";
 import call from "../../utils/call";
+import { usePostHog } from "posthog-react-native";
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -100,6 +101,7 @@ const UpdateText = styled.Text`
 `;
 
 const RearrangeWeek = ({ navigation, route }) => {
+    const posthog = usePostHog();
     const { week } = route.params;
 
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -204,6 +206,7 @@ const RearrangeWeek = ({ navigation, route }) => {
 
         if (activitiesToUpdate.length > 0) {
             await call('POST', "users/reorganiseWeek", { activities: activitiesToUpdate });
+            posthog.capture('rearrange_week_save', { week: week.week });
             navigation.goBack();
         }
     };

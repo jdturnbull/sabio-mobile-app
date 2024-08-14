@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { updateState } from "../../stores/onboarding/onboardingSlice";
+import { usePostHog } from "posthog-react-native";
 
 const Container = styled.View`
     flex: 1;
@@ -27,6 +28,7 @@ const OptionText = styled.Text`
 `;
 
 const RequestNotifications = () => {
+    const posthog = usePostHog();
     const dispatch = useDispatch();
     const navigation = useNavigation();
 
@@ -47,7 +49,7 @@ const RequestNotifications = () => {
         PushNotification.requestPermissions().then(async (permissions) => {
             if (permissions.alert || permissions.badge || permissions.sound) {
                 const deviceToken = await AsyncStorage.getItem('deviceToken');
-
+                posthog.capture('notifications_approved', { permissions: permissions });
                 dispatch(updateState({
                     notification_settings: {
                         social_notifications: socialNotifications,
@@ -61,11 +63,12 @@ const RequestNotifications = () => {
 
                 navigation.navigate('CreatingPlan');
             } else {
-                // Permission denied
+                posthog.capture('notifications_denied', { permissions: permissions });
                 navigation.navigate('CreatingPlan');
             }
         }).catch((error) => {
             console.error("Error requesting notification permissions: ", error);
+            posthog.capture('notifications_request_failed', { error: error.message });
             navigation.navigate('CreatingPlan');
         });
     }

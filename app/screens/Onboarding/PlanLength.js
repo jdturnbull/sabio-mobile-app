@@ -37,7 +37,7 @@ const PlanLength = () => {
   const OPTIONS = [
     {
       label: 'Custom Length',
-      subLabel: '4 - 52 weeks',
+      subLabel: '4 - 45 weeks',
     },
     {
       label: '14 Weeks',
@@ -51,7 +51,7 @@ const PlanLength = () => {
       label: '20 Weeks',
       endDate: start.clone().add(20, 'weeks').format('DD MMM YYYY'),
     },
-    { label: 'Custom Date', subLabel: '1 - 12 months' },
+    { label: 'Custom Date' },
   ];
 
   const handleNext = () => {
@@ -64,8 +64,8 @@ const PlanLength = () => {
       return;
     }
 
-    if (selected === 'Custom Length' && weeks > 52) {
-      Alert.alert('Maximum plan length is 52 weeks');
+    if (selected === 'Custom Length' && weeks > 45) {
+      Alert.alert('Maximum plan length is 45 weeks');
       return;
     }
 
@@ -84,8 +84,8 @@ const PlanLength = () => {
       return;
     }
 
-    if (selected === 'Custom Date' && moment(date).isAfter(start.clone().add(1, 'year'))) {
-      Alert.alert('The selected end date must be within one year from your start date');
+    if (selected === 'Custom Date' && moment(date).isAfter(moment().add(45, 'weeks'))) {
+      Alert.alert('The selected end date must be within 45 weeks from now');
       return;
     }
 
