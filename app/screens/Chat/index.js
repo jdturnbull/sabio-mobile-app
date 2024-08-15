@@ -1,18 +1,20 @@
 import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
-import { View, TouchableOpacity, useWindowDimensions, Animated, Keyboard } from 'react-native';
+import { View, TouchableOpacity, useWindowDimensions, Animated, Keyboard, Alert } from 'react-native';
 import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useKeyboard } from '@react-native-community/hooks';
+import moment from 'moment';
 import ArrowLeft from '../../assets/icons/24x/ArrowLeft';
 import * as openai from '../../utils/openai';
 import Send from '../../assets/icons/24x/Send';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import call from "../../utils/call";
 import AssistantMessage from "./AssistantMessage";
 import UserMessage from "./UserMessage";
 import TypingAnimation from "./TypingAnimation";
 import { usePostHog } from "posthog-react-native";
+import { update } from "../../stores/user/userSlice";
 
 const Container = styled.View`
   flex: 1;
@@ -95,6 +97,7 @@ const Chat = () => {
     const posthog = usePostHog();
     const { day, week } = route.params || {};
 
+    const dispatch = useDispatch();
     const navigation = useNavigation();
     const isFocused = useIsFocused();
     const scrollRef = useRef();
@@ -114,6 +117,7 @@ const Chat = () => {
     const [requiresResponse, setRequiresResponse] = useState(false);
     const [responsePending, setResponsePending] = useState(false);
     const [runId, setRunId] = useState(null);
+    const [newUserThreadId, setNewUserThreadId] = useState(null);
 
     const [animatedWidth] = useState(new Animated.Value(width * 0.9));
     const [animatedMargin] = useState(new Animated.Value(120));
@@ -133,7 +137,9 @@ const Chat = () => {
 
     useEffect(() => {
         if (!isFocused) {
-            console.log('Resetting state')
+            if (newUserThreadId) {
+                dispatch(update({ userId: user.id, data: { thread_id: newUserThreadId } }));
+            }
             clearState();
         }
     }, [isFocused])
@@ -151,6 +157,12 @@ const Chat = () => {
 
     const handleError = ({ error }) => {
         console.log(error);
+        if (newUserThreadId) {
+            setNewUserThreadId(null);
+        } else if (user.thread_id) {
+            dispatch(update({ userId: user.id, data: { thread_id: null } }));
+            Alert.alert('Whoops!', 'Something went wrong with your conversation, we\'ve reset it for you.');
+        }
     };
 
     const setupAssistant = async () => {
@@ -163,10 +175,16 @@ const Chat = () => {
 
     const setupThread = async () => {
         if (thread) return thread;
-        // TODO: Check if this date has a threadId already
-        const threadId = week && week.activities && week.activities[0] ?
-            await call('GET', `users/getThreadByDate/${week.activities[0].date}/${user.id}/${week.activities[0].training_plan_id}`) :
-            null;
+        // Get the activity that matches the day param
+        const activity = week && week.activities ? week.activities.find(act => moment(act.date, 'YYYY-MM-DD').format('dddd') === day) : null;
+
+        let threadId = null;
+
+        if (activity) {
+            threadId = await call('GET', `users/getThreadByDate/${activity.date}/${user.id}/${activity.training_plan_id}`);
+        } else if (user.thread_id) {
+            threadId = user.thread_id;
+        }
 
         if (threadId) {
             const { response, error } = await openai.retrieveThread(threadId);
@@ -177,8 +195,10 @@ const Chat = () => {
             const { response, error } = await openai.createThread(messages);
 
             if (response) {
-                if (week && week.activities && week.activities[0]) {
-                    await call('POST', 'users/createConversation', { user_id: user.id, thread_id: response.id, training_plan_id: week.activities[0].training_plan_id, associated_date: week.activities[0].date });
+                if (activity) {
+                    await call('POST', 'users/createConversation', { user_id: user.id, thread_id: response.id, training_plan_id: activity.training_plan_id, associated_date: activity.date });
+                } else {
+                    setNewUserThreadId(response.id);
                 }
                 return response;
             }

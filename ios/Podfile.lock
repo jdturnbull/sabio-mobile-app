@@ -328,6 +328,8 @@ PODS:
     - React-Core
   - react-native-haptic (1.0.1):
     - React
+  - react-native-in-app-review (4.3.3):
+    - React-Core
   - react-native-netinfo (9.5.0):
     - React-Core
   - react-native-notifications (5.1.0):
@@ -560,6 +562,7 @@ DEPENDENCIES:
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-haptic (from `../node_modules/react-native-haptic`)
+  - react-native-in-app-review (from `../node_modules/react-native-in-app-review`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-notifications (from `../node_modules/react-native-notifications`)
   - react-native-render-html (from `../node_modules/react-native-render-html`)
@@ -668,6 +671,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-date-picker"
   react-native-haptic:
     :path: "../node_modules/react-native-haptic"
+  react-native-in-app-review:
+    :path: "../node_modules/react-native-in-app-review"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-notifications:
@@ -775,6 +780,7 @@ SPEC CHECKSUMS:
   react-native-blur: 69ecfe61d81b32ee7baae10f5d17aeb4e2594b10
   react-native-date-picker: 312c387d2ff873c66c5e4cf78ff6827fa91644e2
   react-native-haptic: d90a0a661333a22cb2b434c7094a65f27aed773d
+  react-native-in-app-review: db8bb167a5f238e7ceca5c242d6b36ce8c4404a4
   react-native-netinfo: 48c5f79a84fbc3ba1d28a8b0d04adeda72885fa8
   react-native-notifications: 4601a5a8db4ced6ae7cfc43b44d35fe437ac50c4
   react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe

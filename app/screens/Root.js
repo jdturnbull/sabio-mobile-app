@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Easing, View, Modal, Dimensions, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
+import { Easing, View, Modal, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import { withIAPContext } from 'react-native-iap';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,12 +12,13 @@ import Chat from './Chat';
 import PlanOverview from './PlanOverview';
 import RearrangeWeek from './RearrangeWeek';
 import { useNavigation } from '@react-navigation/native';
-import { setup, updateState } from '../stores/user/userSlice';
+import { setup, update, updateState } from '../stores/user/userSlice';
 import useActiveRoute from '../hooks/useActiveRoute';
 import NotificationSettings from './NotificationSettings';
 import ManagePlan from './Main/ManagePlan';
 import Privacy from './Privacy';
 import SubscriptionModalContent from '../components/authed/SubscriptionModalContent';
+import InAppReview from 'react-native-in-app-review';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import call from '../utils/call';
 import PlanExpiredModal from '../components/authed/PlanExpiredModal';
@@ -117,6 +118,8 @@ const Root = () => {
     };
   });
 
+
+
   useEffect(() => {
     if (!user) {
       dispatch(setup('Root'));
@@ -125,6 +128,20 @@ const Root = () => {
         email: user.email,
         name: `${user.first_name} ${user.second_name}`,
       });
+
+      if (moment.unix(user?.created_at / 1000).isBefore(moment().subtract(1, 'weeks')) && !user?.has_requested_review) {
+        setTimeout(() => {
+          InAppReview.RequestInAppReview()
+            .then((hasFlowFinishedSuccessfully) => {
+              if (hasFlowFinishedSuccessfully) {
+                dispatch(update({ userId: user.id, data: { has_requested_review: true } }));
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }, 2000);
+      }
     }
   }, [user]);
 

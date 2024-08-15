@@ -10,7 +10,6 @@ const Container = styled.View`
   padding-vertical: 9px;
   margin-bottom: 20px;
   margin-left: 45px;
-  margin-right: 28px;
   align-self: flex-end;
 `;
 

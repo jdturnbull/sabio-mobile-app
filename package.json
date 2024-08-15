@@ -47,6 +47,7 @@
     "react-native-global-props": "^1.1.5",
     "react-native-haptic": "^1.0.1",
     "react-native-iap": "^12.12.1",
+    "react-native-in-app-review": "^4.3.3",
     "react-native-keyboard-accessory": "^0.1.16",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-linear-gradient": "^2.8.3",
