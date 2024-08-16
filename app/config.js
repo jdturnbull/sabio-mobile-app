@@ -10,6 +10,6 @@ const CONFIG_NGROK = {
   API_BASE: 'https://sabio.ngrok.app',
 };
 
-const CONFIG = process.env.NODE_ENV === 'production' ? CONFIG_PROD : CONFIG_DEV;
+const CONFIG = process.env.NODE_ENV === 'production' ? CONFIG_PROD : CONFIG_NGROK;
 
 export const apiBase = CONFIG.API_BASE;

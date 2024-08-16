@@ -446,3 +446,17 @@ export const TIMEZONE_LIST = [
 export const getTimezoneData = (timezone) => {
   return TIMEZONE_LIST.find((item) => item.timezone === timezone);
 };
+
+export const getCurrencyFromTimezone = (timezone) => {
+  const timezoneData = getTimezoneData(timezone);
+  const country = timezoneData?.country;
+
+  if (!country) return 'GBP';
+
+  const EUR_COUNTRIES = ['Austria', 'Belgium', 'Cyprus', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Ireland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta', 'Netherlands', 'Portugal', 'Slovakia', 'Slovenia', 'Spain'];
+  const USD_COUNTRIES = ['United States', 'Ecuador', 'El Salvador', 'Guam', 'Northern Mariana Islands', 'Puerto Rico', 'American Samoa', 'U.S. Virgin Islands', 'East Timor', 'Palau', 'Micronesia', 'Marshall Islands'];
+
+  if (EUR_COUNTRIES.includes(country)) return 'EUR';
+  if (USD_COUNTRIES.includes(country)) return 'USD';
+  return 'GBP';
+};

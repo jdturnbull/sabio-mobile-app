@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Dimensions, ScrollView, View, Text, TouchableOpacity, Alert } from "react-native";
 import PremiumLarge from '../../assets/icons/48x/Premium';
 import Close from '../../assets/icons/24x/Clear';
 import Tick from '../../assets/icons/24x/TickOutline';
 import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
-
 import {
     initConnection,
     requestSubscription,
@@ -16,6 +15,9 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { update, updateState } from "../../stores/user/userSlice";
 import { usePostHog } from "posthog-react-native";
+import { getCurrencyFromTimezone } from "../../utils/timezones";
+import call from "../../utils/call";
+
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
@@ -38,37 +40,37 @@ const ModalInnerContent = styled.View`
     shadow-radius: 3.84px;
 `;
 
-const SubscriptionContent = styled.View`
+const SubscriptionContent = styled(ScrollView)`
     flex: 1;
+    padding-horizontal: 1px;
     flex-direction: column;
-    padding-vertical: 20px;
-    align-items: center;  
+    padding-bottom: 20px;
 `;
 
 const ModalHeaderText = styled.Text`
     color: ${(props) => props.theme.text.colors.white};
     font-weight: ${(props) => props.theme.text.weight.bold};
     font-size: ${(props) => props.theme.text.size.lg};
-    margin-top: 20px;
+    margin-top: 10px;
 `;
 
 const ModalBodyText = styled.Text`
     color: ${(props) => props.theme.text.colors.white};
     font-weight: ${(props) => props.theme.text.weight.regular};
     font-size: ${(props) => props.theme.text.size.md};
-    margin-top: 10px;
+    margin-top: 5px;
 `;
 
 const OptionsContainer = styled.View`
     flex: 1;
     flex-direction: column;
-    margin-top: 20px;
+    margin-top: 5px;
     width: 100%;
 `;
 
 const OptionBox = styled(TouchableOpacity)`
     width: 100%;
-    background-color: #49548A30;
+    background-color: ${(props) => props.selected ? '#49548A80' : '#49548A30'};
     padding: 10px;
     border-radius: 10px;
     border: ${(props) => props.selected ? '1px solid #49548A' : '1px solid #49548A30'};
@@ -117,14 +119,60 @@ const BulletPoint = ({ text }) => {
 const SubscriptionModalContent = () => {
     const posthog = usePostHog();
     const dispatch = useDispatch();
-    const user = useSelector((state) => state.user.user);
+    const user = useSelector((state) => state.user?.user);
     const triggeredFrom = useSelector((state) => state.user.subscribeModalTriggeredFrom);
     const [selectedOption, setSelectedOption] = useState('Annual');
+    const [currency, setCurrency] = useState(getCurrencyFromTimezone(user.timezone));
+
+    const { getSubscriptions, connected } = useIAP();
 
     const handleSubscribe = async () => {
+        await initConnection();
+        if (connected) {
+            if (selectedOption === 'Annual') {
+                await getSubscriptions({ skus: ['annual'] });
+
+                await requestSubscription({
+                    sku: 'annual',
+                    appAccountToken: user.id,
+                });
+            } else {
+                await getSubscriptions({ skus: ['monthly'] });
+
+                await requestSubscription({
+                    sku: 'monthly',
+                    appAccountToken: user.id,
+                });
+            }
+        }
         posthog.capture('subscribe_button_pressed', { source: triggeredFrom });
-        dispatch(update({ userId: user.id, data: { subscription_status: "SUBSCRIBED" } }))
     };
+
+    useEffect(() => {
+        const purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
+            purchase.transactionReceipt;
+            if (purchase.transactionReceipt) {
+                const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
+                if (response) {
+                    posthog.capture('SUBSCRIBED', { source: triggeredFrom, subscription: selectedOption });
+                    dispatch(update({ userId: user.id, data: { subscription_status: 'SUBSCRIBED' } }))
+                    dispatch(updateState({ showSubscribeModal: false, showNewSubscriptionWelcome: true }))
+                } else {
+                    posthog.capture('SUBSCRIPTION_ERROR_SABIO', { source: triggeredFrom, subscription: selectedOption });
+                    Alert.alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
+                }
+            }
+        });
+
+        const purchaseErrorSubscription = purchaseErrorListener((error) => {
+            posthog.capture('SUBSCRIPTION_ERROR_APPLE', { source: triggeredFrom, subscription: selectedOption, error: error.message });
+        });
+
+        return () => {
+            purchaseUpdateSubscription.remove();
+            purchaseErrorSubscription.remove();
+        };
+    }, []);
 
     const handleGesture = (event) => {
         if (event.nativeEvent.translationY > 100) {
@@ -133,9 +181,28 @@ const SubscriptionModalContent = () => {
         }
     };
 
+    const PRICES = {
+        'GBP': {
+            'Annual': { total: '£99.99/year', perWeek: '£1.92' },
+            'Monthly': { total: '£14.99/month', perWeek: '£3.45' },
+        },
+        'USD': {
+            'Annual': { total: '$128.99/year', perWeek: '$2.48' },
+            'Monthly': { total: '$19.99/month', perWeek: '$4.44' },
+        },
+        'EUR': {
+            'Annual': { total: '€117.99/year', perWeek: '€2.26' },
+            'Monthly': { total: '€17.99/month', perWeek: '€4.05' },
+        },
+        'CAD': {
+            'Annual': { total: '$175.99/year', perWeek: '$3.38' },
+            'Monthly': { total: '$26.99/month', perWeek: '$6.22' },
+        }
+    }
+
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <PanGestureHandler onGestureEvent={handleGesture}>
+            <PanGestureHandler style={{ flex: 1 }} onGestureEvent={handleGesture}>
                 <ModalContent>
                     <ModalInnerContent>
                         <View style={{ width: '100%', alignItems: 'flex-end' }}>
@@ -146,7 +213,7 @@ const SubscriptionModalContent = () => {
                                 <Close />
                             </TouchableOpacity>
                         </View>
-                        <SubscriptionContent>
+                        <SubscriptionContent showsVerticalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
                             <PremiumLarge />
                             <ModalHeaderText>Join Sabio Premium</ModalHeaderText>
                             <ModalBodyText>Unlock Sabio's full potential</ModalBodyText>
@@ -166,19 +233,19 @@ const SubscriptionModalContent = () => {
                                         </View>
                                     </View>
                                     <View id="bottom" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                                        <OptionSubText>£99.99/year</OptionSubText>
-                                        <OptionSubText>£1.92/week</OptionSubText>
+                                        <OptionSubText>{PRICES[currency]['Annual']['total']}</OptionSubText>
+                                        <OptionSubText>{PRICES[currency]['Annual']['perWeek']}/week</OptionSubText>
                                     </View>
                                 </OptionBox>
                                 <OptionBox style={{ marginTop: 20 }} selected={selectedOption === 'Monthly'} onPress={() => setSelectedOption('Monthly')}>
                                     <OptionMainText>Monthly</OptionMainText>
                                     <View id="bottom" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                                        <OptionSubText>£14.99/month</OptionSubText>
-                                        <OptionSubText>£3.45/week</OptionSubText>
+                                        <OptionSubText>{PRICES[currency]['Monthly']['total']}</OptionSubText>
+                                        <OptionSubText>{PRICES[currency]['Monthly']['perWeek']}/week</OptionSubText>
                                     </View>
                                 </OptionBox>
                             </OptionsContainer>
-
+                            <View style={{ height: 100 }} />
                         </SubscriptionContent>
                         <FloatingButton onPress={handleSubscribe}>
                             <FloatingButtonText>SUBSCRIBE</FloatingButtonText>

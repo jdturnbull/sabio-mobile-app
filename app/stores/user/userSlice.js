@@ -246,6 +246,7 @@ export const userSlice = createSlice({
     training_plans: [],
     chronic_conditions: [],
     preferences: [],
+    showNewSubscriptionWelcome: false,
     schedules: [],
     progress_reports: [],
     notifications: [],

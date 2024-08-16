@@ -23,6 +23,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import call from '../utils/call';
 import PlanExpiredModal from '../components/authed/PlanExpiredModal';
 import WeeklyCheckinModal from '../components/authed/WeeklyCheckinModal';
+import ShowSubscriptionWelcomeModal from '../components/authed/ShowSubscriptionWelcomeModal';
 import { usePostHog } from 'posthog-react-native';
 
 const MAIN_SCREENS = ['Slider', 'Account', 'Notifications', 'Reports', 'Feed', 'View'];
@@ -86,6 +87,7 @@ const Root = () => {
   const navigation = useNavigation();
   const user = useSelector((state) => state.user.user);
   const session = useSelector((state) => state.user.session);
+  const showNewSubscriptionWelcome = useSelector((state) => state.user?.showNewSubscriptionWelcome);
   const planIsUpdating = useSelector((state) => state.user.plan_updating);
 
   const [keepWeeklyCheckinClosed, setKeepWeeklyCheckinClosed] = useState(false);
@@ -254,6 +256,13 @@ const Root = () => {
         visible={showWeeklyCheckinModal}
       >
         <WeeklyCheckinModal handleClose={handleWeeklyCheckinClose} />
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showNewSubscriptionWelcome}
+      >
+        <ShowSubscriptionWelcomeModal />
       </Modal>
       {planIsUpdating && <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#000', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }, animatedStyle]}>
         <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold', marginBottom: 20 }}>Sabio is analysing your plan</Text>
