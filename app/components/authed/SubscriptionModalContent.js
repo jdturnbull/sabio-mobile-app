@@ -127,25 +127,31 @@ const SubscriptionModalContent = () => {
     const { getSubscriptions, connected } = useIAP();
 
     const handleSubscribe = async () => {
-        await initConnection();
-        if (connected) {
-            if (selectedOption === 'Annual') {
-                await getSubscriptions({ skus: ['annual'] });
+        try {
+            await initConnection();
+            if (connected) {
+                if (selectedOption === 'Annual') {
+                    await getSubscriptions({ skus: ['annual'] });
 
-                await requestSubscription({
-                    sku: 'annual',
-                    appAccountToken: user.id,
-                });
-            } else {
-                await getSubscriptions({ skus: ['monthly'] });
+                    await requestSubscription({
+                        sku: 'annual',
+                        appAccountToken: user.id,
+                    });
+                } else {
+                    await getSubscriptions({ skus: ['monthly'] });
 
-                await requestSubscription({
-                    sku: 'monthly',
-                    appAccountToken: user.id,
-                });
+                    await requestSubscription({
+                        sku: 'monthly',
+                        appAccountToken: user.id,
+                    });
+                }
             }
+            posthog.capture('subscribe_button_pressed', { source: triggeredFrom });
+        } catch (error) {
+            console.error('Subscription error:', error);
+            posthog.capture('subscription_error', { source: triggeredFrom, subscription: selectedOption, error: error.message });
+            Alert.alert('Subscription Error', error.message);
         }
-        posthog.capture('subscribe_button_pressed', { source: triggeredFrom });
     };
 
     useEffect(() => {
