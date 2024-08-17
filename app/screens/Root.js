@@ -132,6 +132,7 @@ const Root = () => {
     try {
       await initConnection();
       const purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
+        posthog.capture('purchase_updated_listener', { purchase });
         if (purchase.transactionReceipt) {
           try {
             const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
@@ -146,9 +147,6 @@ const Root = () => {
             Alert.alert('There was a problem confirming your subscription', 'Please try again or email support@heysabio.com');
             posthog.capture('confirm_subscription_error', { error });
           }
-        } else {
-          Alert.alert('There was a problem confirming your subscription', 'Please try again or email support@heysabio.com');
-          posthog.capture('confirm_subscription_error', { error: 'No receipt' });
         }
       });
 
