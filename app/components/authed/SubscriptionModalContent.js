@@ -137,7 +137,7 @@ const SubscriptionModalContent = () => {
                 await requestSubscription({ sku: 'monthly' });
             }
         } catch (error) {
-            await call('POST', 'users/handleSubscribeError', { error })
+            posthog.capture('request_subscription_error', { error });
         }
     };
 
