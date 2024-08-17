@@ -11,6 +11,7 @@ import {
     purchaseErrorListener,
     purchaseUpdatedListener,
     useIAP,
+    clearTransactionIOS,
 } from 'react-native-iap';
 import { useDispatch, useSelector } from "react-redux";
 import { update, updateState } from "../../stores/user/userSlice";
@@ -137,12 +138,19 @@ const SubscriptionModalContent = () => {
 
                 await call('POST', 'users/gotSubscriptions');
 
-                await requestSubscription({
-                    sku,
-                    appAccountToken: user.id,
-                });
+                try {
+                    await clearTransactionIOS();
+                    await requestSubscription({
+                        sku,
+                        appAccountToken: user?.id,
+                    });
+                } catch (error) {
+                    await call('POST', 'users/requestSubscriptionError', { error });
+                    console.error('Subscription error:', error);
+                }
 
-                await call('POST', 'users/requestSubscription');
+
+                await call('POST', 'users/requestedSubscription');
             }
             posthog.capture('subscribe_button_pressed', { source: triggeredFrom });
         } catch (error) {
