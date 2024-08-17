@@ -129,25 +129,24 @@ const SubscriptionModalContent = () => {
     const handleSubscribe = async () => {
         try {
             await initConnection();
+            await call('POST', 'users/initconnection');
             if (connected) {
-                if (selectedOption === 'Annual') {
-                    await getSubscriptions({ skus: ['annual'] });
+                await call('POST', 'users/connectionValid');
+                const sku = selectedOption === 'Annual' ? 'annual' : 'monthly';
+                await getSubscriptions({ skus: [sku] });
 
-                    await requestSubscription({
-                        sku: 'annual',
-                        appAccountToken: user.id,
-                    });
-                } else {
-                    await getSubscriptions({ skus: ['monthly'] });
+                await call('POST', 'users/gotSubscriptions');
 
-                    await requestSubscription({
-                        sku: 'monthly',
-                        appAccountToken: user.id,
-                    });
-                }
+                await requestSubscription({
+                    sku,
+                    appAccountToken: user.id,
+                });
+
+                await call('POST', 'users/requestSubscription');
             }
             posthog.capture('subscribe_button_pressed', { source: triggeredFrom });
         } catch (error) {
+            await call('POST', 'users/subscriptionError', { error });
             console.error('Subscription error:', error);
             posthog.capture('subscription_error', { source: triggeredFrom, subscription: selectedOption, error: error.message });
             Alert.alert('Subscription Error', error.message);
@@ -157,28 +156,34 @@ const SubscriptionModalContent = () => {
     useEffect(() => {
         const purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
             try {
-                purchase.transactionReceipt;
                 if (purchase.transactionReceipt) {
                     const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
                     if (response) {
-                        posthog.capture('SUBSCRIBED', { source: triggeredFrom, subscription: selectedOption });
-                        dispatch(update({ userId: user.id, data: { subscription_status: 'SUBSCRIBED' } }))
-                        dispatch(updateState({ showSubscribeModal: false, showNewSubscriptionWelcome: true }))
+                        if (response === 'EXPIRED') {
+                            Alert.alert('Your subscription has expired', 'Please restore your purchase in your settings to continue using Sabio, contact support@heysabio.com if you need help');
+                        } else {
+                            posthog.capture('SUBSCRIBED', { source: triggeredFrom, subscription: selectedOption });
+                            dispatch(update({ userId: user.id, data: { subscription_status: 'SUBSCRIBED' } }));
+                            dispatch(updateState({ showSubscribeModal: false, showNewSubscriptionWelcome: true }));
+                        }
                     } else {
                         posthog.capture('SUBSCRIPTION_ERROR_SABIO', { source: triggeredFrom, subscription: selectedOption });
                         Alert.alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
                     }
                 }
             } catch (error) {
+                await call('POST', 'users/purchseUpdateError', { error });
                 console.error('Purchase update error:', error);
                 posthog.capture('purchase_update_error', { source: triggeredFrom, subscription: selectedOption, error: error.message });
                 Alert.alert('Purchase Update Error', error.message);
             }
         });
 
-        const purchaseErrorSubscription = purchaseErrorListener((error) => {
+        const purchaseErrorSubscription = purchaseErrorListener(async (error) => {
+            await call('POST', 'users/purchseUpdateError', { error });
             console.error('Purchase error:', error);
             posthog.capture('SUBSCRIPTION_ERROR_APPLE', { source: triggeredFrom, subscription: selectedOption, error: error.message });
+            Alert.alert('Purchase Error', error.message);
         });
 
         return () => {
