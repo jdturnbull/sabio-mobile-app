@@ -156,21 +156,28 @@ const SubscriptionModalContent = () => {
 
     useEffect(() => {
         const purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
-            purchase.transactionReceipt;
-            if (purchase.transactionReceipt) {
-                const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
-                if (response) {
-                    posthog.capture('SUBSCRIBED', { source: triggeredFrom, subscription: selectedOption });
-                    dispatch(update({ userId: user.id, data: { subscription_status: 'SUBSCRIBED' } }))
-                    dispatch(updateState({ showSubscribeModal: false, showNewSubscriptionWelcome: true }))
-                } else {
-                    posthog.capture('SUBSCRIPTION_ERROR_SABIO', { source: triggeredFrom, subscription: selectedOption });
-                    Alert.alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
+            try {
+                purchase.transactionReceipt;
+                if (purchase.transactionReceipt) {
+                    const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
+                    if (response) {
+                        posthog.capture('SUBSCRIBED', { source: triggeredFrom, subscription: selectedOption });
+                        dispatch(update({ userId: user.id, data: { subscription_status: 'SUBSCRIBED' } }))
+                        dispatch(updateState({ showSubscribeModal: false, showNewSubscriptionWelcome: true }))
+                    } else {
+                        posthog.capture('SUBSCRIPTION_ERROR_SABIO', { source: triggeredFrom, subscription: selectedOption });
+                        Alert.alert('There was a problem with your purchase, you can contact support at support@heysabio.com');
+                    }
                 }
+            } catch (error) {
+                console.error('Purchase update error:', error);
+                posthog.capture('purchase_update_error', { source: triggeredFrom, subscription: selectedOption, error: error.message });
+                Alert.alert('Purchase Update Error', error.message);
             }
         });
 
         const purchaseErrorSubscription = purchaseErrorListener((error) => {
+            console.error('Purchase error:', error);
             posthog.capture('SUBSCRIPTION_ERROR_APPLE', { source: triggeredFrom, subscription: selectedOption, error: error.message });
         });
 
