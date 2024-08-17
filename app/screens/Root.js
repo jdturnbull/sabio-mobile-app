@@ -1,8 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Easing, View, Modal, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
+import { Easing, View, Modal, ActivityIndicator, Text, TouchableOpacity, Alert } from 'react-native';
 import { withIAPContext } from 'react-native-iap';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  initConnection,
+  purchaseErrorListener,
+  purchaseUpdatedListener,
+} from 'react-native-iap';
 import moment from 'moment-timezone';
 import Onboarding from '../screens/Onboarding';
 import Main from '../screens/Main';
@@ -119,6 +124,52 @@ const Root = () => {
       opacity: opacity.value,
     };
   });
+
+  const [purchaseUpdateSubscription, setPurchaseUpdateSubscription] = useState(null);
+  const [purchaseErrorSubscription, setPurchaseErrorSubscription] = useState(null);
+
+  const initializeConnection = async (setPurchaseUpdateSubscription, setPurchaseErrorSubscription) => {
+    try {
+      await initConnection();
+      const purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
+        if (purchase.transactionReceipt) {
+          const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
+          if (response === 'EXPIRED') {
+            Alert.alert('Subscription expired', 'Please renew your subscription in Apple settings or email support@heysabio.com');
+          } else {
+            dispatch(update({ userId: user.id, data: { subscription_status: 'SUBSCRIBED' } }));
+            dispatch(updateState({ showSubscribeModal: false, showNewSubscriptionWelcome: true }));
+          }
+        } else {
+          Alert.alert('There was a problem confirming your subscription', 'Please try again or email support@heysabio.com');
+        }
+      });
+      setPurchaseUpdateSubscription(purchaseUpdateSubscription);
+    } catch (error) {
+      console.error('initConnection error', error);
+      await call('POST', 'users/initConnectionError', { error });
+    }
+  };
+
+  useEffect(() => {
+    initializeConnection(setPurchaseUpdateSubscription, setPurchaseErrorSubscription);
+
+    const purchaseErrorSubscription = purchaseErrorListener(
+      (error) => {
+        console.warn('purchaseErrorListener', error);
+      },
+    );
+    setPurchaseErrorSubscription(purchaseErrorSubscription);
+
+    return () => {
+      if (purchaseUpdateSubscription) {
+        purchaseUpdateSubscription.remove();
+      }
+      if (purchaseErrorSubscription) {
+        purchaseErrorSubscription.remove();
+      }
+    };
+  }, []);
 
 
 

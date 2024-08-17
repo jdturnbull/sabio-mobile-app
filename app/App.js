@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import styled, { ThemeProvider } from 'styled-components';
 import { StatusBar } from 'react-native';
@@ -8,7 +8,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { REACT_APP_POSTHOG_API_KEY } from '@env';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import { ActiveRouteProvider } from './hooks/useActiveRoute';
 import store from './stores/store';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -18,19 +18,9 @@ import Root from './screens/Root';
 import { theme } from './utils/theme';
 import Splash from './screens/Splash';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import call from './utils/call';
 
 createDatabase();
-
-PushNotification.configure({
-  onRegister: async function (token) {
-    await AsyncStorage.setItem('deviceToken', token.token);
-  },
-  onNotification: function (notification) {
-    notification.finish(PushNotificationIOS.FetchResult.NoData);
-  },
-  popInitialNotification: false,
-  requestPermissions: true,
-});
 
 const AppContainer = styled.View`
   flex: 1;
