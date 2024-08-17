@@ -132,7 +132,7 @@ const Root = () => {
     try {
       await initConnection();
       const purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
-        if (purchase.transactionReceipt) {
+        if (purchase.transactionReceipt && user) {
           try {
             const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
             if (response === 'EXPIRED') {
