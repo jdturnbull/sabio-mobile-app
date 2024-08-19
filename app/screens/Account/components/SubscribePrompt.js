@@ -1,9 +1,13 @@
 import React from "react";
-import { TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity } from "react-native";
 import styled from "styled-components";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { REACT_APP_APPLE_PASSWORD } from '@env';
 import Premium from '../../../assets/icons/24x/Premium';
-import { updateState } from "../../../stores/user/userSlice";
+import { update, updateState } from "../../../stores/user/userSlice";
+import { getAvailablePurchases, validateReceiptIos } from "react-native-iap";
+import call from "../../../utils/call";
+import { usePostHog } from "posthog-react-native";
 
 const Container = styled.View`
     padding: 12px;
@@ -62,16 +66,67 @@ const ButtonText = styled.Text`
 `;
 
 
-
-
 const SubscribePrompt = () => {
     const dispatch = useDispatch();
+    const posthog = usePostHog();
+    const user = useSelector((state) => state.user?.user);
 
     const handleOpen = () => {
         dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Subscribe' }));
     };
 
-    const handleRestore = () => { };
+    const handleRestore = async () => {
+        posthog.capture('restore_subscription_pressed');
+        const previousPurchases = await getAvailablePurchases();
+
+        if (!previousPurchases.length) {
+            posthog.capture('no_previous_subscriptions');
+            return;
+        }
+
+        let hasActiveSubscription = false;
+        let activePurchase = null;
+
+        posthog.capture('has_previous_subscriptions');
+
+        for (let x = 0; x < previousPurchases.length; x++) {
+            const purchase = previousPurchases[x];
+            const validatedReceipt = await validateReceiptIos({
+                receiptBody: {
+                    'receipt-data': purchase.transactionReceipt,
+                    'password': REACT_APP_APPLE_PASSWORD
+                },
+                isTest: process.env.NODE_ENV !== 'production'
+            });
+
+            if (!validatedReceipt) continue;
+
+            if (validatedReceipt.status === 0) {
+                hasActiveSubscription = true;
+                activePurchase = purchase;
+                break;
+            }
+        }
+
+        if (hasActiveSubscription) {
+            posthog.capture('has_active_subscription', { purchase: activePurchase });
+            const response = await call('POST', 'users/confirmSubscription', { userId: user?.id, purchase: activePurchase });
+
+            if (response === 'EXPIRED') {
+                posthog.capture('previous_subscription_expired', { purchase: activePurchase });
+                Alert.alert('Subscription expired', 'Please renew your subscription in Apple settings or press subscribe. Email support@heysabio.com if you have any questions.');
+            } else {
+                posthog.capture('subscription_restored', { purchase: activePurchase });
+                dispatch(update({ userId: user.id, data: { subscription_status: 'SUBSCRIBED' } }));
+                dispatch(updateState({ showSubscribeModal: false, showNewSubscriptionWelcome: true }));
+            }
+
+
+        } else {
+            Alert.alert('No active subscription found', 'If you have any questions, please contact support@heysabio.com');
+            dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Restore' }));
+        }
+    };
 
     return (
         <Container>

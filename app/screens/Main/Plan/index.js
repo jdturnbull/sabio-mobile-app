@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import {
   purchaseErrorListener,
   purchaseUpdatedListener,
+  clearTransactionIOS,
 } from 'react-native-iap';
 import Slider from './screens/Slider';
 import Replan from './screens/Replan';
@@ -13,13 +14,15 @@ import AddActivity from './screens/AddActivity';
 import ViewDay from './screens/ViewDay';
 import { useDispatch, useSelector } from 'react-redux';
 import call from '../../../utils/call';
-import { updateState } from '../../../stores/user/userSlice';
+import { update, updateState } from '../../../stores/user/userSlice';
+import { usePostHog } from 'posthog-react-native';
 
 const PlanStack = createStackNavigator();
 
 const Plan = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const posthog = usePostHog();
   const user = useSelector((state) => state.user?.user);
   const plan_updating = useSelector((state) => state.user.plan_updating);
   const training_plans = useSelector((state) => state.user.training_plans);
@@ -40,36 +43,40 @@ const Plan = () => {
   }, [isFocused]);
 
   useEffect(() => {
-    purchaseUpdatedListener(async (purchase) => {
-      if (purchase.transactionReceipt) {
+    const purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
+      if (purchase && purchase.transactionReceipt) {
         try {
           const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
           if (response === 'EXPIRED') {
+            clearTransactionIOS();
             Alert.alert('Subscription expired', 'Please renew your subscription in Apple settings or email support@heysabio.com');
           } else {
             dispatch(update({ userId: user.id, data: { subscription_status: 'SUBSCRIBED' } }));
             dispatch(updateState({ showSubscribeModal: false, showNewSubscriptionWelcome: true }));
+            clearTransactionIOS();
             posthog.capture('confirm_subscription_success');
           }
         } catch (error) {
           Alert.alert('There was a problem confirming your subscription', error.message);
+          clearTransactionIOS();
           posthog.capture('confirm_subscription_error', { error: error.message });
           console.log('Purchase error listener', error);
         }
       }
     });
 
-    purchaseErrorListener((error) => {
+    const purchaseErrorSubscription = purchaseErrorListener((error) => {
       posthog.capture('purchase_error_listener', { error });
+      clearTransactionIOS();
       console.log('Purchase Error', error);
     });
 
     return () => {
-      if (purchaseUpdatedListener) {
-        purchaseUpdatedListener();
+      if (purchaseUpdateSubscription) {
+        purchaseUpdateSubscription.remove();
       }
-      if (purchaseErrorListener) {
-        purchaseErrorListener();
+      if (purchaseErrorSubscription) {
+        purchaseErrorSubscription.remove();
       }
     };
   }, []);

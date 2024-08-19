@@ -5,14 +5,7 @@ import PremiumLarge from '../../assets/icons/48x/Premium';
 import Close from '../../assets/icons/24x/Clear';
 import Tick from '../../assets/icons/24x/TickOutline';
 import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
-import {
-    initConnection,
-    requestSubscription,
-    purchaseErrorListener,
-    purchaseUpdatedListener,
-    useIAP,
-    clearTransactionIOS,
-} from 'react-native-iap';
+import { getAvailablePurchases, requestSubscription, validateReceiptIos, useIAP } from 'react-native-iap';
 import { useDispatch, useSelector } from "react-redux";
 import { update, updateState } from "../../stores/user/userSlice";
 import { usePostHog } from "posthog-react-native";
@@ -124,6 +117,8 @@ const SubscriptionModalContent = () => {
     const triggeredFrom = useSelector((state) => state.user.subscribeModalTriggeredFrom);
     const [selectedOption, setSelectedOption] = useState('Annual');
     const [currency, setCurrency] = useState(getCurrencyFromTimezone(user.timezone));
+
+    // NOTE: Can use getAvailablePurchases validateReceiptIos to check if the user has an active subscription already
 
     const { getSubscriptions } = useIAP();
 
