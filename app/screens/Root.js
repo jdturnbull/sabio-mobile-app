@@ -3,11 +3,6 @@ import { Easing, View, Modal, ActivityIndicator, Text, TouchableOpacity, Alert }
 import { withIAPContext } from 'react-native-iap';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  initConnection,
-  purchaseErrorListener,
-  purchaseUpdatedListener,
-} from 'react-native-iap';
 import moment from 'moment-timezone';
 import Onboarding from '../screens/Onboarding';
 import Main from '../screens/Main';
@@ -90,7 +85,7 @@ const Root = () => {
   const posthog = usePostHog();
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const user = useSelector((state) => state.user.user);
+  const user = useSelector((state) => state.user?.user);
   const session = useSelector((state) => state.user.session);
   const showNewSubscriptionWelcome = useSelector((state) => state.user?.showNewSubscriptionWelcome);
   const planIsUpdating = useSelector((state) => state.user.plan_updating);
@@ -124,59 +119,6 @@ const Root = () => {
       opacity: opacity.value,
     };
   });
-
-  const [purchaseUpdateSubscription, setPurchaseUpdateSubscription] = useState(null);
-  const [purchaseErrorSubscription, setPurchaseErrorSubscription] = useState(null);
-
-  const initializeConnection = async (setPurchaseUpdateSubscription, setPurchaseErrorSubscription) => {
-    try {
-      await initConnection();
-      const purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
-        if (purchase.transactionReceipt && user) {
-          try {
-            const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
-            if (response === 'EXPIRED') {
-              Alert.alert('Subscription expired', 'Please renew your subscription in Apple settings or email support@heysabio.com');
-            } else {
-              dispatch(update({ userId: user.id, data: { subscription_status: 'SUBSCRIBED' } }));
-              dispatch(updateState({ showSubscribeModal: false, showNewSubscriptionWelcome: true }));
-              posthog.capture('confirm_subscription_success');
-            }
-          } catch (error) {
-            Alert.alert('There was a problem confirming your subscription', error.message);
-            posthog.capture('confirm_subscription_error', { error: error.message });
-          }
-        }
-      });
-
-      setPurchaseUpdateSubscription(purchaseUpdateSubscription);
-    } catch (error) {
-      posthog.capture('init_iap_connection_error', { error: error.message });
-    }
-  };
-
-  useEffect(() => {
-    initializeConnection(setPurchaseUpdateSubscription, setPurchaseErrorSubscription);
-
-    const purchaseErrorSubscription = purchaseErrorListener(
-      (error) => {
-        console.warn('purchaseErrorListener', error);
-        posthog.capture('purchase_error_listener', { error });
-      },
-    );
-    setPurchaseErrorSubscription(purchaseErrorSubscription);
-
-    return () => {
-      if (purchaseUpdateSubscription) {
-        purchaseUpdateSubscription.remove();
-      }
-      if (purchaseErrorSubscription) {
-        purchaseErrorSubscription.remove();
-      }
-    };
-  }, []);
-
-
 
   useEffect(() => {
     if (!user) {

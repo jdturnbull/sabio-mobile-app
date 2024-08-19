@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigationState, useFocusEffect, useIsFocused, useNavigation } from '@react-navigation/native';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Alert } from 'react-native';
 import styled from 'styled-components';
-
+import {
+  purchaseErrorListener,
+  purchaseUpdatedListener,
+} from 'react-native-iap';
 import Slider from './screens/Slider';
 import Replan from './screens/Replan';
 import AddActivity from './screens/AddActivity';
@@ -13,23 +16,6 @@ import call from '../../../utils/call';
 import { updateState } from '../../../stores/user/userSlice';
 
 const PlanStack = createStackNavigator();
-
-const FloatingButton = styled(TouchableOpacity)`
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 28px;
-  background-color: ${props => props.theme.colors.primary};
-  justify-content: center;
-  align-items: center;
-  elevation: 5;
-  shadow-color: #000;
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.25;
-  shadow-radius: 3.84px;
-`;
 
 const Plan = () => {
   const dispatch = useDispatch();
@@ -52,6 +38,41 @@ const Plan = () => {
       run();
     }
   }, [isFocused]);
+
+  useEffect(() => {
+    purchaseUpdatedListener(async (purchase) => {
+      if (purchase.transactionReceipt) {
+        try {
+          const response = await call('POST', 'users/confirmSubscription', { userId: user.id, purchase });
+          if (response === 'EXPIRED') {
+            Alert.alert('Subscription expired', 'Please renew your subscription in Apple settings or email support@heysabio.com');
+          } else {
+            dispatch(update({ userId: user.id, data: { subscription_status: 'SUBSCRIBED' } }));
+            dispatch(updateState({ showSubscribeModal: false, showNewSubscriptionWelcome: true }));
+            posthog.capture('confirm_subscription_success');
+          }
+        } catch (error) {
+          Alert.alert('There was a problem confirming your subscription', error.message);
+          posthog.capture('confirm_subscription_error', { error: error.message });
+          console.log('Purchase error listener', error);
+        }
+      }
+    });
+
+    purchaseErrorListener((error) => {
+      posthog.capture('purchase_error_listener', { error });
+      console.log('Purchase Error', error);
+    });
+
+    return () => {
+      if (purchaseUpdatedListener) {
+        purchaseUpdatedListener();
+      }
+      if (purchaseErrorListener) {
+        purchaseErrorListener();
+      }
+    };
+  }, []);
 
   const training_plan = useMemo(() => {
     return training_plans?.find(plan => plan.status === 'ACTIVE');
