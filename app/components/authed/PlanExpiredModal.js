@@ -6,6 +6,7 @@ import BodyText from "../shared/BodyText";
 import { useDispatch, useSelector } from "react-redux";
 import { activatePlan, addNewPlan, setup } from "../../stores/user/userSlice";
 import { usePostHog } from "posthog-react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const Container = styled.View`
     flex: 1;
@@ -31,6 +32,7 @@ const Button = styled(TouchableOpacity)`
 
 const PlanExpiredModal = ({ handleClose }) => {
     const posthog = usePostHog();
+    const navigation = useNavigation();
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user.user);
     const training_plans = useSelector((state) => state.user.training_plans);

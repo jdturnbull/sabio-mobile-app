@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import styled, { ThemeProvider } from 'styled-components';
 import { StatusBar } from 'react-native';
 import PushNotification from 'react-native-push-notification';
@@ -21,6 +21,11 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import call from './utils/call';
 
 createDatabase();
+
+Text.defaultProps = {
+  ...(Text.defaultProps || {}),
+  allowFontScaling: false,
+};
 
 const AppContainer = styled.View`
   flex: 1;

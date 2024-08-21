@@ -24,6 +24,7 @@ import call from '../utils/call';
 import PlanExpiredModal from '../components/authed/PlanExpiredModal';
 import WeeklyCheckinModal from '../components/authed/WeeklyCheckinModal';
 import ShowSubscriptionWelcomeModal from '../components/authed/ShowSubscriptionWelcomeModal';
+import ApproveChangesModal from '../components/authed/ApproveChangesModal';
 import { usePostHog } from 'posthog-react-native';
 
 const MAIN_SCREENS = ['Slider', 'Account', 'Notifications', 'Reports', 'Feed', 'View'];
@@ -98,6 +99,7 @@ const Root = () => {
 
   const [planExpired, setPlanExpired] = useState(false);
   const [showWeeklyCheckinModal, setShowWeeklyCheckinModal] = useState(false);
+  const [showApproveChangesModal, setShowApproveChangesModal] = useState(false);
 
   useEffect(() => {
     if (training_plan && moment(training_plan.end_date).isBefore(moment().tz(user.timezone))) {
@@ -120,6 +122,14 @@ const Root = () => {
       opacity: opacity.value,
     };
   });
+
+  useEffect(() => {
+    if (user?.replan_changes?.changes?.length >= 0) {
+      setShowApproveChangesModal(true);
+    } else {
+      setShowApproveChangesModal(false);
+    }
+  }, [user])
 
   useEffect(() => {
     if (!user) {
@@ -169,7 +179,8 @@ const Root = () => {
             updatedUser = await call('GET', `users/${user.id}`);
             if (!updatedUser?.should_replan) {
               clearInterval(intervalRef.current);
-              dispatch(updateState({ plan_updating: false }));
+              dispatch(updateState({ plan_updating: false, plan_changes: updatedUser.replan_changes?.changes || [] }));
+              setShowApproveChangesModal(true);
             }
           }, 5000);
         } else {
@@ -220,6 +231,10 @@ const Root = () => {
     setKeepWeeklyCheckinClosed(true);
   }
 
+  const handleCloseApproveChangesModal = () => {
+    setShowApproveChangesModal(false);
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: '#16171B' }}>
       <RootStack.Navigator screenOptions={{ headerShown: false, ...CustomTransition }} initialRouteName="Onboarding">
@@ -262,6 +277,13 @@ const Root = () => {
         visible={showNewSubscriptionWelcome && !hasShownSubscriptionWelcome}
       >
         <ShowSubscriptionWelcomeModal setHasShownSubscriptionWelcome={setHasShownSubscriptionWelcome} />
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showApproveChangesModal}
+      >
+        <ApproveChangesModal handleClose={handleCloseApproveChangesModal} />
       </Modal>
       {planIsUpdating && <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#000', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }, animatedStyle]}>
         <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold', marginBottom: 20 }}>Sabio is analysing your plan</Text>

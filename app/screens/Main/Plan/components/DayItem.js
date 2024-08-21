@@ -12,7 +12,7 @@ const DAY_COLOR_MAP = {
     'Monday': '#885A89',
     'Tuesday': '#D4B483',
     'Wednesday': '#355834',
-    'Thursday': '#6D466B',
+    'Thursday': '#469db9',
     'Friday': '#FF8585',
     'Saturday': '#134074',
     'Sunday': '#FF3357',

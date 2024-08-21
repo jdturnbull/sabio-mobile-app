@@ -243,6 +243,7 @@ export const userSlice = createSlice({
     injuries: [],
     medications: [],
     plan_updating: false,
+    plan_changes: [],
     training_plans: [],
     chronic_conditions: [],
     preferences: [],

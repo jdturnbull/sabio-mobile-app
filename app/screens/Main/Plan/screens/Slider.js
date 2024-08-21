@@ -130,7 +130,7 @@ const Slider = ({ weeks }) => {
         <HeaderTouchable onPress={handlePrev}>
           <ArrowLeft style={visibleIndex === 0 ? { display: 'none' } : {}} />
         </HeaderTouchable>
-        <HeaderText>{`Week ${_weeks[visibleIndex]?.week || ''}`}</HeaderText>
+        <HeaderText allowFontScaling={false}>{`Week ${_weeks[visibleIndex]?.week || ''}`}</HeaderText>
         <HeaderTouchable onPress={handleNext}>
           <ArrowRight style={visibleIndex === _weeks.length - 1 ? { display: 'none' } : {}} />
         </HeaderTouchable>
