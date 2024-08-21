@@ -19,7 +19,7 @@ const guidance = [
   "Like other's activities to give them a motivational boost!",
   "Check out the plan overview to see what you'll be doing during your training",
   "Create multiple plans and switch between them with a press of a button",
-  "Injured? Sabio can assign physio to help you recover"
+  "Injured? Sabio can assign physio exercises to help you recover"
 ];
 
 const Container = styled.View`

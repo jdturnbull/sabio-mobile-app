@@ -74,17 +74,24 @@ const Slider = ({ weeks }) => {
 
   useEffect(() => {
     _setWeeks(weeks);
-    const currentDate = moment();
-    const currentWeekIndex = weeks.findIndex(week =>
-      week.activities.some(activity =>
-        moment(activity.date).isSame(currentDate, 'week')
-      )
-    );
-    if (currentWeekIndex !== -1) {
-      setVisibleIndex(currentWeekIndex);
-      scrollViewRef.current.scrollTo({ x: currentWeekIndex * Dimensions.get('window').width, animated: false });
-    }
   }, [weeks]);
+
+  useEffect(() => {
+    if (_weeks) {
+      const currentDate = moment();
+      const currentWeekIndex = _weeks.findIndex(week =>
+        week.activities.some(activity =>
+          moment(activity.date).isSame(currentDate, 'week')
+        )
+      );
+      if (currentWeekIndex !== -1) {
+        if (currentWeekIndex > 5) {
+          setVisibleIndex(currentWeekIndex);
+          scrollViewRef.current.scrollTo({ x: currentWeekIndex * Dimensions.get('window').width, animated: false });
+        }
+      }
+    }
+  }, []);
 
   const handlePrev = () => {
     if (visibleIndex > 0) {

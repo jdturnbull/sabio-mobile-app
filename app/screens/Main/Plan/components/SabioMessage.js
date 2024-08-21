@@ -33,7 +33,7 @@ const MessageContainer = styled(Animated.View)`
     background-color: ${(props) => props.theme.colors.background2};
     border-radius: 10px;
     overflow: hidden; 
-    padding: 10px;
+    padding: 8px;
 `;
 
 const MessageText = styled.Text`
@@ -57,7 +57,7 @@ const SabioMessage = ({ focus, nutrition, disabled }) => {
     const posthog = usePostHog();
     const [showMessage, setShowMessage] = useState(false);
     const [contentHeight, setContentHeight] = useState(0);
-    const height = useSharedValue(35);
+    const height = useSharedValue(50);
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
@@ -69,7 +69,7 @@ const SabioMessage = ({ focus, nutrition, disabled }) => {
         if (showMessage) {
             height.value = withTiming(contentHeight, { duration: 500 });
         } else {
-            height.value = withTiming(35, { duration: 500 });
+            height.value = withTiming(50, { duration: 500 });
         }
     }, [showMessage, contentHeight, height]);
 
@@ -114,7 +114,7 @@ const SabioMessage = ({ focus, nutrition, disabled }) => {
                     </MessageText>
                 </MessageContainer>
                 {!disabled && <ToggleButton onPress={toggleMessage}>
-                    <ToggleButtonText>{showMessage ? "Hide" : "Show"} Sabio's advice</ToggleButtonText>
+                    <ToggleButtonText>{showMessage ? "See less" : "See more"}</ToggleButtonText>
                 </ToggleButton>}
             </Right>
         </Container>

@@ -125,6 +125,7 @@ const AddRace = () => {
   return (
     <TouchableWithoutFeedback onLongPress={Keyboard.dismiss}>
       <KeyboardAwareScrollView
+        showsVerticalScrollIndicator={false}
         extraScrollHeight={80}
         contentContainerStyle={{ flexGrow: 1 }}
         enableOnAndroid={true}

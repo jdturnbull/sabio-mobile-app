@@ -48,7 +48,7 @@ const ButtonContainer = styled.View`
 `;
 
 const Touchable = styled(TouchableOpacity)`
-    background-color: ${(props) => props.theme.colors.background3};
+    background-color: ${(props) => props.theme.colors.highlight};
     padding: 5px;
     border-radius: 5px;
     flex-direction: row;
@@ -56,7 +56,7 @@ const Touchable = styled(TouchableOpacity)`
 `;
 
 const TouchableText = styled.Text`
-    color: ${(props) => props.theme.colors.highlight};
+    color: ${(props) => props.theme.colors.white};
     font-size: ${(props) => props.theme.text.size.xs};
     font-weight: ${(props) => props.theme.text.weight.semibold};
     margin-left: ${(props) => props.iconExists ? '5px' : '0px'};
@@ -77,7 +77,7 @@ const TrainingPlanCard = ({ plan, handleActivate }) => {
     return (
         <Container onPress={handleContainerPress} active={status === 'ACTIVE'} disabled={status === 'ACTIVE'}>
             <Top>
-                {status === 'ACTIVE' && <TopText>Currently Active Plan</TopText>}
+                {status === 'ACTIVE' && <TopText style={{ color: '#EE6E12' }}>Currently Active Plan</TopText>}
                 <TopText>
                     {plan.plan.client_information.duration}
                 </TopText>

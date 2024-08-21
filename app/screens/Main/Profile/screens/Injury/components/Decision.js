@@ -9,8 +9,9 @@ import NextButton from "../../../../../../components/shared/NextButton";
 import { useDispatch, useSelector } from "react-redux";
 import { createRehabPlan, setup } from "../../../../../../stores/user/userSlice";
 import { usePostHog } from "posthog-react-native";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-const Container = styled.View`
+const Container = styled(KeyboardAwareScrollView)`
     flex: 1;
 `;
 
@@ -32,7 +33,7 @@ const Decision = ({ hasLockedFeeling, hasFullRangeOfMotion, checkedByProfessiona
     const title = canTrain ? "It's time to enter injury mode" : "We can't help you with this injury";
     const subtitle = canTrain ? "Here's how Sabio's injury mode works" : "Based on your answers we recommend you stop training and contact a professional to discuss your injury.";
 
-    const howInjuryModeWorks = "Sabio will assign you physio to help you recover from your injury, when you're ready to train again, you can exit injury mode and Sabio will ease you back into your plan. You can stay on your current plan, or create a new one.";
+    const howInjuryModeWorks = "Sabio will assign you physio exercises to help you recover from your injury, when you're ready to train again, you can exit injury mode and Sabio will ease you back into your plan. You can stay on your current plan, or create a new one. We strongly recommend you not rely soley on Sabio's advice, and also consult a professional.";
 
     const handleSubmit = () => {
         if (!description) {
@@ -45,7 +46,10 @@ const Decision = ({ hasLockedFeeling, hasFullRangeOfMotion, checkedByProfessiona
     };
 
     return (
-        <Container>
+        <Container showsVerticalScrollIndicator={false} extraScrollHeight={130}
+            contentContainerStyle={{ flexGrow: 1 }}
+            enableOnAndroid={true}
+            keyboardOpeningTime={0}>
             <Title>{title}</Title>
             <SubHeader>{subtitle}</SubHeader>
             {canTrain ? <BodyText style={{ marginVertical: 20 }}>{howInjuryModeWorks}</BodyText> : <BodyText style={{ marginTop: 20 }}>We have deemed this injury too severe for Sabio to help with.</BodyText>}

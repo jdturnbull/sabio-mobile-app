@@ -91,6 +91,7 @@ const Root = () => {
   const planIsUpdating = useSelector((state) => state.user.plan_updating);
 
   const [keepWeeklyCheckinClosed, setKeepWeeklyCheckinClosed] = useState(false);
+  const [hasShownSubscriptionWelcome, setHasShownSubscriptionWelcome] = useState(false);
 
   const training_plans = useSelector((state) => state.user.training_plans) || [];
   const training_plan = training_plans?.filter((p) => p.status === 'ACTIVE')[0] || null;
@@ -258,9 +259,9 @@ const Root = () => {
       <Modal
         animationType="slide"
         transparent={true}
-        visible={showNewSubscriptionWelcome}
+        visible={showNewSubscriptionWelcome && !hasShownSubscriptionWelcome}
       >
-        <ShowSubscriptionWelcomeModal />
+        <ShowSubscriptionWelcomeModal setHasShownSubscriptionWelcome={setHasShownSubscriptionWelcome} />
       </Modal>
       {planIsUpdating && <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#000', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }, animatedStyle]}>
         <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold', marginBottom: 20 }}>Sabio is analysing your plan</Text>

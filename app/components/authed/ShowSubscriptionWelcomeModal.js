@@ -30,7 +30,7 @@ const ModalInnerContent = styled.View`
     shadow-radius: 3.84px;
 `;
 
-const ShowSubscriptionWelcomeModal = () => {
+const ShowSubscriptionWelcomeModal = ({ setHasShownSubscriptionWelcome }) => {
     const dispatch = useDispatch();
     const posthog = usePostHog();
 
@@ -38,6 +38,7 @@ const ShowSubscriptionWelcomeModal = () => {
         if (event.nativeEvent.translationY > 100) {
             posthog.capture('closed_subscription_welcome_modal');
             dispatch(updateState({ showNewSubscriptionWelcome: false }));
+            setHasShownSubscriptionWelcome(true);
         }
     };
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import moment from 'moment';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { View, TouchableOpacity, Text, Dimensions, ActivityIndicator } from 'react-native';
+import { View, TouchableOpacity, Text, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
 import Title from '../../../../components/shared/Title';
@@ -329,7 +329,7 @@ const ViewDay = ({ fetchActivities }) => {
           </ActivityContainer>
         )
       })}
-      <View style={{ flex: 1, marginTop: 20 }}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, marginBottom: 20, marginTop: 20 }}>
         {recoveryGuidance && <BodyText style={{ fontWeight: 600, marginBottom: 10 }}>Recovery guidance</BodyText>}
         {recoveryGuidance && <BodyText>{recoveryGuidance}</BodyText>}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
@@ -350,7 +350,7 @@ const ViewDay = ({ fetchActivities }) => {
             <OptionText>{activities.length > 1 ? 'Change activities' : 'Change activity'}</OptionText>
           </OptionButton>}
         </View>
-      </View>
+      </ScrollView>
       {!complete && <CompleteButton onPress={handleComplete}>
         <CompleteText>Complete day</CompleteText>
       </CompleteButton>}

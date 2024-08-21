@@ -19,7 +19,7 @@ const Reports = () => {
   const training_plans = useSelector((state) => state.user.training_plans);
   const training_plan = training_plans.filter((p) => p.status === 'ACTIVE')[0];
 
-  const nextReportIn = moment(training_plan.next_progress_report_at).diff(moment(), 'days');
+  const nextReportIn = moment(training_plan?.next_progress_report_at).diff(moment(), 'days') || 7;
 
   const isFocused = useIsFocused();
 
