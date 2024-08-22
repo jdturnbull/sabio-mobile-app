@@ -179,7 +179,7 @@ const Root = () => {
             updatedUser = await call('GET', `users/${user.id}`);
             if (!updatedUser?.should_replan) {
               clearInterval(intervalRef.current);
-              dispatch(updateState({ plan_updating: false, plan_changes: updatedUser.replan_changes?.changes || [] }));
+              dispatch(updateState({ plan_updating: false, user: updatedUser }));
               setShowApproveChangesModal(true);
             }
           }, 5000);
@@ -232,6 +232,7 @@ const Root = () => {
   }
 
   const handleCloseApproveChangesModal = () => {
+    dispatch(update({ userId: user.id, data: { replan_changes: {}, should_replan: false } }));
     setShowApproveChangesModal(false);
   }
 

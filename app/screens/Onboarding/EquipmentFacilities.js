@@ -149,7 +149,7 @@ const EquipmentFacilities = ({ editMode }) => {
   };
 
   return (
-    <Container>
+    <Container showsVerticalScrollIndicator={false}>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
         {editMode && <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}><ArrowLeft /></TouchableOpacity>}
         <Title style={{ marginBottom: 0, marginLeft: editMode ? 10 : 0 }}>{editMode ? 'Update equipment' : 'Do you have any favourite equipment or facilities?'}</Title>
