@@ -188,12 +188,12 @@ const Preferences = () => {
                 {showInput ? <Return color={'#999'} /> : <Add color={'#f8f8f8'} />}
             </NewButton>
             <Scrollable>
-                {preferences.map((preference, i) => <EditableOption key={i} item={preference} label={preference.description} handleSwipe={handleArchive} />)}
+                {preferences.map((preference, i) => <EditableOption key={i} item={preference} label={preference.description} handleSwipe={handleArchive} onPress={() => Alert.alert('Remove this preference?', 'This will change your plan', [{ text: 'Cancel', style: 'cancel' }, { text: 'Confirm', onPress: () => handleArchive(preference.id) }])} />)}
                 <TouchableOpacity onPress={() => setShowArchived(!showArchived)} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 20 }}>
                     <SubHeader style={{ marginRight: 5, color: '#f8f8f8' }}>Archived Preferences</SubHeader>
                     {showArchived ? <ArrowUp color={'#f8f8f890'} /> : <ArrowDown color={'#f8f8f890'} />}
                 </TouchableOpacity>
-                {showArchived && archivedPreferences.map((preference, i) => <EditableOption key={i} item={preference} label={preference.description} handleSwipe={handleRestore} />)}
+                {showArchived && archivedPreferences.map((preference, i) => <EditableOption key={i} item={preference} label={preference.description} handleSwipe={handleRestore} onPress={() => Alert.alert('Restore this preference?', 'This will change your plan', [{ text: 'Cancel', style: 'cancel' }, { text: 'Confirm', onPress: () => handleRestore(preference.id) }])} />)}
             </Scrollable>
         </Container>
     )

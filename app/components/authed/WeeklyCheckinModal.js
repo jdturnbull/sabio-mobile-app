@@ -8,8 +8,9 @@ import CustomInput from "../shared/CustomInput";
 import Title from "../shared/Title";
 import SubHeader from "../shared/SubHeader";
 import { useDispatch, useSelector } from "react-redux";
-import { addWeeklyCheckin } from "../../stores/user/userSlice";
+import { addWeeklyCheckin, update } from "../../stores/user/userSlice";
 import { usePostHog } from "posthog-react-native";
+import moment from "moment";
 
 const Container = styled.View`
     flex: 1;
@@ -81,6 +82,7 @@ const WeeklyCheckinModal = ({ handleClose }) => {
 
     const handleSkip = () => {
         posthog.capture('weekly_checkin_skip', { exerciseFlowNotWork, anyLimitations, boredom });
+        dispatch(addWeeklyCheckin({ userId: user.id, training_plan_id: training_plan.id, data: { exerciseFlowNotWork, anyLimitations, boredom } }));
         handleClose();
     }
 

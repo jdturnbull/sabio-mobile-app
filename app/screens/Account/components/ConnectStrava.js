@@ -56,7 +56,7 @@ const ConnectStrava = () => {
             dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Strava' }));
         } else {
             try {
-                const redirect_uri = process.env === 'production' ? encodeURIComponent("https://v2api.heysabio.com/connection/strava") : encodeURIComponent("http://localhost:7074/connection/strava");
+                const redirect_uri = process.env.NODE_ENV === 'development' ? encodeURIComponent("http://localhost:7074/connection/strava") : encodeURIComponent("https://v2api.heysabio.com/connection/strava");
                 const url = `https://www.strava.com/oauth/authorize?response_type=code&client_id=116349&redirect_uri=${redirect_uri}&approval_prompt=auto&scope=activity:read_all&state=${user.id}`;
                 SafariView.show({ url });
             } catch (error) {

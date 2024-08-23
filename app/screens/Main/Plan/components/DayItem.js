@@ -132,14 +132,14 @@ const DayItem = ({ _day, recoveryGuidance, week }) => {
         const { training_plan_id } = _day.activities[0];
 
         if (complete) {
+            await call('POST', 'users/uncompleteDay', { planId: training_plan_id, date: _day.date })
             setComplete(false);
             progress.value = withTiming(0, { duration: 500 });
-            await call('POST', 'users/uncompleteDay', { planId: training_plan_id, date: _day.date })
         } else {
+            await call('POST', 'users/completeDay', { planId: training_plan_id, date: _day.date })
             setComplete(true);
             hapticImpact();
             progress.value = withTiming(100, { duration: 500 });
-            await call('POST', 'users/completeDay', { planId: training_plan_id, date: _day.date })
         }
     };
 

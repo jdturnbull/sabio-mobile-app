@@ -164,9 +164,19 @@ const ApproveChangesModal = ({ handleClose }) => {
     };
 
     const handleApprove = async () => {
-        await call('GET', `users/approveReplanChanges/${user.id}`);
-        dispatch(update({ userId: user.id, data: { replan_changes: {}, should_replan: false } }));
-        handleClose();
+        try {
+            await call('GET', `users/approveReplanChanges/${user.id}`);
+            dispatch(update({
+                userId: user.id,
+                data: {
+                    replan_changes: {},
+                    should_replan: false
+                }
+            }));
+            handleClose();
+        } catch (error) {
+            console.log(error.message);
+        }
     };
 
     return (
