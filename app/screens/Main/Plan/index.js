@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import call from '../../../utils/call';
 import { update, updateState } from '../../../stores/user/userSlice';
 import { usePostHog } from 'posthog-react-native';
+import { hapticImpact } from '../../../utils/haptics';
 
 const PlanStack = createStackNavigator();
 
@@ -24,6 +25,7 @@ const Plan = () => {
   const navigation = useNavigation();
   const posthog = usePostHog();
   const user = useSelector((state) => state.user?.user);
+  const showApproveChangesModal = useSelector((state) => state.user?.user?.replan_changes && Object.keys(state.user?.user?.replan_changes).length > 0);
   const plan_updating = useSelector((state) => state.user.plan_updating);
   const training_plans = useSelector((state) => state.user.training_plans);
   const [weeks, setWeeks] = useState([]);
@@ -41,6 +43,7 @@ const Plan = () => {
       run();
     }
   }, [isFocused]);
+
 
   useEffect(() => {
     const purchaseUpdateSubscription = purchaseUpdatedListener(async (purchase) => {
@@ -101,6 +104,29 @@ const Plan = () => {
     setWeeks(weeksData);
   }, [training_plan]);
 
+  const handleComplete = async (_day) => {
+    const { training_plan_id } = _day.activities[0];
+
+    if (_day.activities[0].status === 'COMPLETE') {
+      await call('POST', 'users/uncompleteDay', { planId: training_plan_id, date: _day.date })
+      await fetchActivities();
+    } else {
+      await call('POST', 'users/completeDay', { planId: training_plan_id, date: _day.date })
+      hapticImpact();
+      await fetchActivities();
+    }
+  };
+
+  useEffect(() => {
+    const run = async () => {
+      if (!showApproveChangesModal && user) {
+        await fetchActivities();
+      }
+    }
+
+    run();
+  }, [showApproveChangesModal]);
+
   useFocusEffect(
     useCallback(() => {
       fetchActivities();
@@ -118,7 +144,7 @@ const Plan = () => {
     <View style={{ flex: 1 }}>
       <PlanStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Slider">
         <PlanStack.Screen name="Slider">
-          {props => <Slider {...props} weeks={weeks} />}
+          {props => <Slider {...props} weeks={weeks} handleComplete={handleComplete} />}
         </PlanStack.Screen>
         <PlanStack.Screen name="Replan">
           {props => <Replan {...props} weeks={weeks} />}

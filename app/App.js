@@ -2,12 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 import styled, { ThemeProvider } from 'styled-components';
 import { StatusBar } from 'react-native';
-import PushNotification from 'react-native-push-notification';
 import { PostHogProvider } from 'posthog-react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { REACT_APP_POSTHOG_API_KEY } from '@env';
-import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { ActiveRouteProvider } from './hooks/useActiveRoute';
 import store from './stores/store';

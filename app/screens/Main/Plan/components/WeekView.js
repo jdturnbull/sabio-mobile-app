@@ -36,7 +36,7 @@ const sortDays = (daysMap) => {
   return Array.from(daysMap.values()).sort((a, b) => sortedDays.indexOf(a.day) - sortedDays.indexOf(b.day));
 };
 
-const WeekView = ({ week }) => {
+const WeekView = ({ week, handleComplete }) => {
   const user = useSelector((state) => state.user?.user);
   const [loading, setLoading] = useState(true);
   const opacity = useSharedValue(0);
@@ -74,7 +74,7 @@ const WeekView = ({ week }) => {
         <View style={{ width: '100%', alignItems: 'flex-end', marginBottom: 10 }}>
           <InfoButton location={'Plan'} />
         </View>
-        {days.map((day, i) => <DayItem key={day.date} index={i} _day={day} week={week} recoveryGuidance={week?.recovery_guidelines?.monitor} />)}
+        {days.map((day, i) => <DayItem key={day.date} index={i} _day={day} week={week} handleComplete={handleComplete} />)}
         <View style={{ height: 30 }} />
       </Container>
     </Animated.View>

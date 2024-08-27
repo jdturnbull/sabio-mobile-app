@@ -45,11 +45,22 @@ const RequestNotifications = () => {
         }
     }, [])
 
+    useEffect(() => {
+        PushNotification.configure({
+            onRegister: async function (token) {
+                const deviceToken = token.token;
+                await AsyncStorage.setItem('deviceToken', deviceToken);
+            },
+        });
+    }, []);
+
     const handleNext = async () => {
         PushNotification.requestPermissions().then(async (permissions) => {
             if (permissions.alert || permissions.badge || permissions.sound) {
-                const deviceToken = await AsyncStorage.getItem('deviceToken');
+                const token = await AsyncStorage.getItem('deviceToken');
+
                 posthog.capture('notifications_approved', { permissions: permissions });
+
                 dispatch(updateState({
                     notification_settings: {
                         social_notifications: socialNotifications,
@@ -57,7 +68,7 @@ const RequestNotifications = () => {
                         progress_notifications: progressNotifications,
                         motivation_notifications: motivationNotifications,
                         notifications_enabled: true,
-                        token: deviceToken,
+                        token: token,
                     }
                 }));
 

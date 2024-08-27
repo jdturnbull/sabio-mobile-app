@@ -4,6 +4,7 @@ import { TouchableOpacity, View } from "react-native";
 import Sabio from '../../../../assets/icons/32x/SabioArmUp';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import { usePostHog } from "posthog-react-native";
+import _ from 'lodash';
 
 const Container = styled.View`
     flex-direction: row;
@@ -83,11 +84,17 @@ const SabioMessage = ({ focus, nutrition, disabled }) => {
             return 'Example weekly guidance';
         }
         let message = focus;
-        if (nutrition) {
+        if (nutrition.caloric_intake && nutrition.macronutrients) {
             message += `\n\n${nutrition.caloric_intake}\n\n${nutrition.macronutrients}`;
         }
         return message;
     };
+
+    const truncatedMessage = _.truncate(getMessageText(), {
+        'length': 70, // Adjust the length as needed to fit three lines
+        'separator': /,? +/,
+        'omission': '...'
+    });
 
     return (
         <Container>
@@ -110,7 +117,7 @@ const SabioMessage = ({ focus, nutrition, disabled }) => {
                 </View>
                 <MessageContainer style={animatedStyle}>
                     <MessageText>
-                        {getMessageText()}
+                        {showMessage ? getMessageText() : truncatedMessage}
                     </MessageText>
                 </MessageContainer>
                 {!disabled && <ToggleButton onPress={toggleMessage}>

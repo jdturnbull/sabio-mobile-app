@@ -89,6 +89,7 @@ const Root = () => {
   const user = useSelector((state) => state.user?.user);
   const session = useSelector((state) => state.user.session);
   const showNewSubscriptionWelcome = useSelector((state) => state.user?.showNewSubscriptionWelcome);
+  const showApproveChangesModal = useSelector((state) => state.user?.user?.replan_changes);
   const planIsUpdating = useSelector((state) => state.user.plan_updating);
 
   const [keepWeeklyCheckinClosed, setKeepWeeklyCheckinClosed] = useState(false);
@@ -99,7 +100,6 @@ const Root = () => {
 
   const [planExpired, setPlanExpired] = useState(false);
   const [showWeeklyCheckinModal, setShowWeeklyCheckinModal] = useState(false);
-  const [showApproveChangesModal, setShowApproveChangesModal] = useState(false);
 
   useEffect(() => {
     if (training_plan && moment(training_plan.end_date).isBefore(moment().tz(user.timezone))) {
@@ -122,14 +122,6 @@ const Root = () => {
       opacity: opacity.value,
     };
   });
-
-  useEffect(() => {
-    if (user?.replan_changes?.changes?.length >= 0) {
-      setShowApproveChangesModal(true);
-    } else {
-      setShowApproveChangesModal(false);
-    }
-  }, [user])
 
   useEffect(() => {
     if (!user) {
@@ -180,7 +172,7 @@ const Root = () => {
             if (!updatedUser?.should_replan) {
               clearInterval(intervalRef.current);
               dispatch(updateState({ plan_updating: false, user: updatedUser }));
-              setShowApproveChangesModal(true);
+
             }
           }, 5000);
         } else {
@@ -233,7 +225,7 @@ const Root = () => {
 
   const handleCloseApproveChangesModal = () => {
     dispatch(update({ userId: user.id, data: { replan_changes: {}, should_replan: false } }));
-    setShowApproveChangesModal(false);
+
   }
 
   return (
@@ -282,7 +274,7 @@ const Root = () => {
       <Modal
         animationType="slide"
         transparent={true}
-        visible={showApproveChangesModal}
+        visible={showApproveChangesModal && Object.keys(showApproveChangesModal).length > 0 ? true : false}
       >
         <ApproveChangesModal handleClose={handleCloseApproveChangesModal} />
       </Modal>

@@ -2,33 +2,22 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import moment from 'moment';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { View, TouchableOpacity, Text, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
+import { View, TouchableOpacity, ActivityIndicator, Alert, Dimensions, Text } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
 import Title from '../../../../components/shared/Title';
 import call from '../../../../utils/call';
 import { hapticImpact } from '../../../../utils/haptics';
-import BodyText from '../../../../components/shared/BodyText';
 import ChatIcon from '../../../../assets/icons/24x/Chat';
 import Repeat from '../../../../assets/icons/18x/Repeat';
 import Help from '../../../../assets/icons/18x/Help';
 import Tick from '../../../../assets/icons/18x/Tick';
 import { updateState } from '../../../../stores/user/userSlice';
+import SwipeToAction from '../../../../components/shared/SwipeToAction';
 import { Animated } from 'react-native';
 import retrieveCompletion from '../../../../utils/retrieveCompletion';
 import { usePostHog } from 'posthog-react-native';
-
-const DAY_COLOR_MAP = {
-  'Monday': '#885A89',
-  'Tuesday': '#D4B483',
-  'Wednesday': '#355834',
-  'Thursday': '#469db9',
-  'Friday': '#FF8585',
-  'Saturday': '#134074',
-  'Sunday': '#FF3357',
-}
-
-const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Container = styled.View`
   flex: 1;
@@ -103,22 +92,6 @@ const ActivityBodyText = styled.Text`
   font-weight: ${(props) => props.theme.text.weight.regular};
 `;
 
-const CompleteButton = styled(TouchableOpacity)`
-    width: 100%;
-    background-color: ${(props) => props.theme.colors.white};
-    padding: 10px;
-    border-radius: 8px;
-    align-items: center;
-    margin-bottom: 20px;
-`;
-
-const CompleteText = styled.Text`
-  font-family: ${(props) => props.theme.text.family};
-  font-size: ${(props) => props.theme.text.size.sm};
-  letter-spacing: ${(props) => props.theme.text.letterSpacing.sm};
-  font-weight: ${(props) => props.theme.text.weight.bold};
-`;
-
 const EmojiText = styled.Text``;
 
 const ChatButton = styled(TouchableOpacity)`
@@ -128,7 +101,7 @@ const ChatButton = styled(TouchableOpacity)`
 `;
 
 const OptionButton = styled(TouchableOpacity)`
-  background-color: ${(props) => props.theme.colors.highlight};
+  background-color: #A1AAD315;
   padding: 8px;
   border-radius: 8px;
   margin-right: 10px;
@@ -183,10 +156,11 @@ const ViewDay = ({ fetchActivities }) => {
   const training_plans = useSelector((state) => state.user.training_plans);
   const training_plan = training_plans.filter((p) => p.status === 'ACTIVE')[0];
 
-  const { _day, recoveryGuidance, week } = route.params;
+  const { _day, week } = route.params;
   const { day, date, activities } = _day;
 
   const [complete, setComplete] = useState(activities.every(activity => activity.status === 'COMPLETE'));
+  const showBottomQuestionButton = !moment(activities[0].date).isBefore(moment()) || complete;
 
   const handleBack = () => {
     if (!isProcessing) {
@@ -208,30 +182,68 @@ const ViewDay = ({ fetchActivities }) => {
     navigation.goBack();
   };
 
-  const handleChat = () => {
+  const handleChat = async () => {
     if (user.subscription_status === 'SUBSCRIBED') {
       navigation.navigate('Chat', { day, week });
       posthog.capture('activity_chat_button_pressed', { day: day, week: week });
     } else {
-      dispatch(updateState({
-        showSubscribeModal: true,
-        subscribeModalTriggeredFrom: 'Chat'
-      }))
-    }
-  }
+      const lastFreeQuestionAt = await AsyncStorage.getItem('lastFreeQuestionAt') || 0;
 
-  const handleChangeActivity = () => {
+      // If the lastFreeChat was over a week ago, show the modal, else allow them to chat
+      if (moment(parseInt(lastFreeQuestionAt)).isAfter(moment().subtract(1, 'week'))) {
+        dispatch(updateState({
+          showSubscribeModal: true,
+          subscribeModalTriggeredFrom: 'Chat'
+        }))
+      } else {
+        Alert.alert('You can ask one free question a week', 'To use your free weekly question, confirm below.', [
+          {
+            text: 'Cancel', onPress: () => { }
+          },
+          {
+            text: 'Confirm', onPress: async () => {
+              await AsyncStorage.setItem('lastFreeQuestionAt', moment().valueOf().toString());
+              navigation.navigate('Chat', { day, week });
+              posthog.capture('activity_chat_button_pressed', { day: day, week: week });
+            }
+          }
+        ]);
+      }
+    }
+  };
+
+  const handleChangeActivity = async () => {
     if (user.subscription_status !== 'SUBSCRIBED') {
-      dispatch(updateState({
-        showSubscribeModal: true,
-        subscribeModalTriggeredFrom: 'View day activity quick change'
-      }));
+      const lastFreeChangeAt = await AsyncStorage.getItem('lastFreeChangeAt') || 0;
+
+
+      // If the lastFreeChat was over a week ago, show the modal, else allow them to chat
+      if (moment(parseInt(lastFreeChangeAt)).isAfter(moment().subtract(1, 'week'))) {
+        dispatch(updateState({
+          showSubscribeModal: true,
+          subscribeModalTriggeredFrom: 'View day activity quick change'
+        }))
+      } else {
+        Alert.alert('You have one free quick change a week', 'To use your free quick change, confirm below.', [
+          {
+            text: 'Cancel', onPress: () => { }
+          },
+          {
+            text: 'Confirm', onPress: async () => {
+              await AsyncStorage.setItem('lastFreeChangeAt', moment().valueOf().toString());
+              posthog.capture('activity_change_button_pressed', { day: day, week: week });
+              setProposedChanges([]);
+              setIsChanging(true);
+            }
+          }
+        ]);
+      }
     } else {
       posthog.capture('activity_change_button_pressed', { day: day, week: week });
       setProposedChanges([]);
       setIsChanging(true);
     }
-  };
+  }
 
   useEffect(() => {
     const runIsChanging = async () => {
@@ -306,14 +318,14 @@ const ViewDay = ({ fetchActivities }) => {
       {activities.map((activity, i) => {
         return (
           <ActivityContainer key={activity.id}>
-            <ActivityHeader color={DAY_COLOR_MAP[day]}>
+            <ActivityHeader color={'#A1AAD315'}>
               <HeaderText>Session</HeaderText>
             </ActivityHeader>
             <ActivityBody>
-              <Left>
+              {activities.length > 1 && <><Left>
                 <NumberText>{i + 1}</NumberText>
               </Left>
-              <View style={{ marginLeft: 6, marginRight: 12, width: 2, backgroundColor: '#f8f8f810', height: '100%', borderRadius: 50 }} />
+                <View style={{ marginLeft: 6, marginRight: 12, width: 2, backgroundColor: '#f8f8f810', height: '100%', borderRadius: 50 }} /></>}
               <Right>
                 {!isChanging && <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                   <EmojiText>{proposedChanges.length > 0 ? proposedChanges[i].icon : activity.icon}</EmojiText>
@@ -329,34 +341,35 @@ const ViewDay = ({ fetchActivities }) => {
           </ActivityContainer>
         )
       })}
-      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, marginBottom: 20, marginTop: 20 }}>
-        {recoveryGuidance && <BodyText style={{ fontWeight: 600, marginBottom: 10 }}>Recovery guidance</BodyText>}
-        {recoveryGuidance && <BodyText>{recoveryGuidance}</BodyText>}
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
-          <OptionButton onPress={handleChat}>
-            <Help />
-            <OptionText>Ask a question</OptionText>
-          </OptionButton>
-          {!complete && <OptionButton onPress={handleChangeActivity}>
-            {isChanging ? (
-              proposedChanges.length === 0 ? (
-                <SpinningRepeat />
-              ) : (
-                <Tick />
-              )
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
+        {complete || !showBottomQuestionButton && <OptionButton onPress={handleChat}>
+          <Help />
+          <OptionText>Ask a question</OptionText>
+        </OptionButton>}
+        {!complete && <OptionButton onPress={handleChangeActivity}>
+          {isChanging ? (
+            proposedChanges.length === 0 ? (
+              <SpinningRepeat />
             ) : (
-              <Repeat />
-            )}
-            <OptionText>{activities.length > 1 ? 'Change activities' : 'Change activity'}</OptionText>
-          </OptionButton>}
-        </View>
-      </ScrollView>
-      {!complete && <CompleteButton onPress={handleComplete}>
-        <CompleteText>Complete day</CompleteText>
-      </CompleteButton>}
+              <Tick />
+            )
+          ) : (
+            <Repeat />
+          )}
+          <OptionText>{activities.length > 1 ? 'Change activities' : 'Change activity'}</OptionText>
+        </OptionButton>}
+      </View>
+      <View style={{ flex: 1 }} />
+      {!complete && !showBottomQuestionButton &&
+        <SwipeToAction action={handleComplete} />
+      }
+      {showBottomQuestionButton && <OptionButton style={{ margin: 0, marginBottom: 20, width: '100%', justifyContent: 'center', height: 40, backgroundColor: '#f8f8f8' }} onPress={handleChat}>
+        <Help color={'#16171b'} />
+        <OptionText style={{ color: '#16171b' }}>Ask a question</OptionText>
+      </OptionButton>}
     </Container>
   );
-};
+}
 
 export default ViewDay;
 

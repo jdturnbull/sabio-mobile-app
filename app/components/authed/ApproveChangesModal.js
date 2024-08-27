@@ -110,10 +110,6 @@ const ChangeItem = ({ change, i }) => {
                     <HeaderText>Previous Activity</HeaderText>
                 </ActivityHeader>
                 <ActivityBody>
-                    <Left>
-                        <NumberText>{i + 1}</NumberText>
-                    </Left>
-                    <View style={{ marginLeft: 6, marginRight: 12, width: 2, backgroundColor: '#f8f8f810', height: '100%', borderRadius: 50 }} />
                     <Right>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                             <EmojiText>{old_activity.icon}</EmojiText>
@@ -128,10 +124,6 @@ const ChangeItem = ({ change, i }) => {
                     <HeaderText>New Activity</HeaderText>
                 </ActivityHeader>
                 <ActivityBody>
-                    <Left>
-                        <NumberText>{i + 1}</NumberText>
-                    </Left>
-                    <View style={{ marginLeft: 6, marginRight: 12, width: 2, backgroundColor: '#f8f8f810', height: '100%', borderRadius: 50 }} />
                     <Right>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                             <EmojiText>{new_activity.icon}</EmojiText>
@@ -166,13 +158,6 @@ const ApproveChangesModal = ({ handleClose }) => {
     const handleApprove = async () => {
         try {
             await call('GET', `users/approveReplanChanges/${user.id}`);
-            dispatch(update({
-                userId: user.id,
-                data: {
-                    replan_changes: {},
-                    should_replan: false
-                }
-            }));
             handleClose();
         } catch (error) {
             console.log(error.message);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ScrollView, TouchableOpacity, Dimensions, View } from 'react-native';
+import { ScrollView, TouchableOpacity, Dimensions, View, Alert } from 'react-native';
 import styled from 'styled-components';
 import moment from 'moment';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
@@ -9,6 +9,7 @@ import WeekView from '../components/WeekView';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateState } from '../../../../stores/user/userSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Container = styled.View`
   flex: 1;
@@ -63,7 +64,7 @@ const FloatingButton = styled(TouchableOpacity)`
   shadow-radius: 3.84px;
 `;
 
-const Slider = ({ weeks }) => {
+const Slider = ({ weeks, handleComplete }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const user = useSelector((state) => state.user?.user);
@@ -112,14 +113,31 @@ const Slider = ({ weeks }) => {
     setVisibleIndex(index);
   };
 
-  const handleChatPress = () => {
+  const handleChatPress = async () => {
     if (user.subscription_status === 'SUBSCRIBED') {
       navigation.navigate('Chat');
     } else {
-      dispatch(updateState({
-        showSubscribeModal: true,
-        subscribeModalTriggeredFrom: 'Chat'
-      }))
+      const lastFreeChatAt = await AsyncStorage.getItem('lastFreeChatAt') || 0;
+
+      // If the lastFreeChat was over a week ago, show the modal, else allow them to chat
+      if (moment(parseInt(lastFreeChatAt)).isAfter(moment().subtract(1, 'week'))) {
+        dispatch(updateState({
+          showSubscribeModal: true,
+          subscribeModalTriggeredFrom: 'Chat'
+        }))
+      } else {
+        Alert.alert('You can chat for free once a week', 'To use your free weekly chat, confirm below.', [
+          {
+            text: 'Cancel', onPress: () => { }
+          },
+          {
+            text: 'Confirm', onPress: async () => {
+              await AsyncStorage.setItem('lastFreeChatAt', moment().valueOf().toString());
+              navigation.navigate('Chat');
+            }
+          }
+        ]);
+      }
     }
   };
 
@@ -145,7 +163,7 @@ const Slider = ({ weeks }) => {
         showsHorizontalScrollIndicator={false}>
         {_weeks.map((__week, index) => (
           <WeekContainer key={index}>
-            <WeekView week={__week} />
+            <WeekView week={__week} handleComplete={handleComplete} />
           </WeekContainer>
         ))}
       </Scrollable>

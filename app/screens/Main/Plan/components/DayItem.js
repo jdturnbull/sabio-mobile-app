@@ -100,10 +100,9 @@ const ProgressBar = styled(Animated.View)`
 
 const EmojiText = styled.Text``;
 
-const DayItem = ({ _day, recoveryGuidance, week }) => {
+const DayItem = ({ _day, week, handleComplete }) => {
     const { activities, day } = _day;
     const navigation = useNavigation();
-    const user = useSelector((state) => state.user.user);
     const progress = useSharedValue(0);
 
     const [complete, setComplete] = useState(activities.every(activity => activity.status === 'COMPLETE'));
@@ -124,23 +123,7 @@ const DayItem = ({ _day, recoveryGuidance, week }) => {
     });
 
     const handlePress = () => {
-        navigation.navigate('ViewDay', { _day, recoveryGuidance, week });
-    };
-
-
-    const handleComplete = async () => {
-        const { training_plan_id } = _day.activities[0];
-
-        if (complete) {
-            await call('POST', 'users/uncompleteDay', { planId: training_plan_id, date: _day.date })
-            setComplete(false);
-            progress.value = withTiming(0, { duration: 500 });
-        } else {
-            await call('POST', 'users/completeDay', { planId: training_plan_id, date: _day.date })
-            setComplete(true);
-            hapticImpact();
-            progress.value = withTiming(100, { duration: 500 });
-        }
+        navigation.navigate('ViewDay', { _day, week });
     };
 
     const icons_and_titles = activities.map(activity => ({ icon: activity.icon, title: activity.title }));
@@ -150,7 +133,7 @@ const DayItem = ({ _day, recoveryGuidance, week }) => {
         <Container onPress={handlePress} style={{ borderLeftColor: DAY_COLOR_MAP[day] }}>
             <Top>
                 <DayText>{day}</DayText>
-                <CompleteTouchable onPress={handleComplete}>
+                <CompleteTouchable onPress={() => handleComplete(_day)}>
                     <CompleteInner complete={complete} dayColor={DAY_COLOR_MAP[day]}>
                         {complete && <Tick />}
                     </CompleteInner>
