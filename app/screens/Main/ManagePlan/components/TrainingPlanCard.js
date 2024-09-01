@@ -92,7 +92,7 @@ const TrainingPlanCard = ({ plan, handleActivate }) => {
             </Mid>
             <ButtonContainer>
                 {status === 'ARCHIVED' || status === 'INACTIVE' ? <Touchable onPress={handlePress}>
-                    {user.subscription_status !== 'SUBSCRIBED' ? <Premium color={'#A1AAD3'} /> : null}
+                    {user.subscription_status !== 'SUBSCRIBED' ? <Premium color={'#fff'} /> : null}
                     <TouchableText iconExists={user.subscription_status !== 'SUBSCRIBED'}>Activate</TouchableText>
                 </Touchable> : null}
             </ButtonContainer>

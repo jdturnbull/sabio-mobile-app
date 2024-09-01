@@ -16,7 +16,7 @@ const ModalContent = styled.View`
 `;
 
 const ModalInnerContent = styled.View`
-    height: ${(props) => props.disabled ? '150px' : '220px'};
+    height: 220px;
     width: ${screenWidth}px;
     background-color: ${(props) => props.theme.colors.background2};
     border-radius: 10px;
@@ -106,9 +106,11 @@ const NewPlanConfirm = ({ handleClose }) => {
             dispatch(addNewPlan({ userId: user.id, planId: training_plan.id }));
         } else {
             posthog.capture('plan_limit_reached', { plansLeft: plansLeft });
-            Alert.alert('You have reached your maximum number of plans');
+            handleClose();
         }
     }
+
+    const bodyText = getBodyText(user.subscription_status, plansLeft);
 
 
     return (
@@ -123,13 +125,13 @@ const NewPlanConfirm = ({ handleClose }) => {
                             </TouchableOpacity>
                         </View>
                         <Content>
-                            <ModalBodyText>{getBodyText(user.subscription_status, plansLeft)}</ModalBodyText>
+                            <ModalBodyText>{bodyText}</ModalBodyText>
                         </Content>
                         {plansLeft > 0 && <FloatingButton onPress={handleConfirm}>
                             <FloatingButtonText>Confirm</FloatingButtonText>
                         </FloatingButton>}
                         <FloatingButton onPress={handleConfirm}>
-                            <FloatingButtonText>Confirm</FloatingButtonText>
+                            <FloatingButtonText>{plansLeft > 0 ? 'Confirm' : 'Close'}</FloatingButtonText>
                         </FloatingButton>
                     </ModalInnerContent>
                 </ModalContent>

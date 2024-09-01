@@ -64,7 +64,7 @@ const Reports = () => {
       {!loading && reports?.length === 0 && (
         <View style={{ flex: 1, height: 500, justifyContent: 'center', alignItems: 'center' }}>
           <Image source={mascot} style={{ width: 123.2, height: 113.12 }} />
-          <BodyText style={{ marginTop: 40, fontWeight: 600 }}>Your first report will appear in {nextReportIn} days</BodyText>
+          <BodyText style={{ marginTop: 40, fontWeight: 600 }}>Your first report will appear in {nextReportIn + 1} days</BodyText>
           <BodyText style={{ color: '#f8f8f890', fontWeight: 600, marginTop: 5 }}>Sabio is expecting good things 👀</BodyText>
         </View>
       )}

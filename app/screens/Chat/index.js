@@ -95,7 +95,7 @@ const StyledKeyboardAvoidingView = styled.KeyboardAvoidingView``;
 const Chat = () => {
     const route = useRoute();
     const posthog = usePostHog();
-    const { day, week } = route.params || {};
+    const { day, week, fetchActivities } = route.params || {};
 
     const dispatch = useDispatch();
     const navigation = useNavigation();
@@ -118,6 +118,9 @@ const Chat = () => {
     const [responsePending, setResponsePending] = useState(false);
     const [runId, setRunId] = useState(null);
     const [newUserThreadId, setNewUserThreadId] = useState(null);
+
+    const [toolOutputs, setToolOutputs] = useState([]);
+    const [shouldCompleteTool, setShouldCompleteTool] = useState(false);
 
     const [animatedWidth] = useState(new Animated.Value(width * 0.9));
     const [animatedMargin] = useState(new Animated.Value(120));
@@ -148,7 +151,14 @@ const Chat = () => {
     const handleBack = () => {
         if (!isProcessing) {
             setIsProcessing(true);
-            navigation.goBack();
+            if (fetchActivities) {
+                console.log('here')
+                fetchActivities();
+                navigation.navigate('Plan', { screen: 'Slider' });
+            } else {
+                navigation.goBack();
+            }
+
             setTimeout(() => {
                 setIsProcessing(false);
             }, 500);
@@ -191,7 +201,7 @@ const Chat = () => {
             if (response) return response;
             if (error) handleError({ error });
         } else {
-            const messages = JSON.stringify({ messages: [{ role: 'assistant', content: `Hey ${user.first_name}! How can I help you?` }] });
+            const messages = JSON.stringify({ messages: [{ role: 'assistant', content: `Hey ${user.first_name}! I'm Sabio, I can provide workout guidance, in-app support or  change activities in your plan. How can I help you?` }] });
             const { response, error } = await openai.createThread(messages);
 
             if (response) {
@@ -284,9 +294,35 @@ const Chat = () => {
             if (response.status === 'in_progress' || response.status === 'queued') {
                 // If the response isn't ready yet, run the function again in 2 seconds
                 timeoutId = setTimeout(_captureResponse, 2000);
-            }
+            } else if (response.status === 'requires_action') {
+                // Extract the function data from the response
+                const calls = openai.extractFunctionData(response, user.id);
 
-            if (response.status === 'completed') {
+                for (let i = 0; i < calls.length; i++) {
+                    const { args, name, id } = calls[i];
+
+                    if (name === 'change_activities') {
+                        try {
+                            await call('POST', 'users/changeActivities', { userId: user.id, args });
+                            setToolOutputs([
+                                ...toolOutputs,
+                                { id, response: 'Workout changed successfully' },
+                            ]);
+                            setShouldCompleteTool(true);
+                            setResponsePending(false);
+                        } catch (error) {
+                            console.log(error);
+                            setToolOutputs([
+                                ...toolOutputs,
+                                { id, response: 'Something went wrong, please try again.' },
+                            ]);
+                            setShouldCompleteTool(true);
+                            setResponsePending(false);
+                        }
+                    }
+                }
+
+            } else if (response.status === 'completed') {
                 const { response, error } = await openai.retrieveMessages(thread.id);
                 if (error) handleError({ error });
 
@@ -317,6 +353,52 @@ const Chat = () => {
             }
         };
     }, [responsePending]);
+
+    // Handles completing the tool
+    useEffect(() => {
+        const _completeTool = async () => {
+            if (!shouldCompleteTool) return;
+
+            let raw_body = toolOutputs.map((tool, index) => {
+                return { tool_call_id: tool.id, output: tool.response };
+            });
+
+            console.log(raw_body);
+
+            // Replace any undefined outputs with an error string
+            for (let i = 0; i < raw_body.length; i++) {
+                if (raw_body[i].output === undefined) {
+                    raw_body[i].output = 'Error: No output';
+                }
+            }
+
+            const body = JSON.stringify({ tool_outputs: raw_body });
+
+            const { response, error } = await openai.submitToolResponse({
+                thread_id: thread.id,
+                run_id: runId,
+                body,
+                userId: user?.id,
+            });
+
+            console.log(response);
+
+            if (error) {
+                handleError({ error });
+            } else {
+                // Clear tool outputs
+                setToolOutputs([]);
+
+                // Tell the component that the tool no longer needs to be completed
+                setShouldCompleteTool(false);
+
+                // Tell the component a response is pending
+                setResponsePending(true);
+            }
+        };
+
+        _completeTool();
+    }, [shouldCompleteTool]);
 
 
     // Handles sending user message to the assistant

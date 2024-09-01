@@ -12,6 +12,7 @@ const { width: screenWidth } = Dimensions.get('window');
 const Container = styled(Animated.View)`
   width: ${screenWidth - 40}px;
   margin-bottom: 20px;
+  margin-top: 20px;
   height: 50px;
   padding: 5px;
   flex-direction: row;

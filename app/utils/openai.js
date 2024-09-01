@@ -16,6 +16,20 @@ const sortMessagesByDate = (messages) => {
     return _.orderBy(messages, ['created_at'], ['asc']);
 };
 
+export const extractFunctionData = (res) => {
+    const { tool_calls } = res.required_action.submit_tool_outputs;
+
+    const response = [];
+
+    for (let i = 0; i < tool_calls.length; i++) {
+        const call = tool_calls[i];
+        const { arguments: args, name } = call.function;
+        response.push({ name, args, id: call.id });
+    }
+
+    return response;
+};
+
 export const retrieveMessages = async (thread_id) => {
     try {
         const messages = await axios.get(`https://api.openai.com/v1/threads/${thread_id}/messages`, config);
@@ -90,7 +104,7 @@ export const run = async (thread_id, assistant_id, day, week, userId) => {
     while (retryCount < maxRetries) {
         try {
             // TODO: Build instructions and route
-            let instructions = await call('POST', `users/retrieveInstructions`, { day, week, userId });
+            let instructions = await call('POST', `users/retrieveInstructions`, { day, week, userId, version: 2 });
 
             const body = JSON.stringify({
                 assistant_id,
@@ -120,4 +134,34 @@ export const retrieveRun = async (thread_id, run_id) => {
     } catch (error) {
         return { error: error.response.data || error.message };
     }
+};
+
+export const submitToolResponse = async ({ thread_id, run_id, body }) => {
+    let retryCount = 0;
+    let maxRetries = 3;
+    let error_message = '';
+
+    while (retryCount < maxRetries) {
+        try {
+            await axios.post(
+                `https://api.openai.com/v1/threads/${thread_id}/runs/${run_id}/submit_tool_outputs`,
+                body,
+                config,
+            );
+
+            return { response: 'success' };
+        } catch (error) {
+            error_message = error.response.data || error.message;
+            retryCount++;
+            mixpanel.track('OpenAI', {
+                action: 'retry',
+                type: 'Submit tool response',
+                error: error.response.data || error.message,
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait a second before the next retry
+        }
+    }
+
+    return { error: error_message };
 };

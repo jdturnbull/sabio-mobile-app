@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components/native';
 import moment from 'moment';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { View, TouchableOpacity, ActivityIndicator, Alert, Dimensions, Text } from 'react-native';
+import ConfettiCannon from 'react-native-confetti-cannon';
 import { useDispatch, useSelector } from 'react-redux';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
 import Title from '../../../../components/shared/Title';
@@ -147,6 +148,8 @@ const ViewDay = ({ fetchActivities }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
+  const confettiRef = useRef(null);
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [isChanging, setIsChanging] = useState(false);
   const [proposedChanges, setProposedChanges] = useState([]);
@@ -174,17 +177,15 @@ const ViewDay = ({ fetchActivities }) => {
 
   const handleComplete = async () => {
     const { training_plan_id } = _day.activities[0];
-
-
     hapticImpact();
+    confettiRef.current.start();
     await call('POST', 'users/completeDay', { planId: training_plan_id, date: _day.date })
     posthog.capture('completed_day', { day: day, date: _day.date });
-    navigation.goBack();
   };
 
   const handleChat = async () => {
     if (user.subscription_status === 'SUBSCRIBED') {
-      navigation.navigate('Chat', { day, week });
+      navigation.navigate('Chat', { day, week, fetchActivities });
       posthog.capture('activity_chat_button_pressed', { day: day, week: week });
     } else {
       const lastFreeQuestionAt = await AsyncStorage.getItem('lastFreeQuestionAt') || 0;
@@ -341,7 +342,7 @@ const ViewDay = ({ fetchActivities }) => {
           </ActivityContainer>
         )
       })}
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         {complete || !showBottomQuestionButton && <OptionButton onPress={handleChat}>
           <Help />
           <OptionText>Ask a question</OptionText>
@@ -359,14 +360,20 @@ const ViewDay = ({ fetchActivities }) => {
           <OptionText>{activities.length > 1 ? 'Change activities' : 'Change activity'}</OptionText>
         </OptionButton>}
       </View>
-      <View style={{ flex: 1 }} />
       {!complete && !showBottomQuestionButton &&
         <SwipeToAction action={handleComplete} />
       }
-      {showBottomQuestionButton && <OptionButton style={{ margin: 0, marginBottom: 20, width: '100%', justifyContent: 'center', height: 40, backgroundColor: '#f8f8f8' }} onPress={handleChat}>
+      {showBottomQuestionButton && <OptionButton style={{ margin: 0, marginVertical: 20, width: '100%', justifyContent: 'center', height: 40, backgroundColor: '#f8f8f8' }} onPress={handleChat}>
         <Help color={'#16171b'} />
         <OptionText style={{ color: '#16171b' }}>Ask a question</OptionText>
       </OptionButton>}
+      <ConfettiCannon
+        count={200}
+        origin={{ x: -10, y: 0 }}
+        autoStart={false}
+        ref={confettiRef}
+      />
+
     </Container>
   );
 }

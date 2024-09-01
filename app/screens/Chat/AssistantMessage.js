@@ -21,9 +21,10 @@ const StyledText = styled.Text`
 `;
 
 const AssistantMessage = ({ message }) => {
+  const cleanedMessage = message.replace(/\*\*/g, '');
   return (
     <Container>
-      <StyledText>{message}</StyledText>
+      <StyledText>{cleanedMessage}</StyledText>
     </Container>
   );
 };
