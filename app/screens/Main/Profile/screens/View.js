@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
+import moment from 'moment';
 import SubHeader from '../../../../components/shared/SubHeader';
 import { ScrollView } from 'react-native';
 import OptionBox from '../components/OptionBox';
@@ -43,16 +44,26 @@ const View = () => {
   const user = useSelector((state) => state.user.user);
 
   const handlePress = (label) => {
-    if (user?.subscription_status === 'UNSUBSCRIBED') {
-      dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Profile' }))
+    const route = navigationMap[label];
+    // If the user is subscribed, navigate to the route
+    if (user?.subscription_status === 'SUBSCRIBED') {
+      posthog.capture('profile_option_pressed', { option: label });
+      navigation.navigate(route);
       return;
     }
 
-    const route = navigationMap[label];
+    // They are not subscribed, so check if their account is more than two weeks old
+    const accountMoreThanTwoWeeksOld = moment().isAfter(moment(user?.created_at).add(2, 'weeks'));
 
-    if (route) {
+    // If their account is less than two weeks old, allow them to change the activities
+    if (!accountMoreThanTwoWeeksOld) {
+      posthog.capture('profile_option_pressed', { option: label });
       navigation.navigate(route);
+      return;
     }
+
+    // Their account is more than two weeks old, so show the modal
+    dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Profile' }))
   };
 
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components/native';
 import moment from 'moment';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { View, TouchableOpacity, ActivityIndicator, Alert, Dimensions, Text } from 'react-native';
+import { View, TouchableOpacity, ActivityIndicator, Alert, Dimensions, Text, ScrollView } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { useDispatch, useSelector } from 'react-redux';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
@@ -20,7 +20,7 @@ import retrieveCompletion from '../../../../utils/retrieveCompletion';
 import { usePostHog } from 'posthog-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Container = styled.View`
+const Container = styled(ScrollView)`
   flex: 1;
   background-color: #16171b;
   padding-top: 20px;
@@ -184,66 +184,98 @@ const ViewDay = ({ fetchActivities }) => {
   };
 
   const handleChat = async () => {
-    if (user.subscription_status === 'SUBSCRIBED') {
+    // If they are subscribed, just send them straight to the chat
+    if (user?.subscription_status === 'SUBSCRIBED') {
       navigation.navigate('Chat', { day, week, fetchActivities });
       posthog.capture('activity_chat_button_pressed', { day: day, week: week });
-    } else {
-      const lastFreeQuestionAt = await AsyncStorage.getItem('lastFreeQuestionAt') || 0;
-
-      // If the lastFreeChat was over a week ago, show the modal, else allow them to chat
-      if (moment(parseInt(lastFreeQuestionAt)).isAfter(moment().subtract(1, 'week'))) {
-        dispatch(updateState({
-          showSubscribeModal: true,
-          subscribeModalTriggeredFrom: 'Chat'
-        }))
-      } else {
-        Alert.alert('You can ask one free question a week', 'To use your free weekly question, confirm below.', [
-          {
-            text: 'Cancel', onPress: () => { }
-          },
-          {
-            text: 'Confirm', onPress: async () => {
-              await AsyncStorage.setItem('lastFreeQuestionAt', moment().valueOf().toString());
-              navigation.navigate('Chat', { day, week });
-              posthog.capture('activity_chat_button_pressed', { day: day, week: week });
-            }
-          }
-        ]);
-      }
+      return;
     }
-  };
+
+    // If they are not subscribed, check if they are more than two weeks old
+
+    const accountMoreThanTwoWeeksOld = moment().isAfter(moment(user?.created_at).add(2, 'weeks'));
+
+    // They are not more than two weeks old, so send them straight to the chat
+    if (!accountMoreThanTwoWeeksOld) {
+      navigation.navigate('Chat', { day, week, fetchActivities });
+      return;
+    }
+
+    // They are more than two weeks old, so check if they have used their free question this week
+
+    const thisWeekNumber = moment().week().toString();
+    const lastFreeQuestionAt = await AsyncStorage.getItem('lastFreeQuestionAt') || 0;
+
+    if (thisWeekNumber === lastFreeQuestionAt) {
+      // They have used their free question this week, so show the modal
+      dispatch(updateState({
+        showSubscribeModal: true,
+        subscribeModalTriggeredFrom: 'Chat'
+      }));
+    } else {
+      // They have not used their free question this week, so show the alert
+      Alert.alert('You can ask one free question a week', 'To use your free weekly question, confirm below.', [
+        {
+          text: 'Cancel', onPress: () => { }
+        },
+        {
+          text: 'Confirm', onPress: async () => {
+            // Set the last free question at to this week
+            await AsyncStorage.setItem('lastFreeQuestionAt', moment().week().toString());
+            // Send them to the chat
+            navigation.navigate('Chat', { day, week, fetchActivities });
+          }
+        }
+      ]);
+    }
+  }
 
   const handleChangeActivity = async () => {
-    if (user.subscription_status !== 'SUBSCRIBED') {
-      const lastFreeChangeAt = await AsyncStorage.getItem('lastFreeChangeAt') || 0;
-
-
-      // If the lastFreeChat was over a week ago, show the modal, else allow them to chat
-      if (moment(parseInt(lastFreeChangeAt)).isAfter(moment().subtract(1, 'week'))) {
-        dispatch(updateState({
-          showSubscribeModal: true,
-          subscribeModalTriggeredFrom: 'View day activity quick change'
-        }))
-      } else {
-        Alert.alert('You have one free quick change a week', 'To use your free quick change, confirm below.', [
-          {
-            text: 'Cancel', onPress: () => { }
-          },
-          {
-            text: 'Confirm', onPress: async () => {
-              await AsyncStorage.setItem('lastFreeChangeAt', moment().valueOf().toString());
-              posthog.capture('activity_change_button_pressed', { day: day, week: week });
-              setProposedChanges([]);
-              setIsChanging(true);
-            }
-          }
-        ]);
-      }
-    } else {
+    if (user.subscription_status === 'SUBSCRIBED') {
       posthog.capture('activity_change_button_pressed', { day: day, week: week });
       setProposedChanges([]);
       setIsChanging(true);
+      return;
     }
+
+    // They are not subscribed, so check if their account is more than two weeks old
+    const accountMoreThanTwoWeeksOld = moment().isAfter(moment(user?.created_at).add(2, 'weeks'));
+
+    // If their account is less than two weeks old, allow them to change the activities
+    if (!accountMoreThanTwoWeeksOld) {
+      posthog.capture('activity_change_button_pressed', { day: day, week: week });
+      setProposedChanges([]);
+      setIsChanging(true);
+      return;
+    }
+
+    // If their account is more than two weeks old, check if they have used their free quick change this week
+    const thisWeekNumber = moment().week().toString();
+    const lastFreeChangeAt = await AsyncStorage.getItem('lastFreeChangeAt') || 0;
+
+    if (thisWeekNumber === lastFreeChangeAt) {
+      // They have used their free quick change this week, so show the modal
+      dispatch(updateState({
+        showSubscribeModal: true,
+        subscribeModalTriggeredFrom: 'View day activity quick change'
+      }))
+      return;
+    }
+
+    // They have not used their free quick change this week, so show the alert
+    Alert.alert('You have one free quick change a week', 'To use your free quick change, confirm below.', [
+      {
+        text: 'Cancel', onPress: () => { }
+      },
+      {
+        text: 'Confirm', onPress: async () => {
+          await AsyncStorage.setItem('lastFreeChangeAt', moment().week().toString());
+          posthog.capture('activity_change_button_pressed', { day: day, week: week });
+          setProposedChanges([]);
+          setIsChanging(true);
+        }
+      }
+    ]);
   }
 
   useEffect(() => {
@@ -313,7 +345,7 @@ const ViewDay = ({ fetchActivities }) => {
     <Container>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
         <TouchableOpacity style={{ padding: 8 }} onPress={handleBack}><ArrowLeft /></TouchableOpacity>
-        <Title style={{ marginBottom: 0, marginLeft: 10, flex: 1 }}>{moment(date).format('dddd, MMMM Do')}</Title>
+        <Title style={{ marginBottom: 0, marginLeft: 10, flex: 1 }}>{moment(date).format('ddd, MMMM Do')}</Title>
         <ChatButton onPress={handleChat}><ChatIcon /></ChatButton>
       </View>
       {activities.map((activity, i) => {
@@ -367,6 +399,7 @@ const ViewDay = ({ fetchActivities }) => {
         <Help color={'#16171b'} />
         <OptionText style={{ color: '#16171b' }}>Ask a question</OptionText>
       </OptionButton>}
+      <View style={{ height: 20 }} />
       <ConfettiCannon
         count={200}
         origin={{ x: -10, y: 0 }}

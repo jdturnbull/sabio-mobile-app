@@ -117,26 +117,35 @@ const Slider = ({ weeks, handleComplete }) => {
     if (user.subscription_status === 'SUBSCRIBED') {
       navigation.navigate('Chat');
     } else {
+      const accountMoreThanTwoWeeksOld = moment().isAfter(moment(user?.created_at).add(2, 'weeks'));
+      const thisWeekNumber = moment().week().toString();
       const lastFreeChatAt = await AsyncStorage.getItem('lastFreeChatAt') || 0;
 
-      // If the lastFreeChat was over a week ago, show the modal, else allow them to chat
-      if (moment(parseInt(lastFreeChatAt)).isAfter(moment().subtract(1, 'week'))) {
-        dispatch(updateState({
-          showSubscribeModal: true,
-          subscribeModalTriggeredFrom: 'Chat'
-        }))
+      // If the account isn't more than two weeks old, just send them straight to the chat
+      if (!accountMoreThanTwoWeeksOld) {
+        navigation.navigate('Chat');
       } else {
-        Alert.alert('You can chat for free once a week', 'To use your free weekly chat, confirm below.', [
-          {
-            text: 'Cancel', onPress: () => { }
-          },
-          {
-            text: 'Confirm', onPress: async () => {
-              await AsyncStorage.setItem('lastFreeChatAt', moment().valueOf().toString());
-              navigation.navigate('Chat');
+        // So there acount is older than two weeks, but have they used their free chat this week?
+        if (thisWeekNumber === lastFreeChatAt) {
+          // They have used their free chat this week
+          dispatch(updateState({
+            showSubscribeModal: true,
+            subscribeModalTriggeredFrom: 'Chat'
+          }))
+        } else {
+          // They have not used their free chat this week
+          Alert.alert('You can chat for free once a week', 'To use your free weekly chat, confirm below.', [
+            {
+              text: 'Cancel', onPress: () => { }
+            },
+            {
+              text: 'Confirm', onPress: async () => {
+                await AsyncStorage.setItem('lastFreeChatAt', moment().week().toString());
+                navigation.navigate('Chat');
+              }
             }
-          }
-        ]);
+          ]);
+        }
       }
     }
   };
