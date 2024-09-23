@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components/native';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { View, TouchableOpacity, ActivityIndicator, Alert, Dimensions, Text, ScrollView } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
@@ -156,6 +156,11 @@ const ViewDay = ({ fetchActivities }) => {
   const [prevProposedChanges, setPrevProposedChanges] = useState([]);
 
   const user = useSelector((state) => state.user.user);
+
+  useEffect(() => {
+    posthog.capture('viewed_day', { is_today: moment(date).isSame(moment.tz(user.timezone), 'day') });
+  }, []);
+
   const training_plans = useSelector((state) => state.user.training_plans);
   const training_plan = training_plans.filter((p) => p.status === 'ACTIVE')[0];
 
@@ -186,6 +191,7 @@ const ViewDay = ({ fetchActivities }) => {
   const handleChat = async () => {
     // If they are subscribed, just send them straight to the chat
     if (user?.subscription_status === 'SUBSCRIBED') {
+      posthog.capture('used_premium_feature', { feature: 'day_chat', was_trial: false });
       navigation.navigate('Chat', { day, week, fetchActivities });
       posthog.capture('activity_chat_button_pressed', { day: day, week: week });
       return;
@@ -197,6 +203,7 @@ const ViewDay = ({ fetchActivities }) => {
 
     // They are not more than two weeks old, so send them straight to the chat
     if (!accountMoreThanTwoWeeksOld) {
+      posthog.capture('used_premium_feature', { feature: 'day_chat', was_trial: true });
       navigation.navigate('Chat', { day, week, fetchActivities });
       return;
     }
@@ -207,6 +214,7 @@ const ViewDay = ({ fetchActivities }) => {
     const lastFreeQuestionAt = await AsyncStorage.getItem('lastFreeQuestionAt') || 0;
 
     if (thisWeekNumber === lastFreeQuestionAt) {
+      posthog.capture('tried_to_use_premium_feature', { feature: 'day_chat', was_trial: false });
       // They have used their free question this week, so show the modal
       dispatch(updateState({
         showSubscribeModal: true,
@@ -220,6 +228,7 @@ const ViewDay = ({ fetchActivities }) => {
         },
         {
           text: 'Confirm', onPress: async () => {
+            posthog.capture('used_premium_feature', { feature: 'day_chat', was_trial: false, was_free: true });
             // Set the last free question at to this week
             await AsyncStorage.setItem('lastFreeQuestionAt', moment().week().toString());
             // Send them to the chat
@@ -232,6 +241,7 @@ const ViewDay = ({ fetchActivities }) => {
 
   const handleChangeActivity = async () => {
     if (user.subscription_status === 'SUBSCRIBED') {
+      posthog.capture('used_premium_feature', { feature: 'day_activity_quick_change', was_trial: false });
       posthog.capture('activity_change_button_pressed', { day: day, week: week });
       setProposedChanges([]);
       setIsChanging(true);
@@ -243,6 +253,7 @@ const ViewDay = ({ fetchActivities }) => {
 
     // If their account is less than two weeks old, allow them to change the activities
     if (!accountMoreThanTwoWeeksOld) {
+      posthog.capture('used_premium_feature', { feature: 'day_activity_quick_change', was_trial: true });
       posthog.capture('activity_change_button_pressed', { day: day, week: week });
       setProposedChanges([]);
       setIsChanging(true);
@@ -254,6 +265,7 @@ const ViewDay = ({ fetchActivities }) => {
     const lastFreeChangeAt = await AsyncStorage.getItem('lastFreeChangeAt') || 0;
 
     if (thisWeekNumber === lastFreeChangeAt) {
+      posthog.capture('tried_to_use_premium_feature', { feature: 'day_activity_quick_change', was_trial: false });
       // They have used their free quick change this week, so show the modal
       dispatch(updateState({
         showSubscribeModal: true,
@@ -269,6 +281,7 @@ const ViewDay = ({ fetchActivities }) => {
       },
       {
         text: 'Confirm', onPress: async () => {
+          posthog.capture('used_premium_feature', { feature: 'day_activity_quick_change', was_trial: false, was_free: true });
           await AsyncStorage.setItem('lastFreeChangeAt', moment().week().toString());
           posthog.capture('activity_change_button_pressed', { day: day, week: week });
           setProposedChanges([]);

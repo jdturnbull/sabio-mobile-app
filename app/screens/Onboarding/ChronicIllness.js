@@ -58,6 +58,7 @@ const ChronicIllness = ({ editMode }) => {
 
     if (editMode) {
       posthog.capture('updated_chronic_conditions', { chronic_conditions: chronicConditions });
+      posthog.capture('premium_feature_used', { feature: 'chronic_condition_update', was_trial: user_state.user?.subscription_status === 'UNSUBSCRIBED' });
       dispatch(updateChronicConditions({ userId: user_state.user.id, chronic_conditions: chronicConditions }));
       navigation.goBack();
       return;

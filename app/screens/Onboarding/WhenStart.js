@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Alert, View } from 'react-native';
 import styled from 'styled-components';
 import Title from '../../components/shared/Title';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import SubHeader from '../../components/shared/SubHeader';
 import { TouchableOpacity } from 'react-native';
 import moment from 'moment-timezone';
@@ -10,6 +11,7 @@ import NextButton from '../../components/shared/NextButton';
 import { updateState } from '../../stores/onboarding/onboardingSlice';
 import { useNavigation } from '@react-navigation/native';
 import { usePostHog } from 'posthog-react-native';
+import CustomInput from '../../components/shared/CustomInput';
 
 const Container = styled.View`
   flex: 1;
@@ -102,6 +104,7 @@ const WhenStart = () => {
   const [nextTrainingDay1, nextTrainingDay2] = getNextTwoTrainingDays();
 
   const [date, setDate] = useState(nextTrainingDay1);
+  const [age, setAge] = useState(null);
 
   const isSelected = (_date) => {
     return date === _date
@@ -117,7 +120,7 @@ const WhenStart = () => {
       return;
     }
 
-    dispatch(updateState({ profile: { ...state.profile, startDate: date } }));
+    dispatch(updateState({ profile: { ...state.profile, startDate: date, age: age ? age : null } }));
 
     if (state.race?.unit) {
       navigation.navigate('ChronicIllness');
@@ -127,7 +130,7 @@ const WhenStart = () => {
   };
 
   return (
-    <Container ref={scrollRef}>
+    <KeyboardAwareScrollView style={{ flex: 1, padding: 20 }} extraScrollHeight={80} keyboardOpeningTime={100} ref={scrollRef}>
       <Title style={{ marginBottom: 10 }}>When do you want to start your plan?</Title>
       <SubHeader>Pick one of your next training dates</SubHeader>
       <OptionsContainer>
@@ -154,11 +157,16 @@ const WhenStart = () => {
           </SubOptionBox>
         </NowOption>
       </OptionsContainer>
+      <View style={{ marginTop: 20 }}>
+        <Title style={{ marginBottom: 10 }}>What is your age?</Title>
+        <SubHeader>This will help us personalise your plan</SubHeader>
+        <CustomInput style={{ marginTop: 20 }} keyboardType='numeric' value={age} setValue={setAge} placeholder='Your age' label='Optional' />
+      </View>
       <View style={{ flex: 1 }} />
       <NextButton style={{ marginBottom: 20 }} onPress={handleNext}>
         Continue
       </NextButton>
-    </Container>
+    </KeyboardAwareScrollView>
   );
 };
 

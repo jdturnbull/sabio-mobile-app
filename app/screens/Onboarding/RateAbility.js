@@ -130,6 +130,7 @@ const RateAbility = ({ editMode }) => {
             onPress: () => {
               dispatch(updateProfile({ userId: user_state.user.id, data: { past_experience: OPTIONS.find((opt) => opt.label === selected).body } }));
               posthog.capture('updated_past_experience', { past_experience: OPTIONS.find((opt) => opt.label === selected).body });
+              posthog.capture('premium_feature_used', { feature: 'past_experience_update', was_trial: user_state.user?.subscription_status === 'UNSUBSCRIBED' });
               navigation.goBack();
             },
           },

@@ -33,6 +33,7 @@ const RequestNotifications = () => {
     const navigation = useNavigation();
 
     const user = useSelector((state) => state.user?.user);
+
     const [socialNotifications, setSocialNotifications] = useState(true);
     const [actionsNotifications, setActionsNotifications] = useState(true);
     const [progressNotifications, setProgressNotifications] = useState(true);
@@ -74,6 +75,7 @@ const RequestNotifications = () => {
 
                 navigation.navigate('CreatingPlan');
             } else {
+
                 posthog.capture('notifications_denied', { permissions: permissions });
                 navigation.navigate('CreatingPlan');
             }

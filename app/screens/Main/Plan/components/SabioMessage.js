@@ -84,7 +84,7 @@ const SabioMessage = ({ focus, nutrition, disabled }) => {
             return 'Example weekly guidance';
         }
         let message = focus;
-        if (nutrition.caloric_intake && nutrition.macronutrients) {
+        if (nutrition?.caloric_intake && nutrition?.macronutrients) {
             message += `\n\n${nutrition.caloric_intake}\n\n${nutrition.macronutrients}`;
         }
         return message;

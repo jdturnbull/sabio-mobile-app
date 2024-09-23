@@ -10,6 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateState } from '../../../../stores/user/userSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { usePostHog } from 'posthog-react-native';
 
 const Container = styled.View`
   flex: 1;
@@ -65,6 +66,7 @@ const FloatingButton = styled(TouchableOpacity)`
 `;
 
 const Slider = ({ weeks, handleComplete }) => {
+  const posthog = usePostHog();
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const user = useSelector((state) => state.user?.user);
@@ -115,6 +117,7 @@ const Slider = ({ weeks, handleComplete }) => {
 
   const handleChatPress = async () => {
     if (user.subscription_status === 'SUBSCRIBED') {
+      posthog.capture('used_premium_feature', { feature: 'main_chat', was_trial: false });
       navigation.navigate('Chat');
     } else {
       const accountMoreThanTwoWeeksOld = moment().isAfter(moment(user?.created_at).add(2, 'weeks'));
@@ -123,11 +126,13 @@ const Slider = ({ weeks, handleComplete }) => {
 
       // If the account isn't more than two weeks old, just send them straight to the chat
       if (!accountMoreThanTwoWeeksOld) {
+        posthog.capture('used_premium_feature', { feature: 'main_chat', was_trial: true });
         navigation.navigate('Chat');
       } else {
         // So there acount is older than two weeks, but have they used their free chat this week?
         if (thisWeekNumber === lastFreeChatAt) {
           // They have used their free chat this week
+          posthog.capture('tried_to_use_premium_feature', { feature: 'main_chat' });
           dispatch(updateState({
             showSubscribeModal: true,
             subscribeModalTriggeredFrom: 'Chat'
@@ -140,6 +145,7 @@ const Slider = ({ weeks, handleComplete }) => {
             },
             {
               text: 'Confirm', onPress: async () => {
+                posthog.capture('used_premium_feature', { feature: 'main_chat', was_trial: false, was_free: true });
                 await AsyncStorage.setItem('lastFreeChatAt', moment().week().toString());
                 navigation.navigate('Chat');
               }

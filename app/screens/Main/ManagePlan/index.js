@@ -73,7 +73,10 @@ const ManagePlan = () => {
     }
 
     const handleActivate = (planId) => {
-        if (user?.subscription_status === 'SUBSCRIBED') {
+        const accountMoreThanTwoWeeksOld = moment().isAfter(moment(user?.created_at).add(2, 'weeks'));
+
+        if (user?.subscription_status === 'SUBSCRIBED' || !accountMoreThanTwoWeeksOld) {
+            posthog.capture('used_premium_feature', { feature: 'switch_plans', was_trial: accountMoreThanTwoWeeksOld ? false : true });
             posthog.capture('activate_plan', { planId });
             setLoading(true);
             setModalVisible(false);
@@ -83,6 +86,7 @@ const ManagePlan = () => {
                 navigation.navigate('Plan');
             }, 500);
         } else {
+            posthog.capture('tried_to_use_premium_feature', { feature: 'switch_plans', });
             dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Manage plan' }));
         }
     }

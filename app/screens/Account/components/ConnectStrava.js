@@ -8,6 +8,7 @@ import Strava from "../../../assets/icons/24x/Strava";
 import Premium from '../../../assets/icons/24x/Premium';
 import call from "../../../utils/call";
 import { updateState } from "../../../stores/user/userSlice";
+import { usePostHog } from "posthog-react-native";
 
 const Container = styled(TouchableOpacity)`
     padding: 12px;
@@ -37,7 +38,7 @@ const LabelText = styled.Text`
 
 const ConnectStrava = () => {
     const dispatch = useDispatch();
-
+    const posthog = usePostHog();
     const user = useSelector(state => state.user.user);
     const connections = useSelector((state) => state.user.connections);
     const [connected, setConnected] = useState(connections?.length > 0);
@@ -53,9 +54,11 @@ const ConnectStrava = () => {
             return;
         }
         if (user?.subscription_status !== 'SUBSCRIBED') {
+            posthog.capture('tried_to_use_premium_feature', { feature: 'Strava' });
             dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Strava' }));
         } else {
             try {
+                posthog.capture('used_premium_feature', { feature: 'Strava', was_trial: false });
                 const redirect_uri = process.env.NODE_ENV === 'development' ? encodeURIComponent("http://localhost:7074/connection/strava") : encodeURIComponent("https://v2api.heysabio.com/connection/strava");
                 const url = `https://www.strava.com/oauth/authorize?response_type=code&client_id=116349&redirect_uri=${redirect_uri}&approval_prompt=auto&scope=activity:read_all&state=${user.id}`;
                 SafariView.show({ url });

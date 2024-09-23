@@ -112,6 +112,7 @@ const EquipmentFacilities = ({ editMode }) => {
               }
               dispatch(updateProfile({ userId: user_state.user.id, data: { equipment_and_facilities: selected.join(',') } }));
               posthog.capture('updated_equipment_facilities', { equipment_facilities: selected });
+              posthog.capture('premium_feature_used', { feature: 'equipment_facilities_update', was_trial: user_state.user?.subscription_status === 'UNSUBSCRIBED' });
               navigation.goBack();
             },
           },

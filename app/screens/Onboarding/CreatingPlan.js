@@ -8,6 +8,7 @@ import mascot from '../../assets/mascot/wave_right.png';
 import { useNavigation } from '@react-navigation/native';
 import call from '../../utils/call';
 import SubHeader from '../../components/shared/SubHeader';
+import { usePostHog } from 'posthog-react-native';
 
 const guidance = [
   'Connect Strava to enhance Sabio',
@@ -73,6 +74,7 @@ const GuidanceText = styled(Animated.Text)`
 `;
 
 const CreatingPlan = () => {
+  const posthog = usePostHog();
   const dispatch = useDispatch();
   const state = useSelector((state) => state.onboarding);
   const user_state = useSelector((state) => state.user);
@@ -124,6 +126,11 @@ const CreatingPlan = () => {
             }
           }, 5000);
         } else {
+          posthog.identify(user_state.user.id, {
+            onboarded: true,
+            plan_length: generatedWeek
+          });
+
           dispatch(setup('CreatingPlan'));
         }
       } catch (error) {

@@ -98,6 +98,7 @@ const Preferences = () => {
                         dispatch(addPreference({ userId: user.id, preference: newPreference }));
                         setNewPreference("");
                         setShowInput(false);
+                        posthog.capture('premium_feature_used', { feature: 'training_preference_add', was_trial: user?.subscription_status === 'UNSUBSCRIBED' });
                         posthog.capture('training_preference_add', { preference: newPreference });
                     },
                 },
@@ -121,6 +122,7 @@ const Preferences = () => {
                         dispatch(updatePreference({ preferenceId, data: { status: "ARCHIVED" } }));
                         setPreferences(preferences.filter(preference => preference.id !== preferenceId));
                         setArchivedPreferences([...archivedPreferences, _preferences.find(preference => preference.id === preferenceId)]);
+                        posthog.capture('premium_feature_used', { feature: 'training_preference_archive', was_trial: user?.subscription_status === 'UNSUBSCRIBED' });
                         posthog.capture('training_preference_archive', { preference: _preferences.find(preference => preference.id === preferenceId).description });
                     },
                 },
@@ -144,6 +146,7 @@ const Preferences = () => {
                         dispatch(updatePreference({ preferenceId, data: { status: "ACTIVE" } }));
                         setArchivedPreferences(archivedPreferences.filter(preference => preference.id !== preferenceId));
                         setPreferences([...preferences, _preferences.find(preference => preference.id === preferenceId)]);
+                        posthog.capture('premium_feature_used', { feature: 'training_preference_restore', was_trial: user?.subscription_status === 'UNSUBSCRIBED' });
                         posthog.capture('training_preference_restore', { preference: _preferences.find(preference => preference.id === preferenceId).description });
                     },
                 },

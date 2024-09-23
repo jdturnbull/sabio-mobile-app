@@ -63,6 +63,7 @@ const View = () => {
     }
 
     // Their account is more than two weeks old, so show the modal
+    posthog.capture('tried_to_use_premium_feature', { feature: 'profile_option_press', option: label });
     dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Profile' }))
   };
 
