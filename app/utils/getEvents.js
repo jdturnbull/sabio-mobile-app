@@ -37,7 +37,6 @@ export default getEvents = async ({ query, country }) => {
     const date_range_string = `${moment.utc().add(2, 'w').format('YYYY-MM-DD')}..${end_date_string}`;
 
     let search_url = new URL('https://api.amp.active.com/v2/search?');
-
     if (query) search_url.searchParams.append('query', query);
     if (country) search_url.searchParams.append('near', country);
     search_url.searchParams.append('radius', 1000);
@@ -45,32 +44,86 @@ export default getEvents = async ({ query, country }) => {
     search_url.searchParams.append('start_date', date_range_string);
     search_url.searchParams.append('api_key', REACT_APP_ACTIVITY_SEARCH_KEY);
 
-    const response = await axios.get(search_url.toString());
+    try {
+        const response = await axios.get(search_url.toString());
 
-    const results = response.data.results.map((result, index) => {
-        return {
-            id: result.assetGuid,
-            name: result.assetName,
-            city: result.place.cityName,
-            country: result.place.countryName,
-            country_code: result.place.countryCode,
-            start: result.activityStartDate,
-            description: getDescription(result.assetDescriptions),
-            type: getType(result.assetAttributes),
-            image_url: getImageUrl(result.assetImages),
-        };
-    });
+        console.log(!!response.data);
 
-    let uniqueResults = [];
-    const seenIds = new Set();
+        const results = response.data.results.map((result, index) => {
+            return {
+                id: result.assetGuid,
+                name: result.assetName,
+                city: result.place.cityName,
+                country: result.place.countryName,
+                country_code: result.place.countryCode,
+                start: result.activityStartDate,
+                description: getDescription(result.assetDescriptions),
+                type: getType(result.assetAttributes),
+                image_url: getImageUrl(result.assetImages),
+            };
+        });
 
-    results.forEach((result) => {
-        if (!seenIds.has(result.id)) {
-            uniqueResults.push(result);
-            seenIds.add(result.id);
+        let uniqueResults = [];
+        const seenIds = new Set();
+
+        results.forEach((result) => {
+            if (!seenIds.has(result.id)) {
+                uniqueResults.push(result);
+                seenIds.add(result.id);
+            }
+        });
+
+        uniqueResults = uniqueResults.filter((e) => e.type !== '' && e.description !== '' && e.image_url !== '');
+        return uniqueResults;
+    } catch (error) {
+        console.log(error);
+
+        if (error.response && error.response.status === 400) {
+            try {
+                // Reconstruct the search URL without the 'near' parameter
+                let search_url_without_near = new URL('https://api.amp.active.com/v2/search?');
+                if (query) search_url_without_near.searchParams.append('query', query);
+                search_url_without_near.searchParams.append('radius', 1000);
+                search_url_without_near.searchParams.append('category', 'Races');
+                search_url_without_near.searchParams.append('start_date', date_range_string);
+                search_url_without_near.searchParams.append('api_key', REACT_APP_ACTIVITY_SEARCH_KEY);
+
+                const response = await axios.get(search_url_without_near.toString());
+
+                console.log(!!response.data);
+
+                const results = response.data.results.map((result, index) => {
+                    return {
+                        id: result.assetGuid,
+                        name: result.assetName,
+                        city: result.place.cityName,
+                        country: result.place.countryName,
+                        country_code: result.place.countryCode,
+                        start: result.activityStartDate,
+                        description: getDescription(result.assetDescriptions),
+                        type: getType(result.assetAttributes),
+                        image_url: getImageUrl(result.assetImages),
+                    };
+                });
+
+                let uniqueResults = [];
+                const seenIds = new Set();
+
+                results.forEach((result) => {
+                    if (!seenIds.has(result.id)) {
+                        uniqueResults.push(result);
+                        seenIds.add(result.id);
+                    }
+                });
+
+                uniqueResults = uniqueResults.filter((e) => e.type !== '' && e.description !== '' && e.image_url !== '');
+                return uniqueResults;
+            } catch (error) {
+                console.log(error);
+                return [];
+            }
         }
-    });
 
-    uniqueResults = uniqueResults.filter((e) => e.type !== '' && e.description !== '' && e.image_url !== '');
-    return uniqueResults;
+        return [];
+    }
 };

@@ -106,9 +106,7 @@ const Post = ({ post, userId, username }) => {
                             {post.author === username ? 'You' : post.author}
                         </UsernameText>
                     </View>
-                    <TimeText>
-                        {time}
-                    </TimeText>
+
                 </Top>
                 <Content>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -124,9 +122,6 @@ const Post = ({ post, userId, username }) => {
                         <View>
                             <View style={{ flex: 1 }} />
                             <TouchableOpacity onPress={handleLike} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <BodyText style={{ fontWeight: 500, marginRight: 5 }}>
-                                    {likeCount === 0 ? null : likeCount}
-                                </BodyText>
                                 <Animated.View style={animatedStyle}>
                                     <Like color={liked ? 'red' : null} />
                                 </Animated.View>

@@ -118,13 +118,6 @@ const SubscriptionModalContent = () => {
     const [selectedOption, setSelectedOption] = useState('Annual');
     const [currency, setCurrency] = useState(getCurrencyFromTimezone(user.timezone));
 
-
-    useEffect(() => {
-        if (showSubscribeModal) {
-            posthog.capture('viewed_subscribe_modal', { source: triggeredFrom });
-        }
-    }, [])
-
     // NOTE: Can use getAvailablePurchases validateReceiptIos to check if the user has an active subscription already
 
     const { getSubscriptions } = useIAP();
