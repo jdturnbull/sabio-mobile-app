@@ -7,6 +7,7 @@ import EquipmentAndFacilities from '../../Onboarding/EquipmentFacilities';
 import PastExperience from '../../Onboarding/RateAbility';
 import Injury from './screens/Injury';
 import ChronicIllness from '../../Onboarding/ChronicIllness';
+import Illness from './screens/Illness';
 import Preferences from './screens/Preferences';
 
 const Container = styled.View`
@@ -14,15 +15,6 @@ const Container = styled.View`
   padding-top: ${(props) => props.active ? '50px' : '0px'};
   background-color: ${(props) => props.theme.colors.background};
 `;
-
-const HeaderView = styled.View`
-  height: 60px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 20px;
-`;
-
 
 const ProfileStack = createStackNavigator();
 
@@ -49,6 +41,9 @@ const Profile = () => {
         </ProfileStack.Screen>
         <ProfileStack.Screen name="Preferences">
           {(props) => <Preferences {...props} editMode={true} />}
+        </ProfileStack.Screen>
+        <ProfileStack.Screen name="Illness">
+          {(props) => <Illness {...props} editMode={true} />}
         </ProfileStack.Screen>
       </ProfileStack.Navigator>
     </Container>

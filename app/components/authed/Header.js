@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { TouchableOpacity, View } from 'react-native';
-import { WalkthroughElement } from 'react-native-walkthrough';
 import Bell from '../../assets/icons/24x/Bell';
 import Account from '../../assets/icons/24x/Account';
 import { useNavigation } from '@react-navigation/native';

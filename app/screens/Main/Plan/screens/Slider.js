@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ScrollView, TouchableOpacity, Dimensions, View, Alert } from 'react-native';
+import { ScrollView, TouchableOpacity, Dimensions, View, Alert, Modal } from 'react-native';
 import styled from 'styled-components';
 import moment from 'moment';
 import ArrowLeft from '../../../../assets/icons/24x/ArrowLeft';
@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateState } from '../../../../stores/user/userSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePostHog } from 'posthog-react-native';
+import PausedModal from '../components/PausedModal';
 
 const Container = styled.View`
   flex: 1;
@@ -65,6 +66,8 @@ const FloatingButton = styled(TouchableOpacity)`
   shadow-radius: 3.84px;
 `;
 
+
+
 const Slider = ({ weeks, handleComplete }) => {
   const posthog = usePostHog();
   const dispatch = useDispatch();
@@ -72,12 +75,14 @@ const Slider = ({ weeks, handleComplete }) => {
   const user = useSelector((state) => state.user?.user);
   const scrollViewRef = useRef(null);
   const [visibleIndex, setVisibleIndex] = useState(0);
+  const [pausedModalVisible, setPausedModalVisible] = useState(user?.account_paused);
 
   const [_weeks, _setWeeks] = useState(weeks);
 
   useEffect(() => {
     _setWeeks(weeks);
   }, [weeks]);
+
 
   useEffect(() => {
     if (_weeks) {
@@ -156,7 +161,6 @@ const Slider = ({ weeks, handleComplete }) => {
     }
   };
 
-
   return (
     <Container>
       <Header>
@@ -185,6 +189,7 @@ const Slider = ({ weeks, handleComplete }) => {
       <FloatingButton onPress={handleChatPress}>
         <Chat color="#FFFFFF" />
       </FloatingButton>
+      <PausedModal modalVisible={pausedModalVisible} setModalVisible={setPausedModalVisible} />
     </Container>
   );
 };

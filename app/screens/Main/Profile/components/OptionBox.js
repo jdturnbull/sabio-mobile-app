@@ -6,7 +6,7 @@ import ArrowRight from '../../../../assets/icons/18x/ArrowRight';
 const Container = styled(TouchableOpacity)`
     border-radius: 10px;
     padding: 10px;
-    background-color: ${(props) => props.theme.colors.background2};
+    background-color: ${(props) => props.highlight ? props.theme.colors.borderHighlight : props.theme.colors.background2};
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -28,7 +28,7 @@ const OptionBox = ({ label, onPress, Icon }) => {
     const handlePress = () => onPress(label);
 
     return (
-        <Container onPress={handlePress}>
+        <Container highlight={label === 'Resume your training'} onPress={handlePress}>
             <LabelText>{label}</LabelText>
             {!Icon ? <ArrowRight /> : <Icon />}
         </Container>

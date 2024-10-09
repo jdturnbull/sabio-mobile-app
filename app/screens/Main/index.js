@@ -14,7 +14,7 @@ import Profile from './Profile';
 
 
 
-const HIDE_HEADER_ROUTES = ['ViewDay', 'EquipmentAndFacilities', 'PastExperience', 'Injuries', 'Medications', 'ChronicIllness', 'Preferences', 'Schedules', 'PlanOverview', 'RearrangeWeek'];
+const HIDE_HEADER_ROUTES = ['ViewDay', 'EquipmentAndFacilities', 'PastExperience', 'Injuries', 'Medications', 'ChronicIllness', 'Preferences', 'Schedules', 'PlanOverview', 'RearrangeWeek', 'Illness'];
 
 const width = Dimensions.get('window').width;
 

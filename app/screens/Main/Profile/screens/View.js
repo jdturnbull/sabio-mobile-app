@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
 import SubHeader from '../../../../components/shared/SubHeader';
 import { ScrollView } from 'react-native';
 import OptionBox from '../components/OptionBox';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Title from '../../../../components/shared/Title';
 import Premium from '../../../../assets/icons/24x/Premium';
 import { useDispatch, useSelector } from 'react-redux';
@@ -41,32 +41,47 @@ const View = () => {
   const posthog = usePostHog();
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const route = useRoute();
+
   const user = useSelector((state) => state.user.user);
+  const isPaused = user?.account_paused; // Directly use Redux state
+
+  const { fromPausedModal } = route.params || {};
+
+  console.log(isPaused);
+
+  useEffect(() => {
+    if (fromPausedModal) {
+      navigation.navigate('Illness', {
+        fromPausedModal
+      });
+    }
+  }, [fromPausedModal]);
 
   const handlePress = (label) => {
+    if (label === 'Report an illness' || label === 'Resume your training') {
+      navigation.navigate('Illness');
+      return;
+    }
+
     const route = navigationMap[label];
-    // If the user is subscribed, navigate to the route
     if (user?.subscription_status === 'SUBSCRIBED') {
       posthog.capture('profile_option_pressed', { option: label });
       navigation.navigate(route);
       return;
     }
 
-    // They are not subscribed, so check if their account is more than two weeks old
     const accountMoreThanTwoWeeksOld = moment().isAfter(moment(user?.created_at).add(2, 'weeks'));
 
-    // If their account is less than two weeks old, allow them to change the activities
     if (!accountMoreThanTwoWeeksOld) {
       posthog.capture('profile_option_pressed', { option: label });
       navigation.navigate(route);
       return;
     }
 
-    // Their account is more than two weeks old, so show the modal
     posthog.capture('tried_to_use_premium_feature', { feature: 'profile_option_press', option: label });
-    dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Profile' }))
+    dispatch(updateState({ showSubscribeModal: true, subscribeModalTriggeredFrom: 'Profile' }));
   };
-
 
   return (
     <Container>
@@ -80,6 +95,7 @@ const View = () => {
         <OptionBox label={'Equipment and facilities'} onPress={handlePress} value={''} />
         <OptionBox label={'Current ability'} onPress={handlePress} value={''} />
         <OptionBox label={'Report an injury'} onPress={handlePress} value={''} />
+        <OptionBox label={isPaused ? 'Resume your training' : 'Report an illness'} onPress={handlePress} value={''} />
         <OptionBox label={'Chronic conditions'} onPress={handlePress} value={''} />
         <OptionBox label={'Training preferences'} onPress={handlePress} value={''} />
       </OptionsContainer>

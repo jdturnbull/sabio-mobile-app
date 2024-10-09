@@ -16,6 +16,7 @@ const guidance = [
   'Adjust your profile to further personalise your plan on the go',
   'Chat with Sabio for additional guidance',
   'Reorganise your week with a simple drag and drop',
+  'If you report an illness, Sabio will pause your training and replan for you',
   'Complete weekly checkins to let Sabio know if anything needs changing',
   "Like other's activities to give them a motivational boost!",
   "Check out the plan overview to see what you'll be doing during your training",

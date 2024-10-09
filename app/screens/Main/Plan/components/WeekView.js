@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
 import DayItem from './DayItem';
-import { ScrollView, ActivityIndicator, View } from 'react-native';
+import { ScrollView, ActivityIndicator, View, TouchableOpacity } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import PlanScreenOptions from './PlanScreenOptions';
 import SabioMessage from './SabioMessage';
@@ -59,6 +59,8 @@ const WeekView = ({ week, handleComplete }) => {
       opacity: opacity.value,
     };
   });
+
+  const handlePausePress = () => { };
 
   if (loading) {
     return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

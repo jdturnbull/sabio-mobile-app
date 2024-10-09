@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { TouchableWithoutFeedback, Keyboard, TouchableOpacity, View } from 'react-native';
+import { TouchableWithoutFeedback, Keyboard, TouchableOpacity, View, Alert } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Title from '../../components/shared/Title';
 import CustomInput from '../../components/shared/CustomInput';
@@ -53,8 +53,15 @@ const ChronicIllness = ({ editMode }) => {
   const handleSubmit = async () => {
     const chronicConditions = selected.map((condition) => ({
       name: condition,
-      details: details[condition] || '',
+      details: details[condition] || null,
     }));
+
+    // Check if any details are null
+    const hasNullDetails = chronicConditions.some((condition) => condition.details === null);
+    if (hasNullDetails) {
+      Alert.alert('Please provide details for all conditions.');
+      return;
+    }
 
     if (editMode) {
       posthog.capture('updated_chronic_conditions', { chronic_conditions: chronicConditions });
@@ -99,9 +106,10 @@ const ChronicIllness = ({ editMode }) => {
                 <SelectableItem onPress={() => handleSelect(opt)} label={opt} selected={selected.includes(opt)} />
                 {selected.includes(opt) && (
                   <CustomInput
-                    label={`Details for ${opt}`}
-                    placeholder={`Enter details for ${opt}`}
+                    label={`How does this affect you?`}
+                    placeholder={`To help Sabio optimise your plan, tell us the effect this condition has on you.`}
                     value={details[opt] || ''}
+                    multiline={true}
                     setValue={(value) => handleDetailChange(opt, value)}
                   />
                 )}
